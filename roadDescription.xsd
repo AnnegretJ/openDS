@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema targetNamespace="http://opends.eu/roadDescription"
+elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://opends.eu/roadDescription">
+              
+    <xs:element name="roadDescription" type="roadDescriptionType">
+    </xs:element>
+
+
+    <xs:complexType name="roadDescriptionType">
+        <xs:all>
+        	<xs:element name="terrain" type="terrainType" maxOccurs="1"
+        		minOccurs="1">
+        	</xs:element>
+
+        	<xs:element name="segments" type="segmentsType" maxOccurs="1"
+        		minOccurs="1">
+        	</xs:element>
+        	<xs:element name="intersections" type="intersectionsType"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+
+        	<xs:element name="traffic" type="trafficType" maxOccurs="1"
+        		minOccurs="1">
+        	</xs:element>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="terrainType">
+        <xs:all>
+    		<xs:element name="extent" type="extentType" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    		
+    		<xs:element name="heightMap" type="heightMapType"
+    			maxOccurs="1" minOccurs="1">
+    		</xs:element>
+    		<xs:element name="roadStartingPoint" type="roadStartingPointType" maxOccurs="1" minOccurs="1"></xs:element>
+    	</xs:all>
+    </xs:complexType>
+
+	<xs:complexType name="roadStartingPointType">
+    	<xs:attribute name="x" type="xs:float"></xs:attribute>
+    	<xs:attribute name="z" type="xs:float"></xs:attribute>
+  	 </xs:complexType>
+    	
+   
+
+
+    <xs:complexType name="segmentsType">
+    	<xs:sequence>
+    		<xs:element name="segment" type="segmentType" maxOccurs="unbounded" minOccurs="1"></xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="segmentType">
+        <xs:all>
+        	<xs:element name="geometries" type="geometriesType"
+        		maxOccurs="1" minOccurs="1">
+        	</xs:element>
+            <xs:element name="laneLayout" type="laneLayoutType" maxOccurs="1" minOccurs="0">
+        	</xs:element>
+            <xs:element name="surface" type="surfaceType" maxOccurs="1" minOccurs="0">
+            </xs:element>
+            <xs:element name="successor" type="successorType" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>                    </xs:all>
+        
+    	<xs:attribute name="id" type="xs:string"></xs:attribute>
+    	<xs:attribute name="initial" type="xs:boolean"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="laneLayoutType">
+        <xs:all>
+        	<xs:element name="noOfLanes" type="xs:int" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="laneWidth" type="xs:float" maxOccurs="1" minOccurs="0"></xs:element>
+        	<xs:element name="speedLimit" type="xs:float" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="speedLimitOppositeDirection"
+        		type="xs:float" maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="geometryType">
+    	<xs:attribute name="length" type="xs:float"></xs:attribute>
+    	<xs:attribute name="curvature" type="xs:float"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="intersectionsType">
+    	<xs:sequence>
+    		<xs:element name="intersection" type="intersectionType" maxOccurs="unbounded" minOccurs="0"></xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="intersectionType">
+    	<xs:sequence>
+    		<xs:element name="outgoingSegment" type="outgoingSegmentType"
+    			maxOccurs="3" minOccurs="2">
+    		</xs:element>
+    	</xs:sequence>
+
+    	<xs:attribute name="id" type="xs:string"></xs:attribute>
+    	<xs:attribute name="type" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="incomingSegmentType">
+    	<xs:attribute name="ref" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="outgoingSegmentType">
+    	<xs:attribute name="ref" type="xs:string"></xs:attribute>
+    	<xs:attribute name="degree">
+    		<xs:simpleType>
+    			<xs:restriction base="xs:string">
+    				<xs:enumeration value="-90"></xs:enumeration>
+    				<xs:enumeration value="0"></xs:enumeration>
+    				<xs:enumeration value="90"></xs:enumeration>
+    			</xs:restriction>
+    		</xs:simpleType>
+    	</xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="successorType">
+        <xs:choice>
+    		<xs:element name="segment" type="successorSegmentType"></xs:element>
+    		<xs:element name="intersection"
+    			type="successorIntersectionType">
+    		</xs:element>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="successorSegmentType">
+    	<xs:attribute name="ref" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="successorIntersectionType">
+    	<xs:attribute name="ref" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="heightMapType">
+    	<xs:attribute name="path" type="xs:string"></xs:attribute>
+    	<xs:attribute name="resolution" type="xs:int"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="extentType">
+    	<xs:attribute name="length" type="xs:float"></xs:attribute>
+    	<xs:attribute name="width" type="xs:float"></xs:attribute>
+    	<xs:attribute name="maxHeight" type="xs:float"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="geometriesType">
+    	<xs:sequence>
+    		<xs:element name="geometry" type="geometryType" maxOccurs="unbounded"
+    			minOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="surfaceType">
+    	<xs:sequence>
+    		<xs:element name="friction" type="xs:float" maxOccurs="1" minOccurs="0"></xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="trafficType">
+        <xs:all>
+        	<xs:element name="codriver" type="codriverType"
+        		maxOccurs="1" minOccurs="1">
+        	</xs:element>
+        	<xs:element name="vehicles" type="vehiclesType"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="pedestrians" type="pedestriansType"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="codriverType">
+        <xs:all>
+        	<xs:element name="startPosition" type="onroadPositionType"
+        		maxOccurs="1" minOccurs="1">
+        	</xs:element>
+        	<xs:element name="preferredConnections"
+        		type="preferredConnectionsType" maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="targetPosition" type="onroadPositionType"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="terminateSimulation"
+        		type="terminateSimulationType" maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="onroadPositionType">
+    	<xs:attribute name="segment" type="xs:string"></xs:attribute>
+    	<xs:attribute name="lane" type="xs:int"></xs:attribute>
+    	<xs:attribute name="s" type="xs:float"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="preferredConnectionsType">
+    	<xs:sequence>
+    		<xs:element name="connection" type="connectionType"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="connectionType">
+    	<xs:attribute name="intersectionID" type="xs:string"></xs:attribute>
+    	<xs:attribute name="from" type="xs:string"></xs:attribute>
+    	<xs:attribute name="to" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="vehiclesType">
+    	<xs:sequence>
+    		<xs:element name="vehicle" type="vehicleType"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="vehicleType">
+        <xs:all>
+    		<xs:element name="maxSpeed" type="xs:float" maxOccurs="1" minOccurs="0">
+    		</xs:element>
+    		<xs:element name="startPosition" type="onroadPositionType" maxOccurs="1" minOccurs="1">
+    		</xs:element>
+    		<xs:element name="preferredConnections" type="preferredConnectionsType" maxOccurs="1" minOccurs="0">
+    		</xs:element>
+    	</xs:all>
+    	<xs:attribute name="id" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="pedestriansType">
+    	<xs:sequence>
+    		<xs:element name="pedestrian" type="pedestrianType"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="pedestrianType">
+        <xs:all>
+    		<xs:element name="startPosition"
+    			type="offroadPositionType" maxOccurs="1" minOccurs="1">
+    		</xs:element>
+    		<xs:element name="targets" type="targetsType" maxOccurs="1"
+    			minOccurs="1">
+    		</xs:element>
+    		<xs:element name="triggerPosition" type="onroadPositionType"
+    			maxOccurs="1" minOccurs="0">
+    		</xs:element>
+        </xs:all>
+    	<xs:attribute name="id" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="offroadPositionType">
+    	<xs:attribute name="segment" type="xs:string"></xs:attribute>
+    	<xs:attribute name="lateralOffset" type="xs:float"></xs:attribute>
+    	<xs:attribute name="s" type="xs:float"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="targetsType">
+    	<xs:sequence>
+    		<xs:element name="target" type="targetType" maxOccurs="unbounded" minOccurs="1"></xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="targetType">
+    	<xs:attribute name="lateralOffset" type="xs:float"></xs:attribute>
+    	<xs:attribute name="s" type="xs:float"></xs:attribute>
+    	<xs:attribute name="speed" type="xs:float"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="terminateSimulationType">
+    	<xs:attribute name="onTargetPositionReached"
+    		type="xs:boolean">
+    	</xs:attribute>
+    	<xs:attribute name="onRoadEndReached" type="xs:boolean"></xs:attribute>
+    </xs:complexType>
+</xs:schema>

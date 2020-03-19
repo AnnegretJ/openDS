@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interaction xmlns="http://opends.eu/drivingtask/interaction"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://opends.eu/drivingtask/interaction ../../Schema/interaction.xsd">
+
+	<activities>
+	</activities>
+	
+	<triggers>
+		<trigger id="start_pedestrian01" priority="1">
+			<activities>
+				<activity id="start_pedestrian01">
+					<action id="moveTraffic" delay="0" repeat="0">
+						<parameter name="trafficObjectID" value="pedestrian01" />
+						<parameter name="enabled" value="true" />
+					</action>
+				</activity>
+			</activities>
+			<condition>
+				<openDrivePos>
+					<roadID>s000</roadID>
+					<lane>-1</lane>
+					<s>85.0</s>
+				</openDrivePos>
+			</condition>
+		</trigger>
+		<trigger id="shutDownOnTargetPosition" priority="1">
+			<activities>
+				<activity id="shutDownOnTargetPosition">
+					<action id="shutDownSimulation" delay="0" repeat="0">
+					</action>
+				</activity>
+			</activities>
+			<condition>
+				<openDrivePos>
+					<roadID>s000</roadID>
+					<lane>-1</lane>
+					<s>340.0</s>
+				</openDrivePos>
+			</condition>
+		</trigger>
+	</triggers>
+	
+</interaction>

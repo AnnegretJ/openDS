@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<roadDescription xmlns="http://opends.eu/roadDescription"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://opends.eu/roadDescription roadDescription.xsd">
+
+    <terrain>
+	    <extent length="200" width="200" maxHeight="30" />		
+		<heightMap path="../../heightmaps/heightmap_512_002.raw" resolution="512"/>
+		<roadStartingPoint x="500" z="500" />
+    </terrain>
+    
+            
+    <segments>
+    	<segment id="s000" initial="true">
+    		<geometries>
+    			<geometry length="80" curvature="0" />
+			</geometries>
+			<successor>
+				<intersection ref="i000" />
+			</successor>
+			<laneLayout>
+				<noOfLanes>2</noOfLanes>
+				<laneWidth>2.60</laneWidth>
+				<speedLimit>70</speedLimit>
+				<speedLimitOppositeDirection>70</speedLimitOppositeDirection>
+			</laneLayout>
+    	</segment>
+		<segment id="s001" initial="false">
+    		<geometries>
+				<geometry length="100" curvature="0" />
+			</geometries>
+			<laneLayout>
+				<noOfLanes>2</noOfLanes>
+				<laneWidth>2.60</laneWidth>
+				<speedLimit>70</speedLimit>
+				<speedLimitOppositeDirection>70</speedLimitOppositeDirection>
+			</laneLayout>
+    	</segment>
+		<segment id="s002" initial="false">
+    		<geometries>
+				<geometry length="150" curvature="0" />
+			</geometries>
+			<laneLayout>
+				<noOfLanes>2</noOfLanes>
+				<laneWidth>2.60</laneWidth>
+				<speedLimit>70</speedLimit>
+				<speedLimitOppositeDirection>70</speedLimitOppositeDirection>
+			</laneLayout>
+    	</segment>
+		<segment id="s003" initial="false">
+    		<geometries>
+				<geometry length="150" curvature="0" />
+			</geometries>
+			<laneLayout>
+				<noOfLanes>2</noOfLanes>
+				<laneWidth>2.60</laneWidth>
+				<speedLimit>70</speedLimit>
+				<speedLimitOppositeDirection>70</speedLimitOppositeDirection>
+			</laneLayout>
+    	</segment>
+    </segments>
+
+	<intersections>
+    	<intersection id="i000" type="crossing">
+    		<outgoingSegment ref="s001" degree="-90"/>
+			<outgoingSegment ref="s002" degree="0"/>
+			<outgoingSegment ref="s003" degree="90" /> 
+    	</intersection>
+    </intersections>
+	
+	<traffic>
+		<codriver>
+			<startPosition segment="s000" lane="-1" s="10" />
+			<preferredConnections>
+        		<connection intersectionID="i000" from="s000" to="s002" />
+        	</preferredConnections>
+			<targetPosition segment="s002" lane="-1" s="30"/>
+			<terminateSimulation onTargetPositionReached="true" onRoadEndReached="true" />
+		</codriver>
+		<vehicles>
+			<vehicle id="car01">
+				<maxSpeed>45</maxSpeed>
+				<startPosition segment="s001" lane="1" s="50" />
+				<preferredConnections>
+					<connection intersectionID="i000" from="s001" to="s003" />
+				</preferredConnections>
+			</vehicle>
+			<vehicle id="car02">
+				<maxSpeed>70</maxSpeed>
+				<startPosition segment="s003" lane="1" s="35" />
+				<preferredConnections>
+					<connection intersectionID="i000" from="s003" to="s001" />
+				</preferredConnections>
+			</vehicle>
+		</vehicles>
+	</traffic>
+    
+    
+</roadDescription>

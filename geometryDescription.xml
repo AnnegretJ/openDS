@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<geometryDescription xmlns="http://opends.eu/geometryDescription"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://opends.eu/geometryDescription geometryDescription.xsd">
+          
+    <road id="road1">
+    	<start x="0" y="0" hdg="0" />
+    	<geometries>
+    		<line length="100" />
+    		<spiral length="50" curvStart="0" curvEnd="0.01" />
+    		<arc length="50" curvature="0.01" />
+    		<spiral length="50" curvStart="0.01" curvEnd="-0.01" />
+			<arc length="50" curvature="-0.01" />
+			<spiral length="50" curvStart="-0.01" curvEnd="0.0" />
+			<line length="100" />
+    	</geometries>
+    	<noOfLanes>2</noOfLanes>
+    	<width>6.50</width>
+    	<speedLimit>100</speedLimit>
+    </road>  
+    
+</geometryDescription>

@@ -1,0 +1,1 @@
+https://github.com/bubblecloud/jme3-open-asset-pack/tree/master/src/main/resources/character/human/female

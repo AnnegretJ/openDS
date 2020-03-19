@@ -1,0 +1,8 @@
+<#ftl output_format="XML" auto_esc=false>
+<?xml version="1.0" standalone="yes"?>
+<OpenDRIVE>
+    <header revMajor="1" revMinor="1" name="openDrive" version="1.00" date="${creationDateTime}" north="1.9000000000000000e+03" south="-1.1500000000000000e+03" east="3.3000000000000000e+03" west="-4.8000000000000000e+02">
+    </header>
+${roads}
+${junctions}
+</OpenDRIVE>

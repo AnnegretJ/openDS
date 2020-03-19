@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="buildAll" name="Build OpenDS release">
+    <!--ANT 1.7 is required--> 
+    
+	<property name="version" value="4.9_2019-10-01" />	
+	
+    <property name="root.dir" value="." />
+	<property name="src.dir" value="${root.dir}/src" />
+    <property name="bin.dir" value="${root.dir}/bin" />
+	<property name="doc.dir" value="${root.dir}/doc" />
+    <property name="lib.dir" value="${root.dir}/lib" />
+	<property name="log.dir" value="${root.dir}/log" />
+	<property name="tools.dir" value="${root.dir}/tools" />
+    <property name="assets.dir" value="${root.dir}/assets" />
+	
+	<property name="target.lib.name" value="lib" />
+	<property name="simulator.jar.name" value="OpenDS.jar" />
+	<property name="analyzer.jar.name" value="Analyzer.jar" />
+	<property name="geometryGenerator.jar.name" value="GeometryGenerator.jar" />
+	<property name="roadGenerator.jar.name" value="RoadGenerator.jar" />
+	
+	<property name="classpath" value=". ${target.lib.name}/mysql-connector-java-5.1.18-bin.jar ${target.lib.name}/com.springsource.org.jaxen-1.1.1.jar ${target.lib.name}/com.springsource.org.jdom-1.1.0.jar ${target.lib.name}/j2ee-1.4.jar ${target.lib.name}/jaxdomBundle.jar ${target.lib.name}/jaxen.jar ${target.lib.name}/jdom.jar ${target.lib.name}/CarOntology.jar ${target.lib.name}/KAPcomConnector.jar ${target.lib.name}/NetMessageProtocol.jar ${target.lib.name}/jasperreports/ant-1.7.1.jar ${target.lib.name}/jasperreports/antlr-2.7.5.jar ${target.lib.name}/jasperreports/barbecue-1.5-beta1.jar ${target.lib.name}/jasperreports/barcode4j-2.0.jar ${target.lib.name}/jasperreports/batik-anim.jar ${target.lib.name}/jasperreports/batik-awt-util.jar ${target.lib.name}/jasperreports/batik-bridge.jar ${target.lib.name}/jasperreports/batik-css.jar ${target.lib.name}/jasperreports/batik-dom.jar ${target.lib.name}/jasperreports/batik-ext.jar ${target.lib.name}/jasperreports/batik-gvt.jar ${target.lib.name}/jasperreports/batik-parser.jar ${target.lib.name}/jasperreports/batik-script.jar ${target.lib.name}/jasperreports/batik-svg-dom.jar ${target.lib.name}/jasperreports/batik-svggen.jar ${target.lib.name}/jasperreports/batik-util.jar ${target.lib.name}/jasperreports/batik-xml.jar ${target.lib.name}/jasperreports/bcel-5.2.jar ${target.lib.name}/jasperreports/bsh-2.0b4.jar ${target.lib.name}/jasperreports/castor-1.2.jar ${target.lib.name}/jasperreports/commons-beanutils-1.8.0.jar ${target.lib.name}/jasperreports/commons-collections-2.1.1.jar ${target.lib.name}/jasperreports/commons-digester-1.7.jar ${target.lib.name}/jasperreports/commons-javaflow-20060411.jar ${target.lib.name}/jasperreports/commons-logging-1.0.4.jar ${target.lib.name}/jasperreports/dom4j-1.6.1.jar ${target.lib.name}/jasperreports/groovy-all-1.7.5.jar ${target.lib.name}/jasperreports/hibernate3.jar ${target.lib.name}/jasperreports/hsqldb-1.8.0-10.jar ${target.lib.name}/jasperreports/iText-2.1.7.jar ${target.lib.name}/jasperreports/jackson-core-lgpl-1.7.4.jar ${target.lib.name}/jasperreports/jackson-mapper-lgpl-1.7.4.jar ${target.lib.name}/jasperreports/jasperreports-4.1.3.jar ${target.lib.name}/jasperreports/jasperreports-chart-themes-4.1.3.jar ${target.lib.name}/jasperreports/jaxen-1.1.1.jar ${target.lib.name}/jasperreports/jcommon-1.0.15.jar ${target.lib.name}/jasperreports/jdt-compiler-3.1.1.jar ${target.lib.name}/jasperreports/jfreechart-1.0.12.jar ${target.lib.name}/jasperreports/jpa.jar ${target.lib.name}/jasperreports/jxl-2.6.10.jar ${target.lib.name}/jasperreports/log4j-1.2.15.jar ${target.lib.name}/jasperreports/mondrian-3.1.1.12687.jar ${target.lib.name}/jasperreports/png-encoder-1.5.jar ${target.lib.name}/jasperreports/poi-3.7-20101029.jar ${target.lib.name}/jasperreports/poi-ooxml-3.7-20101029.jar ${target.lib.name}/jasperreports/poi-ooxml-schemas-3.7-20101029.jar ${target.lib.name}/jasperreports/servlet.jar ${target.lib.name}/jasperreports/saaj-api-1.3.jar ${target.lib.name}/jasperreports/xml-apis.jar ${target.lib.name}/jasperreports/serializer.jar ${target.lib.name}/jasperreports/spring-beans-2.5.5.jar ${target.lib.name}/jasperreports/spring-core-2.5.5.jar ${target.lib.name}/jasperreports/SteeringDeviationTheme.jar ${target.lib.name}/jasperreports/velocity-1.7-dep.jar ${target.lib.name}/jasperreports/xalan-2.7.1.jar ${target.lib.name}/jasperreports/xbean.jar ${target.lib.name}/jasperreports/xml-apis-ext.jar ${target.lib.name}/jme3.1/core-0.27.jar ${target.lib.name}/jme3.1/dense64-0.27.jar ${target.lib.name}/jme3.1/denseC64-0.27.jar ${target.lib.name}/jme3.1/eventbus.jar ${target.lib.name}/jme3.1/gluegen-rt-2.3.1-natives-linux-amd64.jar ${target.lib.name}/jme3.1/gluegen-rt-2.3.1-natives-linux-armv6.jar ${target.lib.name}/jme3.1/gluegen-rt-2.3.1-natives-linux-armv6hf.jar ${target.lib.name}/jme3.1/gluegen-rt-2.3.1-natives-linux-i586.jar ${target.lib.name}/jme3.1/gluegen-rt-2.3.1-natives-macosx-universal.jar ${target.lib.name}/jme3.1/gluegen-rt-2.3.1-natives-solaris-amd64.jar ${target.lib.name}/jme3.1/gluegen-rt-2.3.1-natives-solaris-i586.jar ${target.lib.name}/jme3.1/gluegen-rt-2.3.1-natives-windows-amd64.jar ${target.lib.name}/jme3.1/gluegen-rt-2.3.1-natives-windows-i586.jar ${target.lib.name}/jme3.1/gluegen-rt-2.3.1.jar ${target.lib.name}/jme3.1/gluegen-rt-main-2.3.1.jar ${target.lib.name}/jme3.1/j-ogg-all-1.0.0.jar ${target.lib.name}/jme3.1/jbullet.jar ${target.lib.name}/jme3.1/jglfont-core_1.3.jar ${target.lib.name}/jme3.1/jinput-2.0.5.jar ${target.lib.name}/jme3.1/jinput-platform-2.0.5-natives-linux.jar ${target.lib.name}/jme3.1/jinput-platform-2.0.5-natives-osx.jar ${target.lib.name}/jme3.1/jinput-platform-2.0.5-natives-windows.jar ${target.lib.name}/jme3.1/jme3-android-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-android-native-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-blender-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-core-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-desktop-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-effects-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-ios-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-jbullet-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-jogg-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-jogl-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-lwjgl-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-networking-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-niftygui-3.0.jar ${target.lib.name}/jme3.1/jme3-plugins-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/jme3-terrain-3.1.0-alpha1.jar ${target.lib.name}/jme3.1/joal-2.3.1-natives-linux-amd64.jar ${target.lib.name}/jme3.1/joal-2.3.1-natives-linux-armv6.jar ${target.lib.name}/jme3.1/joal-2.3.1-natives-linux-armv6hf.jar ${target.lib.name}/jme3.1/joal-2.3.1-natives-linux-i586.jar ${target.lib.name}/jme3.1/joal-2.3.1-natives-macosx-universal.jar ${target.lib.name}/jme3.1/joal-2.3.1-natives-solaris-amd64.jar ${target.lib.name}/jme3.1/joal-2.3.1-natives-solaris-i586.jar ${target.lib.name}/jme3.1/joal-2.3.1-natives-windows-amd64.jar ${target.lib.name}/jme3.1/joal-2.3.1-natives-windows-i586.jar ${target.lib.name}/jme3.1/joal-2.3.1.jar ${target.lib.name}/jme3.1/joal-main-2.3.1.jar ${target.lib.name}/jme3.1/jogl-all-2.3.1-natives-linux-amd64.jar ${target.lib.name}/jme3.1/jogl-all-2.3.1-natives-linux-armv6.jar ${target.lib.name}/jme3.1/jogl-all-2.3.1-natives-linux-armv6hf.jar ${target.lib.name}/jme3.1/jogl-all-2.3.1-natives-linux-i586.jar ${target.lib.name}/jme3.1/jogl-all-2.3.1-natives-macosx-universal.jar ${target.lib.name}/jme3.1/jogl-all-2.3.1-natives-solaris-amd64.jar ${target.lib.name}/jme3.1/jogl-all-2.3.1-natives-solaris-i586.jar ${target.lib.name}/jme3.1/jogl-all-2.3.1-natives-windows-amd64.jar ${target.lib.name}/jme3.1/jogl-all-2.3.1-natives-windows-i586.jar ${target.lib.name}/jme3.1/jogl-all-2.3.1.jar ${target.lib.name}/jme3.1/jogl-all-main-2.3.1.jar ${target.lib.name}/jme3.1/jsr305-2.0.2.jar ${target.lib.name}/jme3.1/jutils-1.0.0.jar ${target.lib.name}/jme3.1/lwjgl-2.9.3.jar ${target.lib.name}/jme3.1/lwjgl-platform-2.9.3-natives-linux.jar ${target.lib.name}/jme3.1/lwjgl-platform-2.9.3-natives-osx.jar ${target.lib.name}/jme3.1/lwjgl-platform-2.9.3-natives-windows.jar ${target.lib.name}/jme3.1/nifty-1.3.3.jar ${target.lib.name}/jme3.1/nifty-default-controls-1.3.3.jar ${target.lib.name}/jme3.1/nifty-style-black-1.3.3.jar ${target.lib.name}/jme3.1/proguard.jar ${target.lib.name}/jme3.1/retrace.jar ${target.lib.name}/jme3.1/simple-0.27.jar ${target.lib.name}/jme3.1/stack-alloc.jar ${target.lib.name}/jme3.1/vecmath-1.3.1.jar ${target.lib.name}/jme3.1/xmlpull-xpp3.jar ${target.lib.name}/Jama-1.0.3.jar ${target.lib.name}/commons-codec-1.4.jar ${target.lib.name}/contre.jar ${target.lib.name}/eyetracker.jar ${target.lib.name}/oculus.jar ${target.lib.name}/tvpt.jar ${target.lib.name}/ffjoystick.jar ${target.lib.name}/simphynity.jar ${target.lib.name}/oculusrift/jna-4.1.0.jar ${target.lib.name}/oculusrift/jovr-0.3.2.2.jar ${target.lib.name}/java_websocket.jar ${target.lib.name}/jfx-1.dev.47488-09-06_144536-2.jar ${target.lib.name}/freemarker.jar ${target.lib.name}/jna-4.4.0.jar"/>
+	
+	
+	<target name="buildAll" depends="clean,create_all_jars,create_java_doc" description="Build whole project"/>
+	<target name="buildExecutable" depends="clean,create_all_jars" description="Build whole project except Java Docs"/>
+	
+	
+	<!--====================-->
+	<!-- CLEAN UP           -->
+	<!--====================-->
+	
+    <target name="clean" description="Clean up">
+		<delete includeemptydirs="true"><fileset dir="analyzerData" erroronmissingdir="false" /></delete>
+		<delete includeemptydirs="true"><fileset dir="${bin.dir}" erroronmissingdir="false" /></delete>
+		<delete includeemptydirs="true"><fileset dir="${doc.dir}" erroronmissingdir="false" /></delete>
+		<delete includeemptydirs="true"><fileset dir="${log.dir}" erroronmissingdir="false" /></delete>
+		<delete includeemptydirs="true"><fileset dir="openDRIVEData" erroronmissingdir="false" /></delete>
+
+		<delete><fileset dir="${root.dir}" includes="*" excludes="README.txt .classpath .project geometryDescription.xml geometryDescription.xsd roadDescription.xml roadDescription.xsd start.bat startProperties.properties scenarioMsg.properties build.xml conf.json"/></delete>
+
+		<delete includeemptydirs="true"><fileset dir="${tools.dir}/multidriver_server/bin" erroronmissingdir="false" /></delete>
+		<delete file="${tools.dir}/multidriver_server/multidriver_server.jar"/>
+		<delete includeemptydirs="true"><fileset dir="${tools.dir}/settingscontroller_client/bin" erroronmissingdir="false" /></delete>
+		<delete file="${tools.dir}/settingscontroller_client/settingscontroller_client.jar"/>
+    </target>	
+
+        
+	
+	<!--====================-->
+	<!-- BUILD CLASS FILES  -->
+	<!--====================-->
+	
+	<target name="build_main" description="Build main class files">
+		<mkdir dir="${bin.dir}"/>
+	  	<javac includeantruntime="false" srcdir="${src.dir}" destdir="${bin.dir}" compiler="javac1.7">
+	  		<compilerarg value="-Xlint:deprecation"/> 
+			<classpath>
+				<fileset dir="${lib.dir}" includes="*.jar"/>
+				<fileset dir="${lib.dir}/jme3.1" includes="*.jar"/>
+				<fileset dir="${lib.dir}/jasperreports" includes="*.jar"/>
+				<fileset dir="${lib.dir}/oculusrift" includes="*.jar"/>
+			</classpath>
+	  	</javac>
+	</target>
+
+	
+	<target name="build_tools" depends="build_main" description="Build tools class files">
+		<mkdir dir="${tools.dir}/multidriver_server/bin"/>
+		<javac includeantruntime="false" srcdir="${tools.dir}/multidriver_server/src" destdir="${tools.dir}/multidriver_server/bin" compiler="javac1.7" />	 
+		
+		<mkdir dir="${tools.dir}/settingscontroller_client/bin"/>
+		<javac includeantruntime="false" srcdir="${tools.dir}/settingscontroller_client/src" destdir="${tools.dir}/settingscontroller_client/bin" compiler="javac1.7" />
+	</target>
+
+	
+	
+	<!--====================-->
+	<!-- CREATE JAR FILES   -->
+	<!--====================-->
+	
+	<target name="create_all_jars" depends="create_main_jars,create_tools_jars" description="Create all jar files"/>
+	
+	
+    <target name="create_main_jars" depends="build_main">
+        <jar destfile="${root.dir}/${simulator.jar.name}">
+            <manifest>
+                <attribute name="Main-Class" value="eu.opends.main.Simulator"/>
+                <attribute name="Class-Path" value="${classpath}"/>
+            </manifest>
+            <fileset dir="${bin.dir}"/>
+            <fileset file="${assets.dir}/JasperReports/log4j/log4j.properties"/>
+            <fileset file="${assets.dir}/Textures/Logo/OpenDS.png"/>
+        </jar>
+
+        <jar destfile="${root.dir}/${analyzer.jar.name}">
+            <manifest>
+                <attribute name="Main-Class" value="eu.opends.main.DriveAnalyzer"/>
+            	<attribute name="Class-Path" value="${classpath}"/>
+            </manifest>
+            <fileset dir="${bin.dir}"/>
+            <fileset file="${assets.dir}/JasperReports/log4j/log4j.properties"/>
+            <fileset file="${assets.dir}/Textures/Logo/OpenDS.png"/>
+        </jar>
+        
+    	<jar destfile="${root.dir}/${geometryGenerator.jar.name}">
+    	    <manifest>
+    	        <attribute name="Main-Class" value="eu.opends.opendrive.GeometryGenerator"/>
+    	    	<attribute name="Class-Path" value="${classpath}"/>
+    	    </manifest>
+    	    <fileset dir="${bin.dir}"/>
+    	    <fileset file="${assets.dir}/JasperReports/log4j/log4j.properties"/>
+    	    <fileset file="${assets.dir}/Textures/Logo/OpenDS.png"/>
+		</jar>
+            
+        <jar destfile="${root.dir}/${roadGenerator.jar.name}">
+        	<manifest>
+        	    <attribute name="Main-Class" value="eu.opends.opendrive.RoadGenerator"/>
+        	 	<attribute name="Class-Path" value="${classpath}"/>
+        	</manifest>
+        	<fileset dir="${bin.dir}"/>
+        	<fileset file="${assets.dir}/JasperReports/log4j/log4j.properties"/>
+        	<fileset file="${assets.dir}/Textures/Logo/OpenDS.png"/>
+    	</jar>
+    </target>
+				
+	
+    <target name="create_tools_jars" depends="build_tools">
+    	<jar destfile="${tools.dir}/multidriver_server/multidriver_server.jar">
+    		<manifest>
+    			<attribute name="Main-Class" value="MultiDriverServer"/>
+    			<attribute name="Class-Path" value="."/>
+    		</manifest>
+    		<fileset dir="${tools.dir}/multidriver_server/bin"/>
+    	</jar>
+    	
+    	<jar destfile="${tools.dir}/settingscontroller_client/settingscontroller_client.jar">
+    		<manifest>
+    			<attribute name="Main-Class" value="SettingsControllerClient"/>
+    			<attribute name="Class-Path" value="."/>
+    		</manifest>
+    		<fileset dir="${tools.dir}/settingscontroller_client/bin"/>
+    	</jar>
+    </target>
+	
+
+	
+	<!--====================-->
+	<!-- CREATE JAVA DOC    -->
+	<!--====================-->
+				
+	<target name="create_java_doc">
+		<javadoc packagenames="eu.opends.*"
+	           sourcepath="${src.dir}"
+	           destdir="${doc.dir}"
+	           author="true"
+	           version="true"
+	           use="true"
+	           windowtitle="OpenDS ${version}">
+			<classpath>
+				<fileset dir="${lib.dir}" includes="*.jar"/>
+				<fileset dir="${lib.dir}/jme3.1" includes="*.jar"/>
+				<fileset dir="${lib.dir}/jasperreports" includes="*.jar"/>
+				<fileset dir="${lib.dir}/oculusrift" includes="*.jar"/>
+			</classpath>
+	    	<doctitle><![CDATA[<h1>OpenDS ${version}</h1>]]></doctitle>
+	    	<bottom><![CDATA[<i>Copyright &#169; 2016 OpenDS. <a href="http://opends.eu" target="_blank">http://opends.eu</a></i>]]></bottom>
+	  	</javadoc>
+	</target>
+	
+	
+	
+	<!--====================-->
+	<!-- ZIP FOLDER         -->
+	<!--====================-->
+		
+	<target name="zip">
+		<zip destfile="OpenDS_${version}.zip" basedir="${root.dir}" update="true"/>
+	</target>
+
+</project>

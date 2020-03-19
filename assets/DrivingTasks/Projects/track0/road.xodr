@@ -1,0 +1,377 @@
+<?xml version="1.0" standalone="yes"?>
+<OpenDRIVE>
+    <header revMajor="1" revMinor="1" name="openDrive" version="1.00" date="2019-03-20_14-31-41" north="1.9000000000000000e+03" south="-1.1500000000000000e+03" east="3.3000000000000000e+03" west="-4.8000000000000000e+02">
+    </header>
+    <road name="s000" length="3107.171939" id="12" junction="-1">
+        <link>
+
+	
+        </link>
+        <planView>
+
+            <geometry s="0.0" x="0.0" y="0.0" hdg="0.0" length="100.0">
+				<line/>
+			</geometry>
+     
+  	<geometry s="100.000000" x="100.000000" y="0.000000" hdg="0.000000" length="46.579470">
+				<arc curvature="-0.033723"/>
+			</geometry>
+    
+  	<geometry s="146.579470" x="129.653412" y="-29.653412" hdg="-1.570796" length="76.000000">
+				<arc curvature="0.041219"/>
+			</geometry>
+    
+  	<geometry s="222.579470" x="178.173915" y="-29.870767" hdg="1.561837" length="0.416698">
+				<arc curvature="0.021501"/>
+			</geometry>
+    
+  	<geometry s="222.996168" x="178.175782" y="-29.454074" hdg="1.570796" length="15.000000">
+				<arc curvature="-0.022013"/>
+			</geometry>
+    
+  	<geometry s="237.996168" x="180.629799" y="-14.725158" hdg="1.240605" length="16.690782">
+				<arc curvature="0.019783"/>
+			</geometry>
+    
+  	<geometry s="254.686949" x="183.360431" y="1.663983" hdg="1.570796" length="76.983876">
+				<arc curvature="-0.040808"/>
+			</geometry>
+    
+  	<geometry s="331.670825" x="232.369888" y="1.663983" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.039903"/>
+			</geometry>
+    
+  	<geometry s="331.670825" x="232.369888" y="1.663983" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.038634"/>
+			</geometry>
+    
+  	<geometry s="331.670825" x="232.369888" y="1.663983" hdg="-1.570796" length="13.000000">
+				<arc curvature="0.012046"/>
+			</geometry>
+    
+  	<geometry s="344.670825" x="233.385687" y="-11.282950" hdg="-1.414200" length="8.134719">
+				<arc curvature="-0.019250"/>
+			</geometry>
+    
+  	<geometry s="352.805544" x="234.021321" y="-19.384462" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.021950"/>
+			</geometry>
+    
+  	<geometry s="352.805544" x="234.021321" y="-19.384462" hdg="-1.570796" length="5.000000">
+				<arc curvature="0.009081"/>
+			</geometry>
+    
+  	<geometry s="357.805544" x="234.134811" y="-24.382744" hdg="-1.525392" length="1.492418">
+				<arc curvature="-0.030423"/>
+			</geometry>
+    
+  	<geometry s="359.297962" x="234.168686" y="-25.874650" hdg="-1.570796" length="130.000000">
+				<arc curvature="0.014631"/>
+			</geometry>
+    
+  	<geometry s="489.297962" x="324.744684" y="-90.505704" hdg="0.331264" length="26.000000">
+				<arc curvature="0.047237"/>
+			</geometry>
+    
+  	<geometry s="515.297962" x="339.027991" y="-70.727560" hdg="1.559419" length="130.000000">
+				<arc curvature="-0.023559"/>
+			</geometry>
+    
+  	<geometry s="645.297962" x="423.821558" y="-68.345833" hdg="-1.503257" length="101.000000">
+				<arc curvature="0.008814"/>
+			</geometry>
+    
+  	<geometry s="746.297962" x="471.741997" y="-153.483742" hdg="-0.613015" length="46.463578">
+				<arc curvature="0.047001"/>
+			</geometry>
+    
+  	<geometry s="792.761540" x="505.259432" y="-136.081440" hdg="1.570796" length="85.168311">
+				<arc curvature="-0.036887"/>
+			</geometry>
+    
+  	<geometry s="877.929851" x="559.479263" y="-136.081440" hdg="-1.570796" length="137.000000">
+				<arc curvature="0.005431"/>
+			</geometry>
+    
+  	<geometry s="1014.929851" x="608.141828" y="-260.784090" hdg="-0.826687" length="143.000000">
+				<arc curvature="0.007198"/>
+			</geometry>
+    
+  	<geometry s="1157.929851" x="738.308207" y="-302.768539" hdg="0.202668" length="80.000000">
+				<arc curvature="-0.004156"/>
+			</geometry>
+    
+  	<geometry s="1237.929851" x="817.887434" y="-299.866986" hdg="-0.129778" length="22.000000">
+				<arc curvature="-0.020761"/>
+			</geometry>
+    
+  	<geometry s="1259.929851" x="838.312812" y="-307.512108" hdg="-0.586527" length="70.000000">
+				<arc curvature="0.005854"/>
+			</geometry>
+    
+  	<geometry s="1329.929851" x="902.823169" y="-333.400894" hdg="-0.176747" length="98.497024">
+				<arc curvature="-0.014153"/>
+			</geometry>
+    
+  	<geometry s="1428.426876" x="961.055309" y="-402.955477" hdg="-1.570796" length="108.000000">
+				<arc curvature="0.003466"/>
+			</geometry>
+    
+  	<geometry s="1536.426876" x="981.036812" y="-508.450208" hdg="-1.196416" length="6.000000">
+				<arc curvature="0.040222"/>
+			</geometry>
+    
+  	<geometry s="1542.426876" x="983.880334" y="-513.717086" hdg="-0.955084" length="59.000000">
+				<arc curvature="0.025400"/>
+			</geometry>
+    
+  	<geometry s="1601.426876" x="1036.380772" y="-524.676218" hdg="0.543507" length="65.000000">
+				<arc curvature="0.009608"/>
+			</geometry>
+    
+  	<geometry s="1666.426876" x="1078.308758" y="-476.390555" hdg="1.168004" length="72.000000">
+				<arc curvature="-0.019103"/>
+			</geometry>
+    
+  	<geometry s="1738.426876" x="1137.247299" y="-445.685480" hdg="-0.207443" length="46.007046">
+				<arc curvature="-0.029634"/>
+			</geometry>
+    
+  	<geometry s="1784.433922" x="1164.042638" y="-478.707501" hdg="-1.570796" length="80.000000">
+				<arc curvature="0.007560"/>
+			</geometry>
+    
+  	<geometry s="1864.433922" x="1187.506987" y="-553.918463" hdg="-0.965973" length="103.000000">
+				<arc curvature="0.009956"/>
+			</geometry>
+    
+  	<geometry s="1967.433922" x="1276.103606" y="-597.067794" hdg="0.059535" length="34.063253">
+				<arc curvature="-0.047862"/>
+			</geometry>
+    
+  	<geometry s="2001.497175" x="1298.240221" y="-617.924225" hdg="-1.570796" length="-0.000000">
+				<arc curvature="-0.026723"/>
+			</geometry>
+    
+  	<geometry s="2001.497175" x="1298.240221" y="-617.924225" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.042214"/>
+			</geometry>
+    
+  	<geometry s="2001.497175" x="1298.240221" y="-617.924225" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.046471"/>
+			</geometry>
+    
+  	<geometry s="2001.497175" x="1298.240221" y="-617.924225" hdg="-1.570796" length="43.000000">
+				<arc curvature="0.027409"/>
+			</geometry>
+    
+  	<geometry s="2044.497175" x="1320.778826" y="-651.638529" hdg="-0.392231" length="29.000000">
+				<arc curvature="0.035612"/>
+			</geometry>
+    
+  	<geometry s="2073.497175" x="1348.293716" y="-648.205015" hdg="0.640522" length="6.000000">
+				<arc curvature="-0.006045"/>
+			</geometry>
+    
+  	<geometry s="2079.497175" x="1353.168380" y="-644.707344" hdg="0.604254" length="43.618713">
+				<arc curvature="0.022159"/>
+			</geometry>
+    
+  	<geometry s="2123.115888" x="1372.657248" y="-607.569831" hdg="1.570796" length="0.000000">
+				<arc curvature="0.032248"/>
+			</geometry>
+    
+  	<geometry s="2123.115888" x="1372.657248" y="-607.569831" hdg="1.570796" length="53.000000">
+				<arc curvature="-0.035420"/>
+			</geometry>
+    
+  	<geometry s="2176.115888" x="1409.407313" y="-580.652506" hdg="-0.306457" length="34.000000">
+				<arc curvature="-0.032365"/>
+			</geometry>
+    
+  	<geometry s="2210.115888" x="1430.569271" y="-605.068227" hdg="-1.406876" length="137.000000">
+				<arc curvature="0.002593"/>
+			</geometry>
+    
+  	<geometry s="2347.115888" x="1476.211164" y="-733.479024" hdg="-1.051697" length="36.000000">
+				<arc curvature="-0.009268"/>
+			</geometry>
+    
+  	<geometry s="2383.115888" x="1488.574573" y="-767.111846" hdg="-1.385362" length="8.651625">
+				<arc curvature="-0.021433"/>
+			</geometry>
+    
+  	<geometry s="2391.767513" x="1489.374430" y="-775.713974" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.002305"/>
+			</geometry>
+    
+  	<geometry s="2391.767513" x="1489.374430" y="-775.713974" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.025543"/>
+			</geometry>
+    
+  	<geometry s="2391.767513" x="1489.374430" y="-775.713974" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.046552"/>
+			</geometry>
+    
+  	<geometry s="2391.767513" x="1489.374430" y="-775.713974" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.020508"/>
+			</geometry>
+    
+  	<geometry s="2391.767513" x="1489.374430" y="-775.713974" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.044110"/>
+			</geometry>
+    
+  	<geometry s="2391.767513" x="1489.374430" y="-775.713974" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.045291"/>
+			</geometry>
+    
+  	<geometry s="2391.767513" x="1489.374430" y="-775.713974" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.049817"/>
+			</geometry>
+    
+  	<geometry s="2391.767513" x="1489.374430" y="-775.713974" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.039208"/>
+			</geometry>
+    
+  	<geometry s="2391.767513" x="1489.374430" y="-775.713974" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.022664"/>
+			</geometry>
+    
+  	<geometry s="2391.767513" x="1489.374430" y="-775.713974" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.032734"/>
+			</geometry>
+    
+  	<geometry s="2391.767513" x="1489.374430" y="-775.713974" hdg="-1.570796" length="69.377718">
+				<arc curvature="0.045282"/>
+			</geometry>
+    
+  	<geometry s="2461.145230" x="1533.541657" y="-775.713974" hdg="1.570796" length="0.000000">
+				<arc curvature="0.017268"/>
+			</geometry>
+    
+  	<geometry s="2461.145230" x="1533.541657" y="-775.713974" hdg="1.570796" length="75.501191">
+				<arc curvature="-0.041610"/>
+			</geometry>
+    
+  	<geometry s="2536.646421" x="1581.607208" y="-775.713974" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.014959"/>
+			</geometry>
+    
+  	<geometry s="2536.646421" x="1581.607208" y="-775.713974" hdg="-1.570796" length="117.000000">
+				<arc curvature="0.005077"/>
+			</geometry>
+    
+  	<geometry s="2653.646421" x="1615.348894" y="-885.953005" hdg="-0.976750" length="27.000000">
+				<arc curvature="-0.003416"/>
+			</geometry>
+    
+  	<geometry s="2680.646421" x="1629.408667" y="-908.992233" hdg="-1.068993" length="11.942829">
+				<arc curvature="-0.042017"/>
+			</geometry>
+    
+  	<geometry s="2692.589250" x="1632.342791" y="-920.440121" hdg="-1.570796" length="0.000000">
+				<arc curvature="-0.046966"/>
+			</geometry>
+    
+  	<geometry s="2692.589250" x="1632.342791" y="-920.440121" hdg="-1.570796" length="71.470717">
+				<arc curvature="0.043956"/>
+			</geometry>
+    
+  	<geometry s="2764.059967" x="1677.842463" y="-920.440121" hdg="1.570796" length="42.000000">
+				<arc curvature="-0.006214"/>
+			</geometry>
+    
+  	<geometry s="2806.059967" x="1683.292348" y="-878.915334" hdg="1.309800" length="7.391316">
+				<arc curvature="0.035311"/>
+			</geometry>
+    
+  	<geometry s="2813.451283" x="1684.251440" y="-871.607648" hdg="1.570796" length="0.000000">
+				<arc curvature="0.044793"/>
+			</geometry>
+    
+  	<geometry s="2813.451283" x="1684.251440" y="-871.607648" hdg="1.570796" length="28.000000">
+				<arc curvature="-0.006507"/>
+			</geometry>
+    
+  	<geometry s="2841.451283" x="1686.795220" y="-843.762313" hdg="1.388594" length="35.000000">
+				<arc curvature="-0.014391"/>
+			</geometry>
+    
+  	<geometry s="2876.451283" x="1701.359160" y="-812.342395" hdg="0.884909" length="21.720656">
+				<arc curvature="0.031578"/>
+			</geometry>
+    
+  	<geometry s="2898.171939" x="1708.520638" y="-792.285175" hdg="1.570796" length="59.000000">
+				<arc curvature="-0.006237"/>
+			</geometry>
+    
+  	<geometry s="2957.171939" x="1719.253546" y="-734.607573" hdg="1.202836" length="50.000000">
+				<arc curvature="0.004972"/>
+			</geometry>
+    
+    <geometry s="3007.171939" x="1731.285199" y="-686.209331" hdg="1.451441" length="100">
+				<line/>
+			</geometry>
+         </planView>
+        <elevationProfile>
+            <elevation s="0.0000000000000000e+00" a="9.5000000000000000e+00" b="0.0000000000000000e+00" c="0.0000000000000000e+00" d="0.0000000000000000e+00"/>
+        </elevationProfile>
+        <lateralProfile>
+        </lateralProfile>
+        <lanes>
+            <laneSection s="0.0000000000000000e+00">
+                <left>
+                    <lane id="2" type="border" level= "false">
+                        <link>
+							<predecessor id="2"/>
+							<successor id="2"/>
+                        </link>
+                        <width sOffset="0.0000000000000000e+00" a="1.5000000000000000e+00" b="0.0000000000000000e+00" c="0.0000000000000000e+00" d="0.0000000000000000e+00"/>
+                        <roadMark sOffset="0.0000000000000000e+00" type="none" weight="standard" color="standard" width="1.3000000000000000e-01"/>
+                    </lane>
+                    <lane id="1" type="driving" level= "false">
+                        <link>
+							<predecessor id="1"/>
+							<successor id="1"/>
+                        </link>
+                        <width sOffset="0.0000000000000000e+00" a="3.0" b="0.0000000000000000e+00" c="0.0000000000000000e+00" d="0.0000000000000000e+00"/>
+                        <roadMark sOffset="0.0000000000000000e+00" type="solid" weight="standard" color="standard" width="1.3000000000000000e-01"/>
+                        <speed sOffset="0.0000000000000000e+00" max="70.0" unit="km/h" />
+                    </lane>
+                </left>
+                <center>
+                    <lane id="0" type="driving" level= "false">
+                        <link>
+                        </link>
+                        <roadMark sOffset="0.0000000000000000e+00" type="broken" weight="standard" color="standard" width="1.3000000000000000e-01"/>
+                    </lane>
+                </center>
+                <right>
+                    <lane id="-1" type="driving" level= "false">
+                        <link>
+							<predecessor id="-1"/>
+							<successor id="-1"/>
+                        </link>
+                        <width sOffset="0.0000000000000000e+00" a="3.0" b="0.0000000000000000e+00" c="0.0000000000000000e+00" d="0.0000000000000000e+00"/>
+                        <roadMark sOffset="0.0000000000000000e+00" type="solid" weight="standard" color="standard" width="1.3000000000000000e-01"/>
+                        <speed sOffset="0.0000000000000000e+00" max="70.0" unit="km/h" />
+                    </lane>
+                    <lane id="-2" type="border" level= "false">
+                        <link>
+							<predecessor id="-2"/>
+							<successor id="-2"/>
+                        </link>
+                        <width sOffset="0.0000000000000000e+00" a="1.5000000000000000e+00" b="0.0000000000000000e+00" c="0.0000000000000000e+00" d="0.0000000000000000e+00"/>
+                        <roadMark sOffset="0.0000000000000000e+00" type="none" weight="standard" color="standard" width="1.3000000000000000e-01"/>
+                    </lane>
+                </right>
+            </laneSection>
+        </lanes>
+        <objects>
+        </objects>
+        <signals>
+        </signals>
+    </road>
+
+
+</OpenDRIVE>

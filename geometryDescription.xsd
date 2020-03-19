@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema targetNamespace="http://opends.eu/geometryDescription" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:geometryDescription="http://opends.eu/geometryDescription">
+              
+    <xs:element name="geometryDescription" type="geometryDescription:geometryDescription">
+    </xs:element>
+
+
+    <xs:complexType name="geometryDescription">
+        <xs:all>
+    		<xs:element name="road" type="geometryDescription:road" maxOccurs="1" minOccurs="1"></xs:element>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="road">
+    	<xs:all>
+    		<xs:element name="start" type="geometryDescription:startType" maxOccurs="1" minOccurs="0"></xs:element>
+    		<xs:element name="geometries"
+    			type="geometryDescription:geometriesType">
+    		</xs:element>
+    		<xs:element name="noOfLanes" type="xs:int"></xs:element>
+    		<xs:element name="width" type="xs:double"></xs:element>
+    		<xs:element name="speedLimit" type="xs:double"></xs:element>
+    	</xs:all>
+    	<xs:attribute name="id" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+
+    <xs:complexType name="geometriesType">
+    	<xs:choice minOccurs="1" maxOccurs="unbounded">
+    		<xs:element name="line" type="geometryDescription:lineType"></xs:element>
+    		<xs:element name="spiral" type="geometryDescription:spiralType"></xs:element>
+    		<xs:element name="arc" type="geometryDescription:arcType"></xs:element>
+    	</xs:choice>
+    </xs:complexType>
+    
+    <xs:complexType name="lineType">
+    	<xs:attribute name="length" type="xs:double"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="spiralType">
+    	<xs:attribute name="length" type="xs:double"></xs:attribute>
+    	<xs:attribute name="curvStart" type="xs:double"></xs:attribute>
+    	<xs:attribute name="curvEnd" type="xs:double"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="arcType">
+    	<xs:attribute name="length" type="xs:double"></xs:attribute>
+    	<xs:attribute name="curvature" type="xs:double"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="startType">
+    	<xs:attribute name="x" type="xs:double"></xs:attribute>
+    	<xs:attribute name="y" type="xs:double"></xs:attribute>
+    	<xs:attribute name="hdg" type="xs:double"></xs:attribute>
+    </xs:complexType>
+</xs:schema>

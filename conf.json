@@ -1,0 +1,55 @@
+{
+	"Communication" : {
+		"MyIP" : "127.0.0.1",
+		"InIP" : "0.0.0.0",
+		"Port" : 30000
+	},
+	"ScreenPrint":{
+		"Comments":" ",
+		"ID":true,
+		"VLgtFild":true,
+		"J0":true,
+		"Jdelta0":true,
+		"manType":true
+	},
+	"Internal" :{
+		"AccWeight" : 0.4,
+		"ActionSelectionMechanism" : 0,
+		"useLRM" : 0,
+		"exportTrajectory" : 0,
+		"followPathEnable" : 0,
+		"timeLateralSalience" : 4
+	},
+	"LogicalReasoning" :{
+		"test" :  10
+	},
+	"ActionSelection" :{
+		"wLl": 11.0,
+    "wLc": 5.0,
+    "wLr": 10.0,
+    "wA": 5.0,
+    "wD": 10.0,
+    "wThrsh": 0.001,
+    "forgFactor": 2
+	},
+	"Log":{
+		"scenario": true,
+		"manoeuvre": true,
+		"lrm": false,
+		"asm": false
+	},
+	"LowLevelParameters":{
+		"Comb": 0,
+		"Lat":  6,
+		"Long": 2,
+		"Parameters": {
+			"steerGain": 65.0,
+			"maxSteer" :100.0,
+			"longGain" :  2.0,
+			"maxAcc"   :  1.0,
+			"minAcc"   :  4.0,
+			"velReset" : 0.01,
+			"enableReset" : true
+		}
+	}
+}

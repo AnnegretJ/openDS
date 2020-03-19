@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenario xmlns="http://opends.eu/drivingtask/scenario"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://opends.eu/drivingtask/scenario ../../Schema/scenario.xsd">
+        
+    <environment>
+       	<weather>
+            <snowingPercentage>-1</snowingPercentage>
+       		<rainingPercentage>-1</rainingPercentage>
+       		<fogPercentage>-1</fogPercentage>
+       	</weather>
+    </environment>
+		
+    <driver>
+        <car id="" ref="driverCar">
+        	<tires>
+        		<type>winter</type>
+        		<size>16</size>
+        	</tires>
+        	<engine>
+        		<engineOn>true</engineOn>
+        		<minSpeed>0</minSpeed>
+				<maxSpeed>180</maxSpeed>
+				<acceleration>3.3</acceleration>
+				<minRPM>750</minRPM>
+				<maxRPM>7500</maxRPM>
+        	</engine>
+        	<light>
+        		<intensity>0.0</intensity>
+        	</light>
+        	<transmission>
+        		<automatic>true</automatic>
+        		<reverse>3.182</reverse>
+        		<forward>
+	       			<vector jtype="java_lang_Float" size="6">
+						<entry>3.615</entry>
+						<entry>1.955</entry>
+						<entry>1.281</entry>
+						<entry>0.973</entry>
+						<entry>0.778</entry>
+						<entry>0.646</entry>
+					</vector>
+				</forward>
+        	</transmission>
+        	<suspension>
+				<stiffness>120</stiffness>
+				<compression>0.2</compression>
+				<damping>0.3</damping>
+        	</suspension>
+        	<wheel>
+        		<frictionSlip>50</frictionSlip>
+        	</wheel>
+        	<brake>
+        		<decelerationFreeWheel>2.0</decelerationFreeWheel>
+        		<decelerationBrake>8.7</decelerationBrake>
+        	</brake>
+        </car>
+		<openDrive>
+			<startRoadID>s000</startRoadID>
+			<startLane>-1</startLane>
+			<startS>20.0</startS>
+		</openDrive>
+    </driver>
+        
+    <traffic>
+		<ODvehicle id="car01">
+			<modelPath>Models/Cars/drivingCars/bmw1/Car.j3o</modelPath>
+			<mass>800</mass>
+			<acceleration>3.3</acceleration>
+			<decelerationBrake>8.7</decelerationBrake>
+			<decelerationFreeWheel>2.0</decelerationFreeWheel>
+			<engineOn>true</engineOn>
+			<distanceFromPath>5.0</distanceFromPath>
+			<maxSpeed>29.0</maxSpeed>
+			<neverFasterThanSteeringCar>false</neverFasterThanSteeringCar>
+			<startRoadID>s000</startRoadID>
+			<startLane>1</startLane>
+			<startS>335.0</startS>
+		</ODvehicle>
+		<pedestrian id="pedestrian01">
+			<modelPath>Models/Humans/female/female.scene</modelPath>
+			<mass>5</mass>
+			<animationStand>Stand</animationStand>
+			<animationWalk>WalkBaked</animationWalk>
+			<scale>0.9</scale>
+			<minDistanceFromPath>1.0</minDistanceFromPath>
+			<maxDistanceFromPath>1.1</maxDistanceFromPath>
+			<startWayPoint>pedestrian01_startWP</startWayPoint>
+			<enabled>false</enabled>
+			<resetWhenStuck>false</resetWhenStuck>
+		</pedestrian>
+
+    </traffic>
+        
+    <road>
+		<wayPoints debug="false" alignToTerrain="true">
+			<wayPoint id="pedestrian01_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-243.0</entry><entry>0.0</entry><entry>98.46488</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_1"><translation><vector jtype="java_lang_Float" size="3"><entry>-242.0</entry><entry>0.0</entry><entry>98.46488</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_2"><translation><vector jtype="java_lang_Float" size="3"><entry>-241.0</entry><entry>0.0</entry><entry>98.46489</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_3"><translation><vector jtype="java_lang_Float" size="3"><entry>-240.0</entry><entry>0.0</entry><entry>98.46489</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_4"><translation><vector jtype="java_lang_Float" size="3"><entry>-239.0</entry><entry>0.0</entry><entry>98.46489</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_5"><translation><vector jtype="java_lang_Float" size="3"><entry>-238.0</entry><entry>0.0</entry><entry>98.4649</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_6"><translation><vector jtype="java_lang_Float" size="3"><entry>-237.0</entry><entry>0.0</entry><entry>98.4649</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_7"><translation><vector jtype="java_lang_Float" size="3"><entry>-236.0</entry><entry>0.0</entry><entry>98.4649</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_8"><translation><vector jtype="java_lang_Float" size="3"><entry>-235.0</entry><entry>0.0</entry><entry>98.464905</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_9"><translation><vector jtype="java_lang_Float" size="3"><entry>-234.0</entry><entry>0.0</entry><entry>98.464905</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_10"><translation><vector jtype="java_lang_Float" size="3"><entry>-233.0</entry><entry>0.0</entry><entry>98.46491</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_11"><translation><vector jtype="java_lang_Float" size="3"><entry>-232.0</entry><entry>0.0</entry><entry>98.46491</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_12"><translation><vector jtype="java_lang_Float" size="3"><entry>-231.0</entry><entry>0.0</entry><entry>98.46491</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_13"><translation><vector jtype="java_lang_Float" size="3"><entry>-230.0</entry><entry>0.0</entry><entry>98.46492</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_14"><translation><vector jtype="java_lang_Float" size="3"><entry>-229.0</entry><entry>0.0</entry><entry>98.46492</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_15"><translation><vector jtype="java_lang_Float" size="3"><entry>-228.0</entry><entry>0.0</entry><entry>98.46492</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_16"><translation><vector jtype="java_lang_Float" size="3"><entry>-227.0</entry><entry>0.0</entry><entry>98.46493</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_17"><translation><vector jtype="java_lang_Float" size="3"><entry>-226.0</entry><entry>0.0</entry><entry>98.46493</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_18"><translation><vector jtype="java_lang_Float" size="3"><entry>-225.0</entry><entry>0.0</entry><entry>98.46493</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_19"><translation><vector jtype="java_lang_Float" size="3"><entry>-224.0</entry><entry>0.0</entry><entry>98.464935</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_20"><translation><vector jtype="java_lang_Float" size="3"><entry>-223.0</entry><entry>0.0</entry><entry>98.464935</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_21"><translation><vector jtype="java_lang_Float" size="3"><entry>-222.0</entry><entry>0.0</entry><entry>98.464935</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_22"><translation><vector jtype="java_lang_Float" size="3"><entry>-221.0</entry><entry>0.0</entry><entry>98.46494</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_23"><translation><vector jtype="java_lang_Float" size="3"><entry>-220.0</entry><entry>0.0</entry><entry>98.46494</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_24"><translation><vector jtype="java_lang_Float" size="3"><entry>-219.0</entry><entry>0.0</entry><entry>98.46494</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_25"><translation><vector jtype="java_lang_Float" size="3"><entry>-218.0</entry><entry>0.0</entry><entry>98.46495</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_26"><translation><vector jtype="java_lang_Float" size="3"><entry>-217.0</entry><entry>0.0</entry><entry>98.46495</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_27"><translation><vector jtype="java_lang_Float" size="3"><entry>-216.0</entry><entry>0.0</entry><entry>98.46495</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_28"><translation><vector jtype="java_lang_Float" size="3"><entry>-215.0</entry><entry>0.0</entry><entry>98.46496</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_29"><translation><vector jtype="java_lang_Float" size="3"><entry>-214.0</entry><entry>0.0</entry><entry>98.46496</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_30"><translation><vector jtype="java_lang_Float" size="3"><entry>-213.0</entry><entry>0.0</entry><entry>98.46496</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_31"><translation><vector jtype="java_lang_Float" size="3"><entry>-212.0</entry><entry>0.0</entry><entry>98.464966</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_32"><translation><vector jtype="java_lang_Float" size="3"><entry>-211.0</entry><entry>0.0</entry><entry>98.464966</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_33"><translation><vector jtype="java_lang_Float" size="3"><entry>-210.0</entry><entry>0.0</entry><entry>98.46497</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_34"><translation><vector jtype="java_lang_Float" size="3"><entry>-209.0</entry><entry>0.0</entry><entry>98.46497</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_35"><translation><vector jtype="java_lang_Float" size="3"><entry>-208.0</entry><entry>0.0</entry><entry>98.46497</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_36"><translation><vector jtype="java_lang_Float" size="3"><entry>-207.0</entry><entry>0.0</entry><entry>98.46498</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_37"><translation><vector jtype="java_lang_Float" size="3"><entry>-206.0</entry><entry>0.0</entry><entry>98.46498</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_38"><translation><vector jtype="java_lang_Float" size="3"><entry>-205.0</entry><entry>0.0</entry><entry>98.46498</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_39"><translation><vector jtype="java_lang_Float" size="3"><entry>-204.0</entry><entry>0.0</entry><entry>98.46499</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_40"><translation><vector jtype="java_lang_Float" size="3"><entry>-203.0</entry><entry>0.0</entry><entry>98.46499</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_41"><translation><vector jtype="java_lang_Float" size="3"><entry>-202.0</entry><entry>0.0</entry><entry>98.46499</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_42"><translation><vector jtype="java_lang_Float" size="3"><entry>-201.0</entry><entry>0.0</entry><entry>98.465</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_target_1_43"><translation><vector jtype="java_lang_Float" size="3"><entry>-200.01</entry><entry>0.0</entry><entry>98.465</entry></vector></translation></wayPoint>
+		</wayPoints>
+		<segments debug="false">
+			<segment id="Segment_pedestrian01_1"><from>pedestrian01_startWP</from><to>pedestrian01_target_1_1</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_2"><from>pedestrian01_target_1_1</from><to>pedestrian01_target_1_2</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_3"><from>pedestrian01_target_1_2</from><to>pedestrian01_target_1_3</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_4"><from>pedestrian01_target_1_3</from><to>pedestrian01_target_1_4</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_5"><from>pedestrian01_target_1_4</from><to>pedestrian01_target_1_5</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_6"><from>pedestrian01_target_1_5</from><to>pedestrian01_target_1_6</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_7"><from>pedestrian01_target_1_6</from><to>pedestrian01_target_1_7</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_8"><from>pedestrian01_target_1_7</from><to>pedestrian01_target_1_8</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_9"><from>pedestrian01_target_1_8</from><to>pedestrian01_target_1_9</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_10"><from>pedestrian01_target_1_9</from><to>pedestrian01_target_1_10</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_11"><from>pedestrian01_target_1_10</from><to>pedestrian01_target_1_11</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_12"><from>pedestrian01_target_1_11</from><to>pedestrian01_target_1_12</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_13"><from>pedestrian01_target_1_12</from><to>pedestrian01_target_1_13</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_14"><from>pedestrian01_target_1_13</from><to>pedestrian01_target_1_14</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_15"><from>pedestrian01_target_1_14</from><to>pedestrian01_target_1_15</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_16"><from>pedestrian01_target_1_15</from><to>pedestrian01_target_1_16</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_17"><from>pedestrian01_target_1_16</from><to>pedestrian01_target_1_17</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_18"><from>pedestrian01_target_1_17</from><to>pedestrian01_target_1_18</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_19"><from>pedestrian01_target_1_18</from><to>pedestrian01_target_1_19</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_20"><from>pedestrian01_target_1_19</from><to>pedestrian01_target_1_20</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_21"><from>pedestrian01_target_1_20</from><to>pedestrian01_target_1_21</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_22"><from>pedestrian01_target_1_21</from><to>pedestrian01_target_1_22</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_23"><from>pedestrian01_target_1_22</from><to>pedestrian01_target_1_23</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_24"><from>pedestrian01_target_1_23</from><to>pedestrian01_target_1_24</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_25"><from>pedestrian01_target_1_24</from><to>pedestrian01_target_1_25</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_26"><from>pedestrian01_target_1_25</from><to>pedestrian01_target_1_26</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_27"><from>pedestrian01_target_1_26</from><to>pedestrian01_target_1_27</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_28"><from>pedestrian01_target_1_27</from><to>pedestrian01_target_1_28</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_29"><from>pedestrian01_target_1_28</from><to>pedestrian01_target_1_29</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_30"><from>pedestrian01_target_1_29</from><to>pedestrian01_target_1_30</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_31"><from>pedestrian01_target_1_30</from><to>pedestrian01_target_1_31</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_32"><from>pedestrian01_target_1_31</from><to>pedestrian01_target_1_32</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_33"><from>pedestrian01_target_1_32</from><to>pedestrian01_target_1_33</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_34"><from>pedestrian01_target_1_33</from><to>pedestrian01_target_1_34</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_35"><from>pedestrian01_target_1_34</from><to>pedestrian01_target_1_35</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_36"><from>pedestrian01_target_1_35</from><to>pedestrian01_target_1_36</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_37"><from>pedestrian01_target_1_36</from><to>pedestrian01_target_1_37</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_38"><from>pedestrian01_target_1_37</from><to>pedestrian01_target_1_38</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_39"><from>pedestrian01_target_1_38</from><to>pedestrian01_target_1_39</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_40"><from>pedestrian01_target_1_39</from><to>pedestrian01_target_1_40</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_41"><from>pedestrian01_target_1_40</from><to>pedestrian01_target_1_41</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_42"><from>pedestrian01_target_1_41</from><to>pedestrian01_target_1_42</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_43"><from>pedestrian01_target_1_42</from><to>pedestrian01_target_1_43</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+		</segments>
+
+    </road>
+
+
+     
+</scenario>
