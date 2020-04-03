@@ -219,9 +219,9 @@ public class APIData
 		{
 			value = openDSGaugeCenter.getOilPressureLight();
 		}
-		else if(var.equals(AdressTable.interior_cockpit_dashboard_tyrePressureLight))
+		else if(var.equals(AdressTable.interior_cockpit_dashboard_tirePressureLight))
 		{
-			value = openDSGaugeCenter.getTyrePressureLight();
+			value = openDSGaugeCenter.getTirePressureLight();
 		}
 		else if(var.equals(AdressTable.interior_cockpit_dashboard_batteryLight))
 		{
@@ -290,12 +290,10 @@ public class APIData
 		}
 		else if(var.equals(AdressTable.interior_cockpit_autoPilot_state))
 		{
-			// TODO (Doku) Possible Options: "on" or "off" or "control" or "none";
         	value = openDSGaugeCenter.getAutoPilotIndicator();
 		}
 		else if(var.equals(AdressTable.interior_cockpit_cruiseControl_state))
 		{
-        	// TODO (Doku) Possible Options: "cruise" or "limit" or "none";
             value = openDSGaugeCenter.getCruiseControlLight();	
 		}
 		else if(var.equals(AdressTable.interior_navigationImage))
@@ -339,7 +337,7 @@ public class APIData
 		}
 		else if(var.equals(AdressTable.exterior_lights_fogLightEnabled))
 		{
-			value = openDSGaugeCenter.getfogBeam();
+			value = openDSGaugeCenter.getFogLight();
 		}
 		else if(var.equals(AdressTable.exterior_lights_hasRearFogLight))
 		{
@@ -347,7 +345,7 @@ public class APIData
 		}
 		else if(var.equals(AdressTable.exterior_lights_rearFogLightEnabled))
 		{
-			value = openDSGaugeCenter.getRearFogBeam();
+			value = openDSGaugeCenter.getRearFogLight();
 		}
 		else if(var.equals(AdressTable.exterior_gearUnit_numForwardGears))
 		{

@@ -27,11 +27,11 @@ public class OpenDSGaugeCenter
 	private String seatBeltInPlace = "true";
 	private String checkLight = "false";
 	private String oilPressureLight = "false";
-	private String tyrePressureLight = "false";
+	private String tirePressureLight = "false";
 	private String cruiseControlLight = "none";
 	private String batteryLight = "false";
-	private String fogBeam = "false";
-	private String rearFogBeam = "false";
+	private String fogLight = "false";
+	private String rearFogLight = "false";
 	
 
 	public void updateAutoPilotIndicator(String apIndicator)
@@ -92,9 +92,9 @@ public class OpenDSGaugeCenter
 		}
 		
 		// if update available
-		if(state.getTyrePressureLight() != null)
+		if(state.getTirePressureLight() != null)
 		{
-			tyrePressureLight = state.getTyrePressureLight().toString().toLowerCase();
+			tirePressureLight = state.getTirePressureLight().toString().toLowerCase();
 		}
 		
 		// if update available
@@ -110,15 +110,15 @@ public class OpenDSGaugeCenter
 		}
 		
 		// if update available
-		if(state.getFogBeam() != null)
+		if(state.getFogLight() != null)
 		{
-			fogBeam = state.getFogBeam().toString().toLowerCase();
+			fogLight = state.getFogLight().toString().toLowerCase();
 		}
 		
 		// if update available
-		if(state.getRearFogBeam() != null)
+		if(state.getRearFogLight() != null)
 		{
-			rearFogBeam = state.getRearFogBeam().toString().toLowerCase();
+			rearFogLight = state.getRearFogLight().toString().toLowerCase();
 		}
 		
 		//System.err.println("UPDATE: " + autoPilotIndicator + "; " + speedLimitIndicator + "; " + navigationImageId);
@@ -167,9 +167,9 @@ public class OpenDSGaugeCenter
 	}
 
 
-	public String getTyrePressureLight()
+	public String getTirePressureLight()
 	{
-		return tyrePressureLight;
+		return tirePressureLight;
 	}
 
 
@@ -185,15 +185,15 @@ public class OpenDSGaugeCenter
 	}
 
 
-	public String getfogBeam()
+	public String getFogLight()
 	{
-		return fogBeam;
+		return fogLight;
 	}
 
 
-	public String getRearFogBeam()
+	public String getRearFogLight()
 	{
-		return rearFogBeam;
+		return rearFogLight;
 	}
 
 

@@ -31,7 +31,7 @@ public class AdressTable
 	public static final String interior_cockpit_hazardLightsSwitchPressed = "/root/thisVehicle/interior/cockpit/hazardLightsSwitchPressed";
 	public static final String interior_cockpit_dashboard_frostLight = "/root/thisVehicle/interior/cockpit/dashboard/frostLight";
 	public static final String interior_cockpit_dashboard_oilPressureLight = "/root/thisVehicle/interior/cockpit/dashboard/oilPressureLight";
-	public static final String interior_cockpit_dashboard_tyrePressureLight = "/root/thisVehicle/interior/cockpit/dashboard/tyrePressureLight";
+	public static final String interior_cockpit_dashboard_tirePressureLight = "/root/thisVehicle/interior/cockpit/dashboard/tirePressureLight";
 	public static final String interior_cockpit_dashboard_batteryLight = "/root/thisVehicle/interior/cockpit/dashboard/batteryLight";
 	public static final String interior_cockpit_dashboard_checkLight = "/root/thisVehicle/interior/cockpit/dashboard/checkLight";
 	public static final String interior_cockpit_dashboard_speedLimit = "/root/thisVehicle/interior/cockpit/dashboard/speedLimit";

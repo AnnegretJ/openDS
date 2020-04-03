@@ -1963,7 +1963,7 @@ public class InteractionMethods
 			{
 				// speed limit values equal to "" or less than 0 will result in clearing the speed
 				// limit indicator from the dashboard
-				if(speedLimitIndicator_String.isEmpty() || speedLimitIndicator_String.equalsIgnoreCase("NONE"))
+				if(speedLimitIndicator_String.isEmpty() || speedLimitIndicator_String.equalsIgnoreCase("none"))
 					speedLimitIndicator = -1;
 				else
 					speedLimitIndicator = Integer.parseInt(speedLimitIndicator_String);
@@ -2001,12 +2001,12 @@ public class InteractionMethods
 			if(oilPressureLight_String != null)
 				oilPressureLight = Boolean.parseBoolean(oilPressureLight_String);
 			
-			// set tyre pressure light state, if available
-			parameter = "tyrePressureLight";
-			Boolean tyrePressureLight = null;
-			String tyrePressureLight_String = parameterList.getProperty(parameter);
-			if(tyrePressureLight_String != null)
-				tyrePressureLight = Boolean.parseBoolean(tyrePressureLight_String);
+			// set tire pressure light state, if available
+			parameter = "tirePressureLight";
+			Boolean tirePressureLight = null;
+			String tirePressureLight_String = parameterList.getProperty(parameter);
+			if(tirePressureLight_String != null)
+				tirePressureLight = Boolean.parseBoolean(tirePressureLight_String);
 						
 			// set cruise control light state, if available
 			parameter = "cruiseControlLight";
@@ -2019,25 +2019,25 @@ public class InteractionMethods
 			if(batteryLight_String != null)
 				batteryLight = Boolean.parseBoolean(batteryLight_String);
 			
-			// set fog beam state, if available
-			parameter = "fogBeam";
-			Boolean fogBeam = null;
-			String fogBeam_String = parameterList.getProperty(parameter);
-			if(fogBeam_String != null)
-				fogBeam = Boolean.parseBoolean(fogBeam_String);
+			// set fog light state, if available
+			parameter = "fogLight";
+			Boolean fogLight = null;
+			String fogLight_String = parameterList.getProperty(parameter);
+			if(fogLight_String != null)
+				fogLight = Boolean.parseBoolean(fogLight_String);
 			
-			// set rear fog beam state, if available
-			parameter = "rearFogBeam";
-			Boolean rearFogBeam = null;
-			String rearFogBeam_String = parameterList.getProperty(parameter);
-			if(rearFogBeam_String != null)
-				rearFogBeam = Boolean.parseBoolean(rearFogBeam_String);
+			// set rear fog light state, if available
+			parameter = "rearFogLight";
+			Boolean rearFogLight = null;
+			String rearFogLight_String = parameterList.getProperty(parameter);
+			if(rearFogLight_String != null)
+				rearFogLight = Boolean.parseBoolean(rearFogLight_String);
 			
 			// create a new state representing the changes of the OpenDSGauge
 			OpenDSGaugeState openDSGaugeState = new OpenDSGaugeState(autoPilotIndicator, 
 					speedLimitIndicator, navigationImageId, frostLight, seatBeltInPlace, 
-					checkLight, oilPressureLight, tyrePressureLight, cruiseControlLight, 
-					batteryLight, fogBeam, rearFogBeam);
+					checkLight, oilPressureLight, tirePressureLight, cruiseControlLight, 
+					batteryLight, fogLight, rearFogLight);
 			
 			//System.err.println(autoPilotIndicator + "; " + speedLimitIndicator + "; " + navigationImageId);
 			

@@ -6,7 +6,7 @@
 				<dashboard>
 					<frostLight></frostLight>
 					<oilPressureLight></oilPressureLight>
-					<tyrePressureLight></tyrePressureLight>
+					<tirePressureLight></tirePressureLight>
 					<batteryLight></batteryLight>
 					<checkLight></checkLight>
 					<speedLimit></speedLimit>

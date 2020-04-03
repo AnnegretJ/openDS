@@ -27,17 +27,17 @@ public class OpenDSGaugeState
 	private Boolean seatBeltInPlace;
 	private Boolean checkLight;
 	private Boolean oilPressureLight;
-	private Boolean tyrePressureLight;
+	private Boolean tirePressureLight;
 	private String cruiseControlLight;
 	private Boolean batteryLight;
-	private Boolean fogBeam;
-	private Boolean rearFogBeam;
+	private Boolean fogLight;
+	private Boolean rearFogLight;
 	
 	
 	public OpenDSGaugeState(String autoPilotIndicator, Integer speedLimitIndicator, String navigationImageId,
 			Boolean frostLight, Boolean seatBeltInPlace, Boolean checkLight, Boolean oilPressureLight, 
-			Boolean tyrePressureLight, String cruiseControlLight, Boolean batteryLight, Boolean fogBeam, 
-			Boolean rearFogBeam)
+			Boolean tirePressureLight, String cruiseControlLight, Boolean batteryLight, Boolean fogLight, 
+			Boolean rearFogLight)
 	{
 		this.autoPilotIndicator = autoPilotIndicator;
 		this.speedLimitIndicator = speedLimitIndicator;
@@ -46,11 +46,11 @@ public class OpenDSGaugeState
 		this.seatBeltInPlace = seatBeltInPlace;
 		this.checkLight = checkLight;
 		this.oilPressureLight = oilPressureLight;
-		this.tyrePressureLight = tyrePressureLight;
+		this.tirePressureLight = tirePressureLight;
 		this.cruiseControlLight = cruiseControlLight;
 		this.batteryLight = batteryLight;
-		this.fogBeam = fogBeam;
-		this.rearFogBeam = rearFogBeam;
+		this.fogLight = fogLight;
+		this.rearFogLight = rearFogLight;
 	}
 
 
@@ -96,9 +96,9 @@ public class OpenDSGaugeState
 	}
 
 
-	public Boolean getTyrePressureLight()
+	public Boolean getTirePressureLight()
 	{
-		return tyrePressureLight;
+		return tirePressureLight;
 	}
 
 
@@ -114,15 +114,15 @@ public class OpenDSGaugeState
 	}
 
 
-	public Boolean getFogBeam()
+	public Boolean getFogLight()
 	{
-		return fogBeam;
+		return fogLight;
 	}
 
 
-	public Boolean getRearFogBeam()
+	public Boolean getRearFogLight()
 	{
-		return rearFogBeam;
+		return rearFogLight;
 	}
 	
 	
