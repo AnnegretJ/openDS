@@ -185,6 +185,14 @@ public class Transmission
 	}
 
 
+	public int getMostEfficientGear()
+	{
+		float currentVehicleSpeed = FastMath.abs(car.getCarControl().getCurrentVehicleSpeedKmHour());
+		float speedPercentage = currentVehicleSpeed/speedAt100PercentMarker;
+		return findBestPowerGear(speedPercentage);
+	}
+	
+	
 	public void performAcceleration(float pAccel) 
 	{
 		float currentEngineSpeed = getRPM();

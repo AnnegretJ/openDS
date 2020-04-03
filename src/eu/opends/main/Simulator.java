@@ -59,6 +59,7 @@ import eu.opends.car.SteeringCar;
 import eu.opends.chrono.ChronoPhysicsSpace;
 import eu.opends.chrono.ChronoVehicleControl;
 import eu.opends.codriver.CodriverConnector;
+import eu.opends.dashboard.OpenDSGaugeCenter;
 import eu.opends.drivingTask.DrivingTask;
 import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.effects.EffectCenter;
@@ -303,11 +304,19 @@ public class Simulator extends SimulationBasics
 	}
 	
 	
-	private  ForceFeedbackController ffbController;
+	private ForceFeedbackController ffbController;
 	public ForceFeedbackController getForceFeedbackController() 
 	{
 		return ffbController;
 	}
+	
+	
+	private OpenDSGaugeCenter openDSGaugeCenter;
+	public OpenDSGaugeCenter getOpenDSGaugeCenter() 
+	{
+		return openDSGaugeCenter;
+	}
+	
 	
 	
     @Override
@@ -543,10 +552,18 @@ public class Simulator extends SimulationBasics
         onScreenVisualizer = new OnScreenVisualizer(this);
         
 		ffbController = new ForceFeedbackController(this);
+		
+		openDSGaugeCenter = new OpenDSGaugeCenter();
 
 		initializationFinished = true;
     }
 
+    
+	public boolean isInitializationFinished()
+	{
+		return initializationFinished;
+	}
+	
 	
 	private void initDrivingTaskLayers()
 	{

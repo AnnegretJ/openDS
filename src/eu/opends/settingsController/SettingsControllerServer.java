@@ -42,6 +42,7 @@ public class SettingsControllerServer extends Thread
 	
 	private Simulator sim;
 	private int port = 0;
+	private RoadData roadDataRecord;
 	private boolean connected = false;
 	
 	private List<ConnectionHandler> connections = new ArrayList<ConnectionHandler>();
@@ -51,6 +52,7 @@ public class SettingsControllerServer extends Thread
 		this.sim = sim;
 		this.port = Simulator.getSettingsLoader().getSetting(Setting.SettingsControllerServer_port, 
 				SimulationDefaults.SettingsControllerServer_port);
+		roadDataRecord = new RoadData();
 	}
 	
 	
@@ -132,6 +134,12 @@ public class SettingsControllerServer extends Thread
 		}
 
 
+	}
+
+
+	public RoadData getRoadDataRecord()
+	{
+		return roadDataRecord;
 	}
         
 }

@@ -43,6 +43,7 @@ public class ObjectWatch
 	private String[] ObjName = new String[20];
 	private int[] ObjID = new int[20];
 	private int[] ObjClass = new int[20];
+	private String[] ObjClassString = new String[20];
 	private int[] ObjSensorInfo = new int[20];
 	private double[] ObjX = new double[20];
 	private double[] ObjY = new double[20];
@@ -98,6 +99,7 @@ public class ObjectWatch
 					ObjName[i] = trafficCar.getName();
 					ObjID[i] = i;
 					ObjClass[i] = 5; // passenger car = 5
+					ObjClassString[i] = "car";
 					ObjSensorInfo[i] = 1; // lidar = 1
 					Vector3f relPos = car.getCarNode().worldToLocal(trafficCar.getPosition(), null);
 					ObjX[i] = -relPos.getZ(); // positive --> in front; negative --> behind
@@ -120,6 +122,7 @@ public class ObjectWatch
 					ObjName[i] = pedestrian.getName();
 					ObjID[i] = i;
 					ObjClass[i] = 1; // pedestrian = 1
+					ObjClassString[i] = "pedestrian";
 					ObjSensorInfo[i] = 1; // lidar = 1
 					Vector3f relPos = car.getCarNode().worldToLocal(pedestrian.getPosition(), null);
 					ObjX[i] = -relPos.getZ(); // positive --> in front; negative --> behind
@@ -140,6 +143,7 @@ public class ObjectWatch
 					ObjName[i] = openDRIVECar.getName();
 					ObjID[i] = i;
 					ObjClass[i] = 5; // passenger car = 5
+					ObjClassString[i] = "car";
 					ObjSensorInfo[i] = 1; // lidar = 1
 					Vector3f relPos = car.getCarNode().worldToLocal(openDRIVECar.getPosition(), null);
 					ObjX[i] = -relPos.getZ(); // positive --> in front; negative --> behind
@@ -165,6 +169,7 @@ public class ObjectWatch
 				ObjName[i] = "";
 				ObjID[i] = 32767;
 				ObjClass[i] = 32767;
+				ObjClassString[i] = "";
 				ObjSensorInfo[i] = 32767;
 				ObjX[i] = 32767;
 				ObjY[i] = 32767;
@@ -280,6 +285,12 @@ public class ObjectWatch
 		return ObjClass;
 	}
 
+
+	public String[] getObjClassString()
+	{
+		return ObjClassString;
+	}
+	
 
 	public int[] getObjSensorInfo()
 	{

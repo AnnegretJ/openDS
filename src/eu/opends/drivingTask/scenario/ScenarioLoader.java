@@ -123,6 +123,8 @@ public class ScenarioLoader
 		suspension_damping,
 		brake_decelerationFreeWheel,
 		brake_decelerationBrake, 
+		fuel_maxAmount,
+		fuel_initialAmount,
 		wheel_frictionSlip, 
 		engine_minRPM,
 		engine_maxRPM,

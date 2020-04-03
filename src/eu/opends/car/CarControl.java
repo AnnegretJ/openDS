@@ -280,6 +280,17 @@ public class CarControl
 			return chronoVehicleControl.getGear();
 	}
 
+	
+	public int getMostEfficientGear()
+	{
+		if(type == PhysicsType.BULLET)
+			return transmission.getMostEfficientGear();
+		else
+			// since no manual transmission available in Chrono, 
+			// current gear will always be the most efficient one
+			return chronoVehicleControl.getGear();
+	}
+	
 
 	public float getRPMPercentage()
 	{

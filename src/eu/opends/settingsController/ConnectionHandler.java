@@ -95,7 +95,7 @@ public class ConnectionHandler extends Thread
 		in = i;	
 		
 		data = new APIData(sim.getCar());		
-		updateSender = new UpdateSender(data, this);
+		updateSender = new UpdateSender(sim, data, this);
 	}
 	
 	public void run(){		

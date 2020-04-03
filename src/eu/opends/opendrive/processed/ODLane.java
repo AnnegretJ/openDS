@@ -1270,13 +1270,13 @@ public class ODLane
 	public double getSpeedLimit(double s)
 	{
 		double laneSection_s = laneSection.getS();
-		List<Speed> widthList = lane.getSpeed();
+		List<Speed> speedLimitList = lane.getSpeed();
 		
-		for(int i=widthList.size()-1; i>=0; i--)
+		for(int i=speedLimitList.size()-1; i>=0; i--)
 		{
-			double offset = laneSection_s + widthList.get(i).getSOffset();
+			double offset = laneSection_s + speedLimitList.get(i).getSOffset();
 			if(s >= offset)
-				return widthList.get(i).getMax();
+				return speedLimitList.get(i).getMax();
 		}
 		
 		// return -1 if speed limit not set

@@ -38,6 +38,7 @@ import eu.opends.environment.TrafficLightForecast;
 import eu.opends.environment.TrafficLightInternalProgram;
 import eu.opends.main.Simulator;
 import eu.opends.opendrive.data.LaneType;
+import eu.opends.opendrive.processed.Intersection;
 import eu.opends.opendrive.processed.ODLane;
 import eu.opends.opendrive.processed.ODPoint;
 import eu.opends.opendrive.processed.ODRoad;
@@ -52,9 +53,9 @@ import eu.opends.opendrive.processed.ODLane.Position;
 import eu.opends.opendrive.util.AdasisCurvature;
 import eu.opends.opendrive.util.ODPosition;
 import eu.opends.opendrive.util.ODVisualizer;
+import eu.opends.settingsController.RoadData;
 import eu.opends.tools.PanelCenter;
 import eu.opends.tools.Vector3d;
-import org.lwjgl.Sys;
 
 public class ScenarioMessage 
 {
@@ -71,8 +72,9 @@ public class ScenarioMessage
 	private boolean sendToCodriver = true;
 	private int rangeOfTrajectoryBackcast = 200;
 	private int rangeOfTrajectoryForecast = 200;
-	private int rangeOfSpeedLimitForecast = 200;
-	//private int rangeOfIntersectionForecast= 200;  // removed in update 11.13 --> 12.04
+	private int rangeOfSpeedLimitForecast = 5000;
+	private int rangeOfIntersectionForecast = 5000;
+	private int rangeOfTrafficLightForecast = 5000;
 	private float minTimeDiffForUpdate = 0.045f; // approx. 0.05
 	
 	private boolean visualizeLaneMarkers = true;
@@ -103,7 +105,9 @@ public class ScenarioMessage
 		printCSVMsg = settingsloader.getSetting(Setting.ScenarioMessage_PrintCSVMsg, false);
 		rangeOfTrajectoryForecast = settingsloader.getSetting(Setting.ScenarioMessage_RangeOfTrajectoryForecast, 200);
 		rangeOfTrajectoryBackcast = settingsloader.getSetting(Setting.ScenarioMessage_RangeOfTrajectoryBackcast, 200);
-		rangeOfSpeedLimitForecast = settingsloader.getSetting(Setting.ScenarioMessage_RangeOfSpeedLimitForecast, 200);
+		rangeOfSpeedLimitForecast = settingsloader.getSetting(Setting.ScenarioMessage_RangeOfSpeedLimitForecast, 5000);
+		rangeOfIntersectionForecast = settingsloader.getSetting(Setting.ScenarioMessage_RangeOfIntersectionForecast, 5000);
+		rangeOfTrafficLightForecast = settingsloader.getSetting(Setting.ScenarioMessage_RangeOfTrafficLightForecast, 5000);
 		visualizeLaneMarkers = settingsloader.getSetting(Setting.ScenarioMessage_VisualizeLaneMarkers, true);
 		visualizeHeadingDiff = settingsloader.getSetting(Setting.ScenarioMessage_VisualizeHeadingDiff, true);
 		visualizeTrajectoryForecast = settingsloader.getSetting(Setting.ScenarioMessage_VisualizeTrajectoryForecast, true);
@@ -360,6 +364,7 @@ public class ScenarioMessage
 				String[] ObjName = objectWatch.getObjName();
 				int[] ObjID = objectWatch.getObjID();
 				int[] ObjClass = objectWatch.getObjClass();
+				String[] ObjClassString = objectWatch.getObjClassString();
 				int[] ObjSensorInfo = objectWatch.getObjSensorInfo();
 				double[] ObjX = objectWatch.getObjX();
 				double[] ObjY = objectWatch.getObjY();
@@ -587,12 +592,10 @@ public class ScenarioMessage
 
 
 				// removed in update 11.13 --> 12.04
-				/*
 				ArrayList<Intersection> intersectionList = refLane.getIntersectionAhead(refLaneIsWrongWay, s, rangeOfIntersectionForecast, preferredConnections);
 				double IntersectionDistance = -1;
 				if(intersectionList.size()>0)
 					IntersectionDistance = intersectionList.get(0).getDistance();
-				*/
 
 
 
@@ -645,18 +648,22 @@ public class ScenarioMessage
 
 				int NrTrfLights = 0;
 				double TrfLightDist = -1;
+				TrafficLightState TrfLightCurrState_TLS = null;
 				int TrfLightCurrState = -1;
 				double TrfLightFirstTimeToChange = -1;
+				TrafficLightState TrfLightFirstNextState_TLS = null;
 				int TrfLightFirstNextState = -1;
 				double TrfLightSecondTimeToChange = -1;
+				TrafficLightState TrfLightSecondNextState_TLS = null;
 				int TrfLightSecondNextState = -1;
 				double TrfLightThirdTimeToChange = -1;
 
-				if(closestTrafficLight != null)
+				if(closestTrafficLight != null && shortestDistance <= rangeOfTrafficLightForecast)
 				{
 					NrTrfLights = 1;
 					TrfLightDist = shortestDistance;
-					TrfLightCurrState = state2Int(closestTrafficLight.getState());
+					TrfLightCurrState_TLS = closestTrafficLight.getState();
+					TrfLightCurrState = state2Int(TrfLightCurrState_TLS);
 
 					TrafficLightInternalProgram internalProgram = closestTrafficLight.getTrafficLightInternalProgram();
 
@@ -664,9 +671,11 @@ public class ScenarioMessage
 					{
 						TrafficLightForecast trafficLightForecast = internalProgram.computeForecast(closestTrafficLight);
 						TrfLightFirstTimeToChange = trafficLightForecast.getFirstChangeTime();
-						TrfLightFirstNextState = state2Int(trafficLightForecast.getFirstNextState());
+						TrfLightFirstNextState_TLS = trafficLightForecast.getFirstNextState();
+						TrfLightFirstNextState = state2Int(TrfLightFirstNextState_TLS);
 						TrfLightSecondTimeToChange = trafficLightForecast.getSecondChangeTime();
-						TrfLightSecondNextState = state2Int(trafficLightForecast.getSecondNextState());
+						TrfLightSecondNextState_TLS = trafficLightForecast.getSecondNextState();
+						TrfLightSecondNextState = state2Int(TrfLightSecondNextState_TLS);
 						TrfLightThirdTimeToChange = trafficLightForecast.getThirdChangeTime();
 						/*
 						System.err.println("closest TrafficLight: " + closestTrafficLight.getName() + "; distance: " + shortestDistance + "; state: " + closestTrafficLight.getState().toString() + "; TrfLightFirstTimeToChange: " + TrfLightFirstTimeToChange
@@ -776,7 +785,80 @@ public class ScenarioMessage
 					//scenario_msg.IntersectionDistance = IntersectionDistance; // removed in update 11.13 --> 12.04
 
 				}
-
+				
+				if(sim.getSettingsControllerServer() != null)
+				{
+					float hdgCar = - sim.getCar().getHeadingDegree();
+					if(hdgCar<-180)
+						hdgCar += 360;
+					if(hdgCar>180)
+						hdgCar -= 360;
+					
+					RoadData roadDataRecord = sim.getSettingsControllerServer().getRoadDataRecord();
+					roadDataRecord.aLgtFild = ALgtFild;
+					roadDataRecord.aLatFild = ALatFild;
+					roadDataRecord.yawRateFild = YawRateFild * FastMath.RAD_TO_DEG;
+					roadDataRecord.roadID = lane.getODRoad().getID();
+					roadDataRecord.laneID = laneID;
+					roadDataRecord.s = (float) s;
+					roadDataRecord.hdgLane = hdgLane * FastMath.RAD_TO_DEG;
+					roadDataRecord.hdgCar = hdgCar;
+					roadDataRecord.hdgDiff = hdgDiff;
+					roadDataRecord.isWrongWay = isWrongWay;
+					roadDataRecord.laneType = lane.getType();
+					roadDataRecord.lanePosition = adasisLaneType;
+					roadDataRecord.laneCrvt = (float) LaneCrvt;
+					roadDataRecord.nrObjs = NrObjs;
+					roadDataRecord.objName = arrayToString(ObjName, NrObjs);
+					roadDataRecord.objClass = arrayToString(ObjClassString, NrObjs);
+					roadDataRecord.objX = arrayToString(ObjX, NrObjs, 1);
+					roadDataRecord.objY = arrayToString(ObjY, NrObjs, 1);
+					roadDataRecord.objDist = arrayToString(ObjDist, NrObjs, 1);
+					roadDataRecord.objDirection = arrayToString(ObjDirection, NrObjs, FastMath.RAD_TO_DEG);
+					roadDataRecord.objVel = arrayToString(ObjVel, NrObjs, 3.6f);
+					roadDataRecord.laneWidth = (float) LaneWidth;
+					roadDataRecord.latOffsLineR = (float) LatOffsLineR;
+					roadDataRecord.latOffsLineL = (float) LatOffsLineL;
+					roadDataRecord.leftLineType = adasisLeftLineType;
+					roadDataRecord.rightLineType = adasisRightLineType;
+					roadDataRecord.leftLaneInfo = leftLaneInfo;
+					roadDataRecord.rightLaneInfo = rightLaneInfo;
+					roadDataRecord.sideObstacleLeft = (SideObstacleLeft==1)?true:false;
+					roadDataRecord.sideObstacleRight = (SideObstacleRight==1)?true:false;
+					roadDataRecord.blindSpotObstacleLeft = (BlindSpotObstacleLeft==1)?true:false;
+					roadDataRecord.blindSpotObstacleRight = (BlindSpotObstacleRight==1)?true:false;
+					roadDataRecord.nrLanesDrivingDirection = NrLanesDrivingDirection;
+					roadDataRecord.nrLanesOppositeDirection = NrLanesOppositeDirection;
+					roadDataRecord.currentSpeedLimit = String.valueOf((float)refLane.getSpeedLimit(s));
+					roadDataRecord.nrSpeedLimits = AdasisSpeedLimitNrP1;
+					roadDataRecord.speedLimitDist = arrayToString(AdasisSpeedLimitDist, AdasisSpeedLimitNrP1, 1);
+					roadDataRecord.speedLimitValues = arrayToString(AdasisSpeedLimitValues, AdasisSpeedLimitNrP1);
+					roadDataRecord.intersectionDistance = (float) IntersectionDistance;
+					roadDataRecord.targetDistance = (float) distToTarget;
+					roadDataRecord.trafficLightAhead = (NrTrfLights==1)?true:false;
+					roadDataRecord.trafficLightDist = (float) TrfLightDist;
+					
+					if(NrTrfLights>0 && TrfLightCurrState_TLS != null && TrfLightFirstNextState_TLS != null &&
+							TrfLightSecondNextState_TLS != null)
+					{
+						String state1 = TrfLightCurrState_TLS.toString().toLowerCase();
+						String state2 = TrfLightFirstNextState_TLS.toString().toLowerCase();
+						String state3 = TrfLightSecondNextState_TLS.toString().toLowerCase();
+						roadDataRecord.trafficLightStates = "[" + state1 + ", " + state2 + ", " + state3 + "]";
+						
+						String time1 = String.valueOf((float)TrfLightFirstTimeToChange);
+						String time2 = String.valueOf((float)TrfLightSecondTimeToChange);
+						String time3 = String.valueOf((float)TrfLightThirdTimeToChange);
+						roadDataRecord.trafficLightTimesToChange  = "[" + time1 + ", " + time2 + ", " + time3 + "]";
+					}
+					else
+					{
+						roadDataRecord.trafficLightStates = "[]";
+						roadDataRecord.trafficLightTimesToChange = "[]";
+					}
+				}
+				
+				
 				sim.getCar().setCurrentLane(lane);
 				sim.getCar().setCurrentS(s);
 			}
@@ -830,6 +912,57 @@ public class ScenarioMessage
 		}
 	}
 
+	
+	private String arrayToString(String[] array, int maxSize)
+	{
+		String output = "[";
+		
+		for(int i=0; i<array.length; i++)
+		{
+			if(i<maxSize)
+				output += array[i];
+			
+			if(i<Math.min(array.length-1, maxSize-1))
+				output += ", ";
+		}
+
+		return output + "]";
+	}
+
+	private String arrayToString(int[] array, int maxSize)
+	{
+		String output = "[";
+		
+		for(int i=0; i<array.length; i++)
+		{
+			if(i<maxSize)
+				output += array[i];
+			
+			if(i<Math.min(array.length-1, maxSize-1))
+				output += ", ";
+		}
+
+		return output + "]";
+	}
+
+	
+	private String arrayToString(double[] array, int maxSize, float convert)
+	{
+		String output = "[";
+		
+		for(int i=0; i<array.length; i++)
+		{
+			if(i<maxSize)
+				output += (float)array[i] * convert;
+			
+			if(i<Math.min(array.length-1, maxSize-1))
+				output += ", ";
+		}
+
+		return output + "]";
+	}
+
+	
 	private void monitorTrafficLightDriveThrough(ODLane currentLane, TrafficLight trafficLight, double distToTrafficLight)
 	{
 		if(0 <= distToTrafficLight)

@@ -31,7 +31,6 @@ import org.w3c.dom.NodeList;
 
 import eu.opends.drivingTask.DrivingTaskDataQuery;
 import eu.opends.drivingTask.DrivingTaskDataQuery.Layer;
-import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.input.KeyMapping;
 
 /**
@@ -213,6 +212,8 @@ public class SettingsLoader
 		ScenarioMessage_RangeOfTrajectoryForecast("settings:scenarioMessage/settings:rangeOfTrajectoryForecast"),
 		ScenarioMessage_RangeOfTrajectoryBackcast("settings:scenarioMessage/settings:rangeOfTrajectoryBackcast"),
 		ScenarioMessage_RangeOfSpeedLimitForecast("settings:scenarioMessage/settings:rangeOfSpeedLimitForecast"),
+		ScenarioMessage_RangeOfIntersectionForecast("settings:scenarioMessage/settings:rangeOfIntersectionForecast"),
+		ScenarioMessage_RangeOfTrafficLightForecast("settings:scenarioMessage/settings:rangeOfTrafficLightForecast"),
 		ScenarioMessage_VisualizeLaneMarkers("settings:scenarioMessage/settings:visualizeLaneMarkers"),
 		ScenarioMessage_VisualizeHeadingDiff("settings:scenarioMessage/settings:visualizeHeadingDiff"),
 		ScenarioMessage_VisualizeTrajectoryForecast("settings:scenarioMessage/settings:visualizeTrajectoryForecast"),

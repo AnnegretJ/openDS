@@ -695,6 +695,11 @@ public abstract class Car
 	{
 		this.targetSpeedCruiseControl = getCurrentSpeedKmh();
 		this.isCruiseControl = isCruiseControl;
+		
+		if(isCruiseControl)
+			sim.getOpenDSGaugeCenter().updateCruiseControlLight("cruise");
+		else
+			sim.getOpenDSGaugeCenter().updateCruiseControlLight("none");
 	}
 	
 	

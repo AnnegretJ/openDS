@@ -18,27 +18,37 @@
 
 package eu.opends.settingsController;
 
+import eu.opends.main.Simulator;
+
 /**
  * 
  * @author Daniel Braun
  */
 public class UpdateSender extends Thread 
 {
-	
+	private Simulator sim;
 	private APIData  data;
-	ConnectionHandler connectionHandler;
+	private ConnectionHandler connectionHandler;
 	
-	public UpdateSender(APIData data, ConnectionHandler connectionHandler){
+	
+	public UpdateSender(Simulator sim, APIData data, ConnectionHandler connectionHandler)
+	{
+		this.sim = sim;
 		this.data = data;
 		this.connectionHandler = connectionHandler;
 	}
 	
-	public void run(){
-		while(!isInterrupted()){
+	
+	public void run()
+	{
+		while(!isInterrupted())
+		{
+			if(sim.isInitializationFinished())
+			{
+				String response = "<Message><Event Name=\"SubscribedValues\">\n" + data.getAllSubscribedValues(false) + "\n</Event></Message>\n";
+				connectionHandler.sendResponse(response);
+			}
 			
-			String response = "<Message><Event Name=\"SubscribedValues\">\n" + data.getAllSubscribedValues(false) + "\n</Event></Message>\n";
-			connectionHandler.sendResponse(response);
-						
 			try {
 				Thread.sleep(connectionHandler.getUpdateInterval());
 			} catch (InterruptedException e) {

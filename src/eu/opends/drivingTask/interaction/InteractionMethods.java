@@ -24,52 +24,14 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 
 import eu.opends.basics.SimulationBasics;
+import eu.opends.dashboard.OpenDSGaugeState;
 import eu.opends.drivingTask.DrivingTaskDataQuery.Layer;
 import eu.opends.hmi.LocalDangerWarningPresentationModel;
 import eu.opends.hmi.PresentationModel;
 import eu.opends.hmi.RoadWorksInformationPresentationModel;
 import eu.opends.main.Simulator;
 import eu.opends.opendrive.processed.ODLane.Position;
-import eu.opends.trigger.ChangeLaneODCarAction;
-import eu.opends.trigger.GetTimeUntilBrakeAction;
-import eu.opends.trigger.GetTimeUntilSpeedChangeAction;
-import eu.opends.trigger.ManipulateObjectTriggerAction;
-import eu.opends.trigger.ManipulatePictureTriggerAction;
-import eu.opends.trigger.MoveTrafficTriggerAction;
-import eu.opends.trigger.OpenInstructionsScreenTriggerAction;
-import eu.opends.trigger.PauseTriggerAction;
-import eu.opends.trigger.PlayMovieAction;
-import eu.opends.trigger.PlayNextMovieAction;
-import eu.opends.trigger.PlaySoundAction;
-import eu.opends.trigger.PresentationTaskAction;
-import eu.opends.trigger.ReportSpeedTriggerAction;
-import eu.opends.trigger.ReportTextTriggerAction;
-import eu.opends.trigger.ReportTrafficLightTriggerAction;
-import eu.opends.trigger.RequestGreenTrafficLightAction;
-import eu.opends.trigger.ResetCarToResetPointAction;
-import eu.opends.trigger.ResumeTriggerAction;
-import eu.opends.trigger.SendMessageTriggerAction;
-import eu.opends.trigger.SendNumberToParallelPortTriggerAction;
-import eu.opends.trigger.SetAutoPilotTriggerAction;
-import eu.opends.trigger.SetCrosswindTriggerAction;
-import eu.opends.trigger.SetMotorwayTaskStimulusTriggerAction;
-import eu.opends.trigger.SetODCarTargetLaneAction;
-import eu.opends.trigger.SetSpeedLimitAction;
-import eu.opends.trigger.SetTVPTStimulusTriggerAction;
-import eu.opends.trigger.SetWeatherTriggerAction;
-import eu.opends.trigger.SetupBrakeReactionTimerTriggerAction;
-import eu.opends.trigger.SetupContreTaskTriggerAction;
-import eu.opends.trigger.SetupLaneChangeReactionTimerTriggerAction;
-import eu.opends.trigger.SetupSteeringReactionTimerTriggerAction;
-import eu.opends.trigger.SetupKeyReactionTimerTriggerAction;
-import eu.opends.trigger.ShutDownSimulationTriggerAction;
-import eu.opends.trigger.StartReactionMeasurementTriggerAction;
-import eu.opends.trigger.StartRecordingTriggerAction;
-import eu.opends.trigger.StopMovieAction;
-import eu.opends.trigger.StopRecordingTriggerAction;
-import eu.opends.trigger.TriggerAction;
-import eu.opends.trigger.WarningFrameTriggerAction;
-import eu.opends.trigger.WriteToKnowledgeBaseTriggerAction;
+import eu.opends.trigger.*;
 
 /**
  * 
@@ -1967,7 +1929,128 @@ public class InteractionMethods
 			return null;
 		}
 	}
+
 	
+	@Action(
+			name = "setOpenDSGauge", 
+			layer = Layer.SCENE, 
+			description = "Sets parameters of OpenDS_Gauge (sent by SettingsControllerServer)",
+			defaultDelay = 0,
+			defaultRepeat = 0,
+			param = {@Parameter(name="autoPilotIndicator", type="String", defaultValue="", 
+								description="show auto pilot indicator on dashboard (on, off, control, <empty string>"),
+					 @Parameter(name="speedLimitIndicator", type="Integer", defaultValue="-1", 
+								description="Show speed limit indicator on dashboard (-1 = no speed limit indicator)"),
+					 @Parameter(name="navigationImageId", type="String", defaultValue="", 
+						description="Show navigation image with given ID on dashboard")
+					}
+		)
+	public TriggerAction setOpenDSGauge(SimulationBasics sim, float delay, int repeat, Properties parameterList)
+	{
+		String parameter = "";
+		
+		try {
+			
+			// set auto pilot indicator, if available
+			parameter = "autoPilotIndicator";
+			String autoPilotIndicator = parameterList.getProperty(parameter);
+			
+			// set speed limit indicator, if available
+			parameter = "speedLimitIndicator";
+			Integer speedLimitIndicator = null;
+			String speedLimitIndicator_String = parameterList.getProperty(parameter);
+			if(speedLimitIndicator_String != null)
+			{
+				// speed limit values equal to "" or less than 0 will result in clearing the speed
+				// limit indicator from the dashboard
+				if(speedLimitIndicator_String.isEmpty() || speedLimitIndicator_String.equalsIgnoreCase("NONE"))
+					speedLimitIndicator = -1;
+				else
+					speedLimitIndicator = Integer.parseInt(speedLimitIndicator_String);
+			}
+			
+			// set navigation image ID, if available
+			parameter = "navigationImageId";
+			String navigationImageId = parameterList.getProperty(parameter);
+			
+			// set frost light state, if available
+			parameter = "frostLight";
+			Boolean frostLight = null;
+			String frostLight_String = parameterList.getProperty(parameter);
+			if(frostLight_String != null)
+				frostLight = Boolean.parseBoolean(frostLight_String);
+			
+			// set seat belt state, if available
+			parameter = "seatBeltInPlace";
+			Boolean seatBeltInPlace = null;
+			String seatBeltInPlace_String = parameterList.getProperty(parameter);
+			if(seatBeltInPlace_String != null)
+				seatBeltInPlace = Boolean.parseBoolean(seatBeltInPlace_String);
+			
+			// set check light state, if available
+			parameter = "checkLight";
+			Boolean checkLight = null;
+			String checkLight_String = parameterList.getProperty(parameter);
+			if(checkLight_String != null)
+				checkLight = Boolean.parseBoolean(checkLight_String);
+			
+			// set oil pressure light state, if available
+			parameter = "oilPressureLight";
+			Boolean oilPressureLight = null;
+			String oilPressureLight_String = parameterList.getProperty(parameter);
+			if(oilPressureLight_String != null)
+				oilPressureLight = Boolean.parseBoolean(oilPressureLight_String);
+			
+			// set tyre pressure light state, if available
+			parameter = "tyrePressureLight";
+			Boolean tyrePressureLight = null;
+			String tyrePressureLight_String = parameterList.getProperty(parameter);
+			if(tyrePressureLight_String != null)
+				tyrePressureLight = Boolean.parseBoolean(tyrePressureLight_String);
+						
+			// set cruise control light state, if available
+			parameter = "cruiseControlLight";
+			String cruiseControlLight = parameterList.getProperty(parameter);
+			
+			// set battery light state, if available
+			parameter = "batteryLight";
+			Boolean batteryLight = null;
+			String batteryLight_String = parameterList.getProperty(parameter);
+			if(batteryLight_String != null)
+				batteryLight = Boolean.parseBoolean(batteryLight_String);
+			
+			// set fog beam state, if available
+			parameter = "fogBeam";
+			Boolean fogBeam = null;
+			String fogBeam_String = parameterList.getProperty(parameter);
+			if(fogBeam_String != null)
+				fogBeam = Boolean.parseBoolean(fogBeam_String);
+			
+			// set rear fog beam state, if available
+			parameter = "rearFogBeam";
+			Boolean rearFogBeam = null;
+			String rearFogBeam_String = parameterList.getProperty(parameter);
+			if(rearFogBeam_String != null)
+				rearFogBeam = Boolean.parseBoolean(rearFogBeam_String);
+			
+			// create a new state representing the changes of the OpenDSGauge
+			OpenDSGaugeState openDSGaugeState = new OpenDSGaugeState(autoPilotIndicator, 
+					speedLimitIndicator, navigationImageId, frostLight, seatBeltInPlace, 
+					checkLight, oilPressureLight, tyrePressureLight, cruiseControlLight, 
+					batteryLight, fogBeam, rearFogBeam);
+			
+			//System.err.println(autoPilotIndicator + "; " + speedLimitIndicator + "; " + navigationImageId);
+			
+			// create SetOpenDSGaugeTriggerAction
+			return new SetOpenDSGaugeTriggerAction(sim, delay, repeat, openDSGaugeState);
+			
+		} catch (Exception e) {
+
+			reportError("setOpenDSGauge", parameter);
+			return null;
+		}
+	}
+		
 	
 	/**
 	 * Writes an entry to the log if given traffic light is in the given state.

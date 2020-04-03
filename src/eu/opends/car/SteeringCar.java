@@ -250,11 +250,13 @@ public class SteeringCar extends Car implements TrafficObject
 			acceleratorPedalIntensity = 0;
 			//PanelCenter.getMessageBox().addMessage("Auto Pilot off", 3);
 			Simulator.getDrivingTaskLogger().reportText("Auto Pilot off", new Date());
+			sim.getOpenDSGaugeCenter().updateAutoPilotIndicator("off");
 		}
 		else
 		{
 			//PanelCenter.getMessageBox().addMessage("Auto Pilot on", 3);
 			Simulator.getDrivingTaskLogger().reportText("Auto Pilot on", new Date());
+			sim.getOpenDSGaugeCenter().updateAutoPilotIndicator("on");
 		}
 	}
 	
@@ -422,17 +424,22 @@ public class SteeringCar extends Car implements TrafficObject
 			acceleratorPedalIntensity = 0;
 			PanelCenter.getMessageBox().addMessage("Auto Pilot off", 3);
 			Simulator.getDrivingTaskLogger().reportText("Auto Pilot off", new Date());
+			sim.getOpenDSGaugeCenter().updateAutoPilotIndicator("off");
 		}
 		else
 		{
 			PanelCenter.getMessageBox().addMessage("Auto Pilot on", 3);
 			Simulator.getDrivingTaskLogger().reportText("Auto Pilot on", new Date());
+			sim.getOpenDSGaugeCenter().updateAutoPilotIndicator("on");
 		}
 	}
 
 
 	public boolean isODAutoPilot()
 	{
+		if(isODAutoPilot == null)
+			return false;
+		
 		return isODAutoPilot;
 	}
 
