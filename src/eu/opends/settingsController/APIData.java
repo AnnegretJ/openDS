@@ -371,7 +371,6 @@ public class APIData
         		value = "none";
         	else
         	{
-        		//TODO (Doku) if manual transmission: "down" or "up" or "none"
         		int mostEfficientGear = car.getCarControl().getMostEfficientGear();
         		
         		if(mostEfficientGear > selectedGear)
@@ -453,7 +452,7 @@ public class APIData
 		}
 		else if(var.equals(AdressTable.exterior_wipers_frontWipers_currentIntervalLevel))
 		{
-			value = "off"; //TODO
+			value = "min"; //TODO
 		}
 		else if(var.equals(AdressTable.exterior_wipers_rearWipers_currentSpeedLevel))
 		{
@@ -461,11 +460,11 @@ public class APIData
 		}
 		else if(var.equals(AdressTable.exterior_wipers_rearWipers_currentIntervalLevel))
 		{
-			value = "off"; //TODO
+			value = "min"; //TODO
 		}
 		else if(var.equals(AdressTable.exterior_sideMirrors_leftMirror_expansionState))
 		{
-			value = "expanded"; //TODO
+			value = "out"; //TODO
 		}
 		else if(var.equals(AdressTable.exterior_sideMirrors_leftMirror_rotationH))
 		{
@@ -477,7 +476,7 @@ public class APIData
 		}
 		else if(var.equals(AdressTable.exterior_sideMirrors_rightMirror_expansionState))
 		{
-			value = "expanded"; //TODO
+			value = "out"; //TODO
 		}
 		else if(var.equals(AdressTable.exterior_sideMirrors_rightMirror_rotationH))
 		{

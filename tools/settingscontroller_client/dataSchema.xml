@@ -2,71 +2,197 @@
 	<thisVehicle>
 		<interior>
 			<cockpit>
+				<hazardLightsSwitchPressed></hazardLightsSwitchPressed>
+				<dashboard>
+					<frostLight></frostLight>
+					<oilPressureLight></oilPressureLight>
+					<tirePressureLight></tirePressureLight>
+					<batteryLight></batteryLight>
+					<checkLight></checkLight>
+					<speedLimit></speedLimit>
+				</dashboard>
 				<pedals>
 					<gasPedal>
-						<Properties>
-							<pressedState></pressedState>
-						</Properties>
+						<pressedState></pressedState>
+						<contact></contact>
 					</gasPedal>
 					<brakePedal>
-						<Properties>
-							<pressedState></pressedState>
-						</Properties>
+						<pressedState></pressedState>
+						<contact></contact>
 					</brakePedal>
+					<clutch>
+						<pressedState></pressedState>
+						<contact></contact>
+					</clutch>
 				</pedals>
+				<handBrake>
+					<engaged></engaged>
+				</handBrake>
+				<ignitionLock>
+					<state></state>
+					<keyPresent></keyPresent>
+				</ignitionLock>
 				<steeringWheel>
-					<Properties>
-						<steerAngle></steerAngle>
-					</Properties>
+					<steerAngle></steerAngle>
 				</steeringWheel>
+				<autoPilot>
+					<state></state>
+				</autoPilot>
+				<cruiseControl>
+					<state></state>
+				</cruiseControl>
 			</cockpit>
+			<navigationImage></navigationImage>
+			<seating>
+				<seats>
+					<driverSeat>
+						<seatbelt>
+							<inPlace></inPlace>
+						</seatbelt>
+					</driverSeat>
+				</seats>
+			</seating>
+			<environmental>
+				<ac>
+					<isPresent></isPresent>
+					<isRunning></isRunning>
+				</ac>
+				<preHeating>
+					<isPresent></isPresent>
+					<isRunning></isRunning>
+				</preHeating>
+			</environmental>
 		</interior>
 		<exterior>
 			<lights>
-				<Properties>
-					<headlights></headlights>
-				</Properties>
+				<turnSignalState></turnSignalState>
+				<headlight></headlight>
+				<hasFogLight></hasFogLight>
+				<fogLightEnabled></fogLightEnabled>
+				<hasRearFogLight></hasRearFogLight>
+				<rearFogLightEnabled></rearFogLightEnabled>
 			</lights>
 			<gearUnit>
-				<Properties>
-					<currentGear></currentGear>
-				</Properties>
+				<numForwardGears></numForwardGears>
+				<numBackwardGears></numBackwardGears>
+				<shiftRecommendation></shiftRecommendation>
+				<currentGear></currentGear>
+				<currentTransmission></currentTransmission>
 			</gearUnit>
 			<engineCompartment>
 				<engine>
-					<Properties>
-						<running></running>
-						<actualRpm></actualRpm>
-					</Properties>
+					<running></running>
+					<maxSpeed></maxSpeed>
+					<maxRpm></maxRpm>
+					<actualRpm></actualRpm>
 				</engine>
 			</engineCompartment>
 			<fueling>
 				<fuelType>
-					<Properties>
-						<currentConsumption></currentConsumption>
-					</Properties>
+					<averageConsumption></averageConsumption>
+					<currentConsumption></currentConsumption>
 					<tank>
-						<Properties>
-							<maxAmount></maxAmount>
-							<actualAmount></actualAmount>
-						</Properties>
+						<maxAmount></maxAmount>
+						<actualAmount></actualAmount>
 					</tank>
 				</fuelType>
 			</fueling>
+			<wipers>
+				<frontWipers>
+					<currentSpeedLevel></currentSpeedLevel>
+					<currentIntervalLevel></currentIntervalLevel>
+				</frontWipers>
+				<rearWipers>
+					<currentSpeedLevel></currentSpeedLevel>
+					<currentIntervalLevel></currentIntervalLevel>
+				</rearWipers>
+			</wipers>
+			<sideMirrors>
+				<leftMirror>
+					<expansionState></expansionState>
+					<rotationH></rotationH>
+					<rotationV></rotationV>
+				</leftMirror>
+				<rightMirror>
+					<expansionState></expansionState>
+					<rotationH></rotationH>
+					<rotationV></rotationV>
+				</rightMirror>
+			</sideMirrors>
 		</exterior>
 		<physicalAttributes>
-			<Properties>
-				<latitude></latitude>
-				<longitude></longitude>
-				<altitude></altitude>
-				<orientation></orientation>
-				<speed></speed>
-				<rise></rise>
-				<accelerationLateral></accelerationLateral>
-				<rotation></rotation>
-				<accelerationRotation></accelerationRotation>
-				<acceleration></acceleration>
-			</Properties>
+			<length></length>
+			<height></height>
+			<width></width>
+			<weight></weight>
+			<latitude></latitude>
+			<longitude></longitude>
+			<altitude></altitude>
+			<orientation></orientation>
+			<speed></speed>
+			<mileage></mileage>
+			<accelerationLongitudinal></accelerationLongitudinal>
+			<accelerationLateral></accelerationLateral>
+			<yawRate></yawRate>
 		</physicalAttributes>
+		<simulationAttributes>
+			<scenarioLocation></scenarioLocation>
+			<modelX></modelX>
+			<modelY></modelY>
+			<modelZ></modelZ>
+		</simulationAttributes>
+		<roadAttributes>
+			<position>
+				<roadID></roadID>
+				<laneID></laneID>
+				<s></s>
+				<distanceToTarget></distanceToTarget>
+			</position>
+			<currentLane>
+				<laneHeading></laneHeading>
+				<carHeading></carHeading>
+				<headingDifference></headingDifference>
+				<drivingInTheWrongDirection></drivingInTheWrongDirection>
+				<laneType></laneType>
+				<lanePositionType></lanePositionType>
+				<laneWidth></laneWidth>
+				<latOffsLineR></latOffsLineR>
+				<latOffsLineL></latOffsLineL>
+				<laneCurvature></laneCurvature>
+				<leftLineType></leftLineType>
+				<rightLineType></rightLineType>
+			</currentLane>
+			<otherLanes>
+				<leftLaneStatus></leftLaneStatus>
+				<rightLaneStatus></rightLaneStatus>
+				<sideObstacleLeft></sideObstacleLeft>
+				<sideObstacleRight></sideObstacleRight>
+				<blindSpotObstacleLeft></blindSpotObstacleLeft>
+				<blindSpotObstacleRight></blindSpotObstacleRight>
+				<numLanesDrivingDirection></numLanesDrivingDirection>
+				<numLanesOppositeDirection></numLanesOppositeDirection>
+			</otherLanes>
+			<traffic>
+				<numObjs></numObjs>
+				<objName></objName>
+				<objClass></objClass>
+				<objX></objX>
+				<objY></objY>
+				<objDist></objDist>
+				<objDirection></objDirection>
+				<objVel></objVel>
+			</traffic>
+			<regulations>
+				<currentSpeedLimit></currentSpeedLimit>
+				<numUpcomingSpeedLimits></numUpcomingSpeedLimits>
+				<upcomingSpeedLimitDistances></upcomingSpeedLimitDistances>
+				<upcomingSpeedLimitValues></upcomingSpeedLimitValues>
+				<upcomingIntersectionDistance></upcomingIntersectionDistance>
+				<trafficLightAhead></trafficLightAhead>
+				<trafficLightDist></trafficLightDist>
+				<trafficLightStates></trafficLightStates>
+				<trafficLightTimesToChange></trafficLightTimesToChange>
+			</regulations>
+		</roadAttributes>
 	</thisVehicle>
 </root>
