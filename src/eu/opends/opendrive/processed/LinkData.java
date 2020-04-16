@@ -20,17 +20,17 @@
 
 package eu.opends.opendrive.processed;
 
-import eu.opends.opendrive.data.ContactPoint;
+import eu.opends.opendrive.data.EContactPoint;
 
 
 public class LinkData
 {
 	private ODLane lane;
-	private ContactPoint contactPoint;
+	private EContactPoint contactPoint;
 	private String connectionID;
 	
 	
-	public LinkData(ODLane lane, ContactPoint contactPoint, String connectionID)
+	public LinkData(ODLane lane, EContactPoint contactPoint, String connectionID)
 	{
 		this.lane = lane;
 		this.contactPoint = contactPoint;
@@ -44,7 +44,7 @@ public class LinkData
 	}
 	
 	
-	public ContactPoint getContactPoint()
+	public EContactPoint getContactPoint()
 	{
 		return contactPoint;
 	}

@@ -13,7 +13,7 @@ import eu.opends.drivingTask.settings.SettingsLoader;
 import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.logitechsdk.util.LogitechLibrary;
 import eu.opends.main.Simulator;
-import eu.opends.opendrive.data.LaneType;
+import eu.opends.opendrive.data.ELaneType;
 import eu.opends.opendrive.processed.ODLane;
 import eu.opends.logitechsdk.util.ForceFeedbackPropertiesReader;
 import eu.opends.logitechsdk.util.LogitechDataStructures;
@@ -269,7 +269,7 @@ public class ForceFeedbackController
 	}
 
 	
-	private LaneType previousSurfaceType = LaneType.DRIVING;
+	private ELaneType previousSurfaceType = ELaneType.DRIVING;
 	private void updateSurfaceEffect()
 	{
     	if(carControl.isUseBullet() && carControl.getBulletVehicleControl().getNumWheels()>=4)
@@ -280,7 +280,7 @@ public class ForceFeedbackController
     		Vector3f rightWheelLocation = new Vector3f();
     		carControl.getBulletWheel(0).getWheelWorldLocation(rightWheelLocation);
     		ODLane laneAtRightWheel = sim.getOpenDriveCenter().getMostProbableLane(rightWheelLocation, expectedLanes);
-    		LaneType surfaceTypeRightWheel = LaneType.NONE;
+    		ELaneType surfaceTypeRightWheel = ELaneType.NONE;
     		if(laneAtRightWheel != null)
     			surfaceTypeRightWheel = laneAtRightWheel.getType();
     			
@@ -288,12 +288,12 @@ public class ForceFeedbackController
     		Vector3f leftWheelLocation = new Vector3f();
     		carControl.getBulletWheel(1).getWheelWorldLocation(leftWheelLocation);
     		ODLane laneAtLeftWheel = sim.getOpenDriveCenter().getMostProbableLane(leftWheelLocation, expectedLanes);
-    		LaneType surfaceTypeLeftWheel = LaneType.NONE;
+    		ELaneType surfaceTypeLeftWheel = ELaneType.NONE;
     		if(laneAtLeftWheel != null)
     			surfaceTypeLeftWheel = laneAtLeftWheel.getType();
     		
     		// get surface type with most dominant effect (discard the other surface type)
-    		LaneType surfaceType = computeCommonSurfaceType(surfaceTypeLeftWheel, surfaceTypeRightWheel);
+    		ELaneType surfaceType = computeCommonSurfaceType(surfaceTypeLeftWheel, surfaceTypeRightWheel);
     		
     		// if change of effect expected --> stop all surface effects
     		if(!surfaceType.equals(previousSurfaceType))
@@ -301,7 +301,7 @@ public class ForceFeedbackController
     		
     		float speed = sim.getCar().getCurrentSpeedKmh();
 
-    		if(surfaceType.equals(LaneType.SHOULDER)) // cobblestone
+    		if(surfaceType.equals(ELaneType.SHOULDER)) // cobblestone
     		{
     			int type = LogitechDataStructures.LOGI_PERIODICTYPE_SINE;
 				
@@ -318,7 +318,7 @@ public class ForceFeedbackController
 				int period = Math.round(map(speed, 0, 100, 120, 40));
 				logitechLib.LogiPlaySurfaceEffect(deviceID, type, magnitudePercentage, period);
     		}
-    		else if(surfaceType.equals(LaneType.BORDER)) // wooden bridge
+    		else if(surfaceType.equals(ELaneType.BORDER)) // wooden bridge
     		{
 				int type = LogitechDataStructures.LOGI_PERIODICTYPE_SQUARE;
 				
@@ -335,7 +335,7 @@ public class ForceFeedbackController
 				int period = Math.round(map(speed, 0, 100, 200, 100));
 				logitechLib.LogiPlaySurfaceEffect(deviceID, type, magnitudePercentage, period);
     		}
-    		else if(surfaceType.equals(LaneType.NONE))  // rough surface
+    		else if(surfaceType.equals(ELaneType.NONE))  // rough surface
     		{
 				int type = LogitechDataStructures.LOGI_PERIODICTYPE_TRIANGLE;
 				
@@ -352,7 +352,7 @@ public class ForceFeedbackController
 				int period = 40;
 				logitechLib.LogiPlaySurfaceEffect(deviceID, type, magnitudePercentage, period);
     		}
-    		else if(surfaceType.equals(LaneType.SIDEWALK)) // ice
+    		else if(surfaceType.equals(ELaneType.SIDEWALK)) // ice
     		{
     			//  0 km/h -->  0%
     			// 50 km/h --> 50%
@@ -406,19 +406,19 @@ public class ForceFeedbackController
 	}
 
 
-	private LaneType computeCommonSurfaceType(LaneType surfaceTypeLeftWheel, LaneType surfaceTypeRightWheel)
+	private ELaneType computeCommonSurfaceType(ELaneType surfaceTypeLeftWheel, ELaneType surfaceTypeRightWheel)
 	{
 		// order of effect intensity: SHOULDER > BORDER > NONE > DRIVING (& ALL OTHER) > SIDEWALK 
-		if(surfaceTypeLeftWheel.equals(LaneType.SHOULDER) || surfaceTypeRightWheel.equals(LaneType.SHOULDER))
-			return LaneType.SHOULDER;
-		else if(surfaceTypeLeftWheel.equals(LaneType.BORDER) || surfaceTypeRightWheel.equals(LaneType.BORDER))
-			return LaneType.BORDER;
-		else if(surfaceTypeLeftWheel.equals(LaneType.NONE) || surfaceTypeRightWheel.equals(LaneType.NONE))
-			return LaneType.NONE;
-		else if(surfaceTypeLeftWheel.equals(LaneType.SIDEWALK) && surfaceTypeRightWheel.equals(LaneType.SIDEWALK))
-			return LaneType.SIDEWALK;
+		if(surfaceTypeLeftWheel.equals(ELaneType.SHOULDER) || surfaceTypeRightWheel.equals(ELaneType.SHOULDER))
+			return ELaneType.SHOULDER;
+		else if(surfaceTypeLeftWheel.equals(ELaneType.BORDER) || surfaceTypeRightWheel.equals(ELaneType.BORDER))
+			return ELaneType.BORDER;
+		else if(surfaceTypeLeftWheel.equals(ELaneType.NONE) || surfaceTypeRightWheel.equals(ELaneType.NONE))
+			return ELaneType.NONE;
+		else if(surfaceTypeLeftWheel.equals(ELaneType.SIDEWALK) && surfaceTypeRightWheel.equals(ELaneType.SIDEWALK))
+			return ELaneType.SIDEWALK;
 		else
-			return LaneType.DRIVING;
+			return ELaneType.DRIVING;
 	}
 
 

@@ -18,7 +18,7 @@
 
 package eu.opends.settingsController;
 
-import eu.opends.opendrive.data.LaneType;
+import eu.opends.opendrive.data.ELaneType;
 import eu.opends.opendrive.processed.ODLane.AdasisLaneInformation;
 import eu.opends.opendrive.processed.ODLane.AdasisLaneType;
 import eu.opends.opendrive.processed.ODLane.AdasisLineType;
@@ -41,7 +41,7 @@ public class RoadData
 	public float hdgDiff = 0;
 	public boolean isWrongWay = false;
 	
-	public LaneType laneType = LaneType.NONE;
+	public ELaneType laneType = ELaneType.NONE;
 	
 	public AdasisLaneType lanePosition = AdasisLaneType.Unknown;
 	/* Nomenclature from ADASIS: 

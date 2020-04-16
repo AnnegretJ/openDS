@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 import eu.opends.opendrive.GeometryReader;
 import eu.opends.opendrive.RoadGenerator;
-import eu.opends.opendrive.data.OpenDRIVE.Road.PlanView.Geometry;
+import eu.opends.opendrive.data.TRoadPlanViewGeometry;
 import eu.opends.opendrive.geometryGenerator.ArcType;
 import eu.opends.opendrive.geometryGenerator.GeometriesType;
 import eu.opends.opendrive.geometryGenerator.LineType;
@@ -288,7 +288,7 @@ public class Junction
 		
 		if(geometryReader.isValid())
         {
-            ArrayList<Geometry> geometryList = geometryReader.getGeometries();
+            ArrayList<TRoadPlanViewGeometry> geometryList = geometryReader.getGeometries();
 
 	        // visualize road
             odRoad = new ODRoad(roadGenerator, geometryList);

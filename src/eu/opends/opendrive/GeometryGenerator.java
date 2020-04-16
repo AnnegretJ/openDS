@@ -43,7 +43,7 @@ import com.jme3.util.SkyFactory.EnvMapType;
 import eu.opends.main.SimulationDefaults;
 import eu.opends.main.Simulator;
 import eu.opends.main.StartPropertiesReader;
-import eu.opends.opendrive.data.OpenDRIVE.Road.PlanView.Geometry;
+import eu.opends.opendrive.data.TRoadPlanViewGeometry;
 import eu.opends.opendrive.processed.ODPoint;
 import eu.opends.opendrive.processed.ODRoad;
 import eu.opends.opendrive.util.OpenDRIVELoaderAnalogListener;
@@ -168,7 +168,7 @@ public class GeometryGenerator extends Simulator
         GeometryReader geometryReader = new GeometryReader(geometryDescriptionPath);
         if(geometryReader.isValid())
         {
-            ArrayList<Geometry> geometryList = geometryReader.getGeometries();
+            ArrayList<TRoadPlanViewGeometry> geometryList = geometryReader.getGeometries();
 
 	        // visualize road
 			ODRoad odRoad = new ODRoad(this, geometryList);

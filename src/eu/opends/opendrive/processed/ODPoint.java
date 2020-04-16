@@ -18,7 +18,7 @@
 
 package eu.opends.opendrive.processed;
 
-import eu.opends.opendrive.data.OpenDRIVE.Road.PlanView.Geometry;
+import eu.opends.opendrive.data.*;
 import eu.opends.opendrive.processed.ODLane.LaneSide;
 import eu.opends.tools.Vector3d;
 
@@ -28,7 +28,7 @@ public class ODPoint
     private double s;
     private Vector3d position;
     private double ortho;
-    private Geometry geometry;
+    private TRoadPlanViewGeometry geometry;
     private GeometryType geometryType;
     private ODLane parentLane;
     
@@ -39,7 +39,7 @@ public class ODPoint
     }
     
     
-    public ODPoint(String ID, double s, Vector3d position, double ortho, Geometry geometry, ODLane parentLane)
+    public ODPoint(String ID, double s, Vector3d position, double ortho, TRoadPlanViewGeometry geometry, ODLane parentLane)
     {
     	this.ID = ID;
     	this.s = s;
@@ -85,7 +85,7 @@ public class ODPoint
 	}
 	
 	
-	public Geometry getGeometry()
+	public TRoadPlanViewGeometry getGeometry()
 	{
 		return geometry;
 	}

@@ -52,7 +52,7 @@ import com.jme3.util.SkyFactory.EnvMapType;
 import eu.opends.main.SimulationDefaults;
 import eu.opends.main.Simulator;
 import eu.opends.main.StartPropertiesReader;
-import eu.opends.opendrive.data.OpenDRIVE.Road.PlanView.Geometry;
+import eu.opends.opendrive.data.TRoadPlanViewGeometry;
 import eu.opends.opendrive.geometryGenerator.Road;
 import eu.opends.opendrive.processed.ODRoad;
 import eu.opends.opendrive.roadGenerator.CodriverType;
@@ -176,7 +176,7 @@ public class RoadGenerator extends Simulator
 		        	geometryReader.setPredecessor(segment, roadDescription);
 		        	geometryReader.setSuccessor(segment.getSuccessor());
 		        	
-		            ArrayList<Geometry> geometryList = geometryReader.getGeometries();
+		            ArrayList<TRoadPlanViewGeometry> geometryList = geometryReader.getGeometries();
 
 		            // overwrite geometry data by road data
 		            Road road = geometryReader.getRoad(); 

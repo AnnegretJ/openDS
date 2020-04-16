@@ -39,38 +39,29 @@ import com.jme3.util.BufferUtils;
 
 import eu.opends.basics.SimulationBasics;
 import eu.opends.opendrive.OpenDRIVELoader;
-import eu.opends.opendrive.data.CenterLane;
-import eu.opends.opendrive.data.Lane;
-import eu.opends.opendrive.data.LaneType;
-import eu.opends.opendrive.data.RoadmarkType;
-import eu.opends.opendrive.data.Lane.RoadMark;
+import eu.opends.opendrive.data.*;
 import eu.opends.opendrive.processed.ODLane.LaneSide;
 import eu.opends.opendrive.util.ODPointComparator;
 import eu.opends.tools.Vector3d;
-import eu.opends.opendrive.data.OpenDRIVE.Road.Lanes.LaneSection;
-import eu.opends.opendrive.data.OpenDRIVE.Road.Lanes.LaneSection.Center;
-import eu.opends.opendrive.data.OpenDRIVE.Road.Lanes.LaneSection.Left;
-import eu.opends.opendrive.data.OpenDRIVE.Road.Lanes.LaneSection.Right;
-import eu.opends.opendrive.data.OpenDRIVE.Road.PlanView.Geometry;
 
 
 public class ODLaneSection
 {
 	private SimulationBasics sim;
 	private ODRoad road;
-	private LaneSection laneSection;
+	private TRoadLanesLaneSection laneSection;
 	private double endS;
 	private ArrayList<ODPoint> laneSectionReferencePointlist;
 	private ArrayList<ODPoint> firstLaneReferencePointlist = new ArrayList<ODPoint>();
 	private HashMap<Integer, ODLane> laneMap = new HashMap<Integer, ODLane>();
 	private HashMap<Integer, ODLane> leftODLaneMap = new HashMap<Integer, ODLane>();
 	private HashMap<Integer, ODLane> rightODLaneMap = new HashMap<Integer, ODLane>();
-	private List<eu.opends.opendrive.data.CenterLane.RoadMark> centerLaneRoadMarkList = 
-			new ArrayList<eu.opends.opendrive.data.CenterLane.RoadMark>();
+	private List<TRoadLanesLaneSectionLcrLaneRoadMark> centerLaneRoadMarkList = 
+			new ArrayList<TRoadLanesLaneSectionLcrLaneRoadMark>();
 
 	
 	public ODLaneSection(SimulationBasics sim, ODRoad road, ArrayList<ODPoint> laneSectionReferencePointlist, 
-			LaneSection laneSection, double endS) 
+			TRoadLanesLaneSection laneSection, double endS) 
 	{
 		this.sim = sim;
 		this.road = road;
@@ -78,14 +69,14 @@ public class ODLaneSection
 		this.endS = endS;
 		this.laneSectionReferencePointlist = laneSectionReferencePointlist;
 		
-		Left left = laneSection.getLeft();
+		TRoadLanesLaneSectionLeft left = laneSection.getLeft();
 		if(left != null)
 		{
-			List<Lane> leftLaneList = left.getLane();
-			for(Lane lane : leftLaneList)
+			List<TRoadLanesLaneSectionLeftLane> leftLaneList = left.getLane();
+			for(TRoadLanesLaneSectionLeftLane lane : leftLaneList)
 			{
 				// insert ODPoints at positions where lanes will be split (due to road marker changes)
-				List<RoadMark> roadMarkList = lane.getRoadMark();
+				List<TRoadLanesLaneSectionLcrLaneRoadMark> roadMarkList = lane.getRoadMark();
 				for(int i=roadMarkList.size()-1; i>=0; i--)
 				{
 					double s = laneSection.getS() + roadMarkList.get(i).getSOffset();
@@ -95,52 +86,59 @@ public class ODLaneSection
 				}
 				
 				ODLane l = new ODLane(sim, road, this, lane, LaneSide.LEFT);
-				laneMap.put(lane.getId(), l);
-				leftODLaneMap.put(lane.getId(), l);
+				laneMap.put(lane.getId().intValueExact(), l);
+				leftODLaneMap.put(lane.getId().intValueExact(), l);
 			}
 		}
 		
-		Center center = laneSection.getCenter();
+		TRoadLanesLaneSectionCenter center = laneSection.getCenter();
 		if(center != null)
 		{
-			CenterLane centerLane = center.getLane();
-			//int ID = centerLane.getId();
-			//LaneType type = centerLane.getType();
-			//SingleSide level = centerLane.getLevel();
-			centerLaneRoadMarkList = centerLane.getRoadMark();
-			for(int i=centerLaneRoadMarkList.size()-1; i>=0; i--)
+			List<TRoadLanesLaneSectionCenterLane> centerLaneList = center.getLane();
+			
+			if(!centerLaneList.isEmpty())
 			{
-				double s = laneSection.getS() + centerLaneRoadMarkList.get(i).getSOffset();
-				ODPoint resultingPoint = road.getPointOnReferenceLine(s, "roadMarkSeparation_" + s);
-				if(resultingPoint != null)
-					laneSectionReferencePointlist.add(resultingPoint);
-			}
+				// there is only one lane (this might be an error in the OpenDRIVE XML Schema)
+				TRoadLanesLaneSectionCenterLane centerLane = centerLaneList.get(0);
+			
+				//int ID = centerLane.getId().intValueExact();
+				//ELaneType type = centerLane.getType();
+				//TBool level = centerLane.getLevel();
+				centerLaneRoadMarkList = centerLane.getRoadMark();
+				for(int i=centerLaneRoadMarkList.size()-1; i>=0; i--)
+				{
+					double s = laneSection.getS() + centerLaneRoadMarkList.get(i).getSOffset();
+					ODPoint resultingPoint = road.getPointOnReferenceLine(s, "roadMarkSeparation_" + s);
+					if(resultingPoint != null)
+						laneSectionReferencePointlist.add(resultingPoint);
+				}
 						
 			/*
-			eu.opends.opendrive.data.CenterLane.Link link = centerLane.getLink();
-			if(link != null)
-			{
-				Integer predecessorID = null;
-				eu.opends.opendrive.data.CenterLane.Link.Predecessor predecessor = link.getPredecessor();
-				if(predecessor != null)
-					predecessorID = predecessor.getId();
+				TRoadLanesLaneSectionLcrLaneLink link = centerLane.getLink();
+				if(link != null)
+				{
+					Integer firstPredecessorID = null;
+					List<TRoadLanesLaneSectionLcrLaneLinkPredecessorSuccessor>  predecessorList = link.getPredecessor();
+					if(!predecessorList.isEmpty())
+						firstPredecessorID = predecessorList.get(0).getId().intValueExact();
 				
-				Integer successorID = null;
-				eu.opends.opendrive.data.CenterLane.Link.Successor successor = link.getSuccessor();
-				if(successor != null)
-					successorID = successor.getId();
-			}		
-			*/			
+					Integer firstSuccessorID = null;
+					List<TRoadLanesLaneSectionLcrLaneLinkPredecessorSuccessor> successorList = link.getSuccessor();
+					if(!successorList.isEmpty())
+						firstSuccessorID = successorList.get(0).getId().intValueExact();
+				}		
+			*/	
+			}
 		}
 		
-		Right right = laneSection.getRight();
+		TRoadLanesLaneSectionRight right = laneSection.getRight();
 		if(right != null)
 		{
-			List<Lane> rightLaneList = right.getLane();
-			for(Lane lane : rightLaneList)
+			List<TRoadLanesLaneSectionRightLane> rightLaneList = right.getLane();
+			for(TRoadLanesLaneSectionRightLane lane : rightLaneList)
 			{
 				// insert ODPoints at positions where lanes will be split (due to road marker changes)
-				List<RoadMark> roadMarkList = lane.getRoadMark();
+				List<TRoadLanesLaneSectionLcrLaneRoadMark> roadMarkList = lane.getRoadMark();
 				for(int i=roadMarkList.size()-1; i>=0; i--)
 				{
 					double s = laneSection.getS() + roadMarkList.get(i).getSOffset();
@@ -150,8 +148,8 @@ public class ODLaneSection
 				}	
 				
 				ODLane l = new ODLane(sim, road, this, lane, LaneSide.RIGHT);
-				laneMap.put(lane.getId(), l);
-				rightODLaneMap.put(lane.getId(), l);
+				laneMap.put(lane.getId().intValueExact(), l);
+				rightODLaneMap.put(lane.getId().intValueExact(), l);
 			}
 		}
 		
@@ -160,7 +158,7 @@ public class ODLaneSection
 	}
 
 	
-	public List<eu.opends.opendrive.data.CenterLane.RoadMark> getCenterLaneRoadMarkList()
+	public List<TRoadLanesLaneSectionLcrLaneRoadMark> getCenterLaneRoadMarkList()
 	{
 		return centerLaneRoadMarkList;
 	}
@@ -172,7 +170,7 @@ public class ODLaneSection
 		double s = point.getS();
 		Vector3d position = point.getPosition();
 		double ortho = point.getOrtho();
-		Geometry geometry = point.getGeometry();
+		TRoadPlanViewGeometry geometry = point.getGeometry();
 			
 		// apply lane offset
 		double laneOffset = -road.getLaneOffset(s);
@@ -221,10 +219,10 @@ public class ODLaneSection
 		// visualize center line
 		for(int i=centerLaneRoadMarkList.size()-1; i>=0; i--)
 		{				
-			RoadmarkType roadmarkType = centerLaneRoadMarkList.get(i).getType();
+			ERoadMarkType roadmarkType = centerLaneRoadMarkList.get(i).getType();
 			ArrayList<ODPoint> pointlist2 = new ArrayList<ODPoint>();
 			
-			eu.opends.opendrive.data.CenterLane.RoadMark roadMark = centerLaneRoadMarkList.get(i);
+			TRoadLanesLaneSectionLcrLaneRoadMark roadMark = centerLaneRoadMarkList.get(i);
 			double _startS =  laneSection.getS() + roadMark.getSOffset();
 			double _endS = endS;
 			
@@ -240,7 +238,7 @@ public class ODLaneSection
 	}
 
 
-	private void drawCenterLineSegment(ArrayList<ODPoint> pointlist, boolean visualize, RoadmarkType roadmarkType)
+	private void drawCenterLineSegment(ArrayList<ODPoint> pointlist, boolean visualize, ERoadMarkType roadmarkType)
 	{
 		if(pointlist.size()<2)
 		{
@@ -264,11 +262,11 @@ public class ODLaneSection
 			double ortho = point.getOrtho();
 
 			
-			double textureOffset = 0.5f;
+			double textureOffset = 0;
 			
-			eu.opends.opendrive.data.CenterLane.RoadMark roadMark = getCenterLineRoadMarkAtPos(s);
+			TRoadLanesLaneSectionLcrLaneRoadMark roadMark = getCenterLineRoadMarkAtPos(s);
 			if(roadMark.getWidth() != null)
-				textureOffset *= roadMark.getWidth();
+				textureOffset = roadMark.getWidth();
 			else	
 				System.err.println("WARNING: Road: " + getODRoad().getID() + "; centerLineRoadMark width == null (ODLaneSection)");
 			
@@ -402,12 +400,12 @@ public class ODLaneSection
 	}
 	
 	
-	public eu.opends.opendrive.data.CenterLane.RoadMark getCenterLineRoadMarkAtPos(double s) 
+	public TRoadLanesLaneSectionLcrLaneRoadMark getCenterLineRoadMarkAtPos(double s) 
 	{
 		
 		for(int i=centerLaneRoadMarkList.size()-1; i>=0; i--)
 		{							
-			eu.opends.opendrive.data.CenterLane.RoadMark roadMark = centerLaneRoadMarkList.get(i);
+			TRoadLanesLaneSectionLcrLaneRoadMark roadMark = centerLaneRoadMarkList.get(i);
 			
 			double _startS =  laneSection.getS() + roadMark.getSOffset();
 			double _endS = endS;
@@ -501,7 +499,7 @@ public class ODLaneSection
 		
 		if(0 < laneID && laneID <= leftODLaneMap.size())
 		{
-			// get accumulated lane width of left lanes -1, -2, -3, ... until given lane
+			// get accumulated lane width of left lanes 1, 2, 3, ... until given lane
 			for(int i=1; i<=laneID; i++)
 			{
 				if(i==laneID)
@@ -533,11 +531,33 @@ public class ODLaneSection
 		if(closestVertex != null)
 			centerPos.y = closestVertex.getY();
 		
-		Geometry geometry = laneReferencePoint.getGeometry();
+		TRoadPlanViewGeometry geometry = laneReferencePoint.getGeometry();
 
 		return new ODPoint(pointID+"_"+laneID, s, centerPos, ortho, geometry, lane);
 	}
+	
 
+	public double getDistanceFromCenterLine(ODLane lane, double s) 
+	{
+		int laneID = lane.getID();
+		double distance = 0;
+		
+		if(0 < laneID && laneID <= leftODLaneMap.size())
+		{
+			// get accumulated distances of left lanes 1, 2, 3, ... until given lane (exclusive)
+			for(int i=1; i<laneID; i++)
+				distance += leftODLaneMap.get(i).getWidth(s);
+		}
+		else if(-rightODLaneMap.size() <= laneID && laneID < 0)
+		{
+			// get accumulated distances of right lanes -1, -2, -3, ... until given lane (exclusive)
+			for(int i=-1; i>laneID; i--)
+				distance += rightODLaneMap.get(i).getWidth(s);
+		}
+
+		return distance;
+	}
+	
 
 	public Vector3f getClosestVertex(int laneID, Vector3f position)
 	{
@@ -586,7 +606,7 @@ public class ODLaneSection
 		int drivingLaneCounter = 0;
 		for(ODLane lane : laneMap.values())
 		{
-			if(lane.getType() == LaneType.DRIVING && lane.getWidth(s) > 0)
+			if(lane.getType() == ELaneType.DRIVING && lane.getWidth(s) > 0)
 				drivingLaneCounter++;
 		}
 		

@@ -26,16 +26,7 @@ import com.jme3.math.Vector3f;
 
 import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
-import eu.opends.opendrive.data.ContactPoint;
-import eu.opends.opendrive.data.ElementType;
-import eu.opends.opendrive.data.OpenDRIVE.Junction;
-import eu.opends.opendrive.data.OpenDRIVE.Road;
-import eu.opends.opendrive.data.OpenDRIVE.Road.Lanes.LaneOffset;
-import eu.opends.opendrive.data.OpenDRIVE.Road.Lanes.LaneSection;
-import eu.opends.opendrive.data.OpenDRIVE.Road.Link.Predecessor;
-import eu.opends.opendrive.data.OpenDRIVE.Road.Link.Successor;
-import eu.opends.opendrive.data.OpenDRIVE.Road.PlanView.Geometry;
-import eu.opends.opendrive.data.PRange;
+import eu.opends.opendrive.data.*;
 import eu.opends.opendrive.processed.ODPoint.GeometryType;
 import eu.opends.opendrive.util.Spiral;
 import eu.opends.opendrive.util.CurvePoint;
@@ -61,14 +52,14 @@ public class ODRoad
 	
 	private SimulationBasics sim;
 	private ODVisualizer visualizer;
-	private Road road;
-	private List<Geometry> geometryList = new ArrayList<Geometry>();
+	private TRoad road;
+	private List<TRoadPlanViewGeometry> geometryList = new ArrayList<TRoadPlanViewGeometry>();
 	private ArrayList<ODPoint> roadReferencePointlist = new ArrayList<ODPoint>();
 	private ArrayList<ODLaneSection> ODLaneSectionList = new ArrayList<ODLaneSection>();
 	private int pointCounter = 1;
 	
 	
-	public ODRoad(SimulationBasics sim, Road road) 
+	public ODRoad(SimulationBasics sim, TRoad road) 
 	{
 		this.sim = sim;
 		this.visualizer = sim.getOpenDriveCenter().getVisualizer();
@@ -79,7 +70,7 @@ public class ODRoad
 		String roadID = road.getId();
 		
 		// extract points of reference line from plan view geometries
-		for(Geometry geometry : geometryList)
+		for(TRoadPlanViewGeometry geometry : geometryList)
 		{
 			String ID = roadID + "_" + segmentCounter;
 			segmentCounter++;
@@ -97,10 +88,10 @@ public class ODRoad
 		}
 
 		
-		List<LaneSection> laneSectionList = road.getLanes().getLaneSection();
+		List<TRoadLanesLaneSection> laneSectionList = road.getLanes().getLaneSection();
 		for(int i=0; i<laneSectionList.size(); i++)
 		{
-			LaneSection ls = laneSectionList.get(i);
+			TRoadLanesLaneSection ls = laneSectionList.get(i);
 			double startS = ls.getS();
 			
 			double endS = road.getLength();
@@ -117,7 +108,7 @@ public class ODRoad
 		
 	
 	// Constructor only used by GeometryGenerator & RoadGenerator
-	public ODRoad(Simulator sim, ArrayList<Geometry> geometryList)
+	public ODRoad(Simulator sim, ArrayList<TRoadPlanViewGeometry> geometryList)
 	{
 		this.sim = sim;
 		this.visualizer = sim.getOpenDriveCenter().getVisualizer();
@@ -144,7 +135,7 @@ public class ODRoad
 		for(int i=0; i<geometryList.size(); i++)
 		{
 			ArrayList<ODPoint> pointList = new ArrayList<ODPoint>();
-			Geometry geometry = geometryList.get(i);
+			TRoadPlanViewGeometry geometry = geometryList.get(i);
 			
 			String ID = "roadPart" + "_" + segmentCounter;
 			segmentCounter++;
@@ -163,7 +154,7 @@ public class ODRoad
 			if(pointList != null && !pointList.isEmpty() && geometryList.size()>i+1)
 			{
 				ODPoint lastPoint = pointList.get(pointList.size()-1);
-				Geometry nextGeometry = geometryList.get(i+1);
+				TRoadPlanViewGeometry nextGeometry = geometryList.get(i+1);
 				
 				nextGeometry.setX(lastPoint.getPosition().getX());
 				nextGeometry.setY(-lastPoint.getPosition().getZ());
@@ -199,18 +190,18 @@ public class ODRoad
 					{
 						// successor is on same road in next lane section
 						ODLane successorLane = ODLaneSectionList.get(i+1).getLane(laneSuccessorID);
-						lane.setSuccessor(new ODLink(sim, successorLane, ContactPoint.START));
+						lane.setSuccessor(new ODLink(sim, successorLane, EContactPoint.START));
 					}
 					else
 					{
 						// successor is on next road
-						Successor roadSuccessor = road.getLink().getSuccessor();
+						TRoadLinkPredecessorSuccessor roadSuccessor = road.getLink().getSuccessor();
 						if(roadSuccessor != null)
 						{
 							String roadSuccessorID = roadSuccessor.getElementId();
-							if(roadSuccessor.getElementType() == ElementType.ROAD && roadSuccessorID != null)
+							if(roadSuccessor.getElementType() == ERoadLinkElementType.ROAD && roadSuccessorID != null)
 							{
-								ContactPoint roadSuccessorContactPoint = roadSuccessor.getContactPoint();
+								EContactPoint roadSuccessorContactPoint = roadSuccessor.getContactPoint();
 								lane.setSuccessor(new ODLink(sim, roadSuccessorID, laneSuccessorID, roadSuccessorContactPoint));
 							}
 						}
@@ -220,13 +211,13 @@ public class ODRoad
 				// junction
 				else
 				{
-					Successor roadSuccessor = road.getLink().getSuccessor();
+					TRoadLinkPredecessorSuccessor roadSuccessor = road.getLink().getSuccessor();
 					if(roadSuccessor != null)
 					{
 						String roadSuccessorID = roadSuccessor.getElementId();
-						if(roadSuccessor.getElementType() == ElementType.JUNCTION && roadSuccessorID != null)
+						if(roadSuccessor.getElementType() == ERoadLinkElementType.JUNCTION && roadSuccessorID != null)
 						{
-							List<Junction> junctionList = sim.getOpenDriveCenter().getJunctionList();
+							List<TJunction> junctionList = sim.getOpenDriveCenter().getJunctionList();
 							lane.setSuccessor(new ODLink(sim, junctionList, roadSuccessorID, road.getId(), lane.getID()));
 						}
 					}
@@ -241,18 +232,18 @@ public class ODRoad
 					{
 						// predecessor is on same road in previous lane section
 						ODLane predecessorLane = ODLaneSectionList.get(i-1).getLane(lanePredecessorID);
-						lane.setPredecessor(new ODLink(sim, predecessorLane, ContactPoint.END));
+						lane.setPredecessor(new ODLink(sim, predecessorLane, EContactPoint.END));
 					}
 					else
 					{
 						// predecessor is on previous road
-						Predecessor predecessor = road.getLink().getPredecessor();
+						TRoadLinkPredecessorSuccessor predecessor = road.getLink().getPredecessor();
 						if(predecessor != null)
 						{
 							String roadPredecessorID = predecessor.getElementId();
-							if(predecessor.getElementType() == ElementType.ROAD && roadPredecessorID != null)
+							if(predecessor.getElementType() == ERoadLinkElementType.ROAD && roadPredecessorID != null)
 							{
-								ContactPoint roadPredecessorContactPoint = predecessor.getContactPoint();
+								EContactPoint roadPredecessorContactPoint = predecessor.getContactPoint();
 								lane.setPredecessor(new ODLink(sim, roadPredecessorID, lanePredecessorID, roadPredecessorContactPoint));
 							}
 						}
@@ -262,13 +253,13 @@ public class ODRoad
 				// junction
 				else
 				{
-					Predecessor predecessor = road.getLink().getPredecessor();
+					TRoadLinkPredecessorSuccessor predecessor = road.getLink().getPredecessor();
 					if(predecessor != null)
 					{
 						String roadPredecessorID = predecessor.getElementId();
-						if(predecessor.getElementType() == ElementType.JUNCTION && roadPredecessorID != null)
+						if(predecessor.getElementType() == ERoadLinkElementType.JUNCTION && roadPredecessorID != null)
 						{
-							List<Junction> junctionList = sim.getOpenDriveCenter().getJunctionList();
+							List<TJunction> junctionList = sim.getOpenDriveCenter().getJunctionList();
 							lane.setPredecessor(new ODLink(sim, junctionList, roadPredecessorID, road.getId(), lane.getID()));
 						}
 					}
@@ -280,7 +271,7 @@ public class ODRoad
 
 	public double getLaneOffset(double s)
 	{
-		List<LaneOffset> laneOffsetList = road.getLanes().getLaneOffset();
+		List<TRoadLanesLaneOffset> laneOffsetList = road.getLanes().getLaneOffset();
 		for(int i=laneOffsetList.size()-1; i>=0; i--)
 		{
 			double sOffset = laneOffsetList.get(i).getS();
@@ -324,7 +315,7 @@ public class ODRoad
 
 	public ODPoint getPointOnReferenceLine(double s, String pointID)
 	{
-		Geometry geometry = getGeometryAtS(s);
+		TRoadPlanViewGeometry geometry = getGeometryAtS(s);
 		if(geometry != null)
 		{
 			double ds = s - geometry.getS();
@@ -344,11 +335,11 @@ public class ODRoad
 	}
 
 
-	public Geometry getGeometryAtS(double s)
+	public TRoadPlanViewGeometry getGeometryAtS(double s)
 	{
 		for(int i=geometryList.size()-1; i>=0; i--)
 		{
-			Geometry geometry = geometryList.get(i);
+			TRoadPlanViewGeometry geometry = geometryList.get(i);
 			//System.err.println("GS: " + geometry.getS() + ", s: " + s + ", GE: " + (geometry.getS() + geometry.getLength()));
 			if(geometry.getS() <= s && s <= (geometry.getS() + geometry.getLength()))
 				return geometry;
@@ -357,9 +348,9 @@ public class ODRoad
 	}
 	
 /*
-	public Geometry getGeometryAtS(double s)
+	public TRoadPlanViewGeometry getGeometryAtS(double s)
 	{
-		for(Geometry geometry : geometryList)
+		for(TRoadPlanViewGeometry geometry : geometryList)
 		{
 			//System.err.println("GS: " + geometry.getS() + ", s: " + s + ", GE: " + (geometry.getS() + geometry.getLength()));
 			if(geometry.getS() <= s && s <= (geometry.getS() + geometry.getLength()))
@@ -474,7 +465,7 @@ public class ODRoad
 		if(nearestPointOnLineAB != null)
 		{
 			GeometryType geometryType = referencePointA.getGeometryType();
-			Geometry geometry = referencePointA.getGeometry();
+			TRoadPlanViewGeometry geometry = referencePointA.getGeometry();
 			
 			// calculate global s value of nearest point (C) on line AB
 			double pointA_s = referencePointA.getS();
@@ -504,7 +495,7 @@ public class ODRoad
 	}
 
 	
-	private ArrayList<ODPoint> extractPointsFromLine(Geometry geometry, String ID) 
+	private ArrayList<ODPoint> extractPointsFromLine(TRoadPlanViewGeometry geometry, String ID) 
 	{
 		//System.out.println("Generating line");
 		
@@ -569,7 +560,7 @@ public class ODRoad
 	}    
 	
 	
-	private ODPoint getPointOnLine(double ds, Geometry geometry, String pointID)
+	private ODPoint getPointOnLine(double ds, TRoadPlanViewGeometry geometry, String pointID)
 	{
 		double startPointS = geometry.getS();
     	Vector3d pos = getPositionOnLine(geometry, ds);
@@ -578,7 +569,7 @@ public class ODRoad
 	}
 	
 	
-	private Vector3d getStartPos(Geometry geometry)
+	private Vector3d getStartPos(TRoadPlanViewGeometry geometry)
 	{
 		double x = geometry.getX();
 		double y = geometry.getY();
@@ -588,7 +579,7 @@ public class ODRoad
 	}
 
 	
-	private Vector3d getPositionOnLine(Geometry geometry, double ds)
+	private Vector3d getPositionOnLine(TRoadPlanViewGeometry geometry, double ds)
 	{
 		double hdg = geometry.getHdg();
 		
@@ -600,7 +591,7 @@ public class ODRoad
 	}
 
 
-	private ArrayList<ODPoint> extractPointsFromArc(Geometry geometry, String ID)
+	private ArrayList<ODPoint> extractPointsFromArc(TRoadPlanViewGeometry geometry, String ID)
 	{
 		//System.out.println("Generating arc");
 		
@@ -657,7 +648,7 @@ public class ODRoad
 	}
 	
 	
-	private ODPoint getPointOnArc(double ds, Geometry geometry, String pointID)
+	private ODPoint getPointOnArc(double ds, TRoadPlanViewGeometry geometry, String pointID)
 	{
 		double hdg = geometry.getHdg();
 		double curvature = geometry.getArc().getCurvature();
@@ -684,7 +675,7 @@ public class ODRoad
 	}
 
 
-	private ArrayList<ODPoint> extractPointsFromSpiral(Geometry geometry, String ID)
+	private ArrayList<ODPoint> extractPointsFromSpiral(TRoadPlanViewGeometry geometry, String ID)
 	{
 		//System.out.println("Generating spiral");
 		
@@ -741,7 +732,7 @@ public class ODRoad
 	}
 
 
-	private ODPoint getPointOnSpiral(double ds, Geometry geometry, String pointID)
+	private ODPoint getPointOnSpiral(double ds, TRoadPlanViewGeometry geometry, String pointID)
 	{
 		// geometry parameters
 		double startPointS = geometry.getS();
@@ -770,7 +761,7 @@ public class ODRoad
 	}
 	
 	
-	private ArrayList<ODPoint> extractPointsFromPoly3(Geometry geometry, String ID)
+	private ArrayList<ODPoint> extractPointsFromPoly3(TRoadPlanViewGeometry geometry, String ID)
 	{
 		//System.out.println("Generating poly3");
 		
@@ -827,7 +818,7 @@ public class ODRoad
 	}
 	
 	
-	private ODPoint getPointOnPoly3(double ds, Geometry geometry, String pointID)
+	private ODPoint getPointOnPoly3(double ds, TRoadPlanViewGeometry geometry, String pointID)
 	{
 		double hdg = geometry.getHdg();
 		double startPointS = geometry.getS();
@@ -841,7 +832,7 @@ public class ODRoad
 	}
 
 
-	private CurvePoint ordPoly3(double ds, Geometry geometry)
+	private CurvePoint ordPoly3(double ds, TRoadPlanViewGeometry geometry)
 	{
 		double a = geometry.getPoly3().getA();
 		double b = geometry.getPoly3().getB();
@@ -853,7 +844,7 @@ public class ODRoad
 	}
 
 	
-	private ArrayList<ODPoint> extractPointsFromParamPoly3(Geometry geometry, String ID)
+	private ArrayList<ODPoint> extractPointsFromParamPoly3(TRoadPlanViewGeometry geometry, String ID)
 	{
 		//System.out.println("Generating paramPoly3");
 		
@@ -910,7 +901,7 @@ public class ODRoad
 	}
 	
 	
-	private ODPoint getPointOnParamPoly3(double ds, Geometry geometry, String pointID)
+	private ODPoint getPointOnParamPoly3(double ds, TRoadPlanViewGeometry geometry, String pointID)
 	{
 		double hdg = geometry.getHdg();
 		double startPointS = geometry.getS();
@@ -924,7 +915,7 @@ public class ODRoad
 	}
 
 
-	private CurvePoint ordParamPoly3(double ds, Geometry geometry)
+	private CurvePoint ordParamPoly3(double ds, TRoadPlanViewGeometry geometry)
 	{
 		// previous position
 		Vector3d previousPos = getPos(ds-interpolationStep, geometry);
@@ -950,12 +941,12 @@ public class ODRoad
 	}
 
 
-	private Vector3d getPos(double ds, Geometry geometry)
+	private Vector3d getPos(double ds, TRoadPlanViewGeometry geometry)
 	{
 		double p = ds;
 		
-		PRange pRange= geometry.getParamPoly3().getPRange();
-		if(pRange == null || pRange == PRange.NORMALIZED)
+		EParamPoly3PRange pRange= geometry.getParamPoly3().getPRange();
+		if(pRange == null || pRange == EParamPoly3PRange.NORMALIZED)
 			p /= geometry.getLength();
 		
 		double au = geometry.getParamPoly3().getAU();

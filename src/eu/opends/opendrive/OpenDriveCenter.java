@@ -44,9 +44,7 @@ import eu.opends.basics.SimulationBasics;
 import eu.opends.car.SteeringCar;
 import eu.opends.codriver.ScenarioMessage;
 import eu.opends.main.Simulator;
-import eu.opends.opendrive.data.OpenDRIVE;
-import eu.opends.opendrive.data.OpenDRIVE.Junction;
-import eu.opends.opendrive.data.OpenDRIVE.Road;
+import eu.opends.opendrive.data.*;
 import eu.opends.opendrive.processed.ODLane;
 import eu.opends.opendrive.processed.ODPoint;
 import eu.opends.opendrive.processed.ODRoad;
@@ -55,7 +53,7 @@ import eu.opends.opendrive.util.ODVisualizer;
 
 public class OpenDriveCenter
 {
-	private static String schemaFile = "assets/DrivingTasks/Schema/OpenDRIVE_1.4H.xsd";
+	private static String schemaFile = "assets/DrivingTasks/Schema/OpenDRIVE_1.5M.xsd";
 	private boolean drawCompass = false;
 	private boolean drawMarker = true;
 	private boolean textureProjectionEnabled = true;
@@ -64,7 +62,7 @@ public class OpenDriveCenter
 	private SimulationBasics sim;
 	private OpenDRIVE od;
 	private Unmarshaller unmarshaller;
-	private List<Junction> junctionList = new ArrayList<Junction>();
+	private List<TJunction> junctionList = new ArrayList<TJunction>();
 	private HashMap<String,ODRoad> roadMap = new HashMap<String, ODRoad>();
 	private ODVisualizer visualizer;
 	private ScenarioMessage scenarioMessage = null;
@@ -113,7 +111,7 @@ public class OpenDriveCenter
 	}
 	
 	
-	public List<Junction> getJunctionList()
+	public List<TJunction> getJunctionList()
 	{
 		return junctionList;
 	}
@@ -135,7 +133,7 @@ public class OpenDriveCenter
 			junctionList = openDrive.getJunction();
 			
 			// process roads
-			for(Road road : openDrive.getRoad())
+			for(TRoad road : openDrive.getRoad())
 				roadMap.put(road.getId(), new ODRoad(sim, road));
 	
 			for(ODRoad road : roadMap.values())

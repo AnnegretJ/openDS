@@ -36,23 +36,10 @@ import com.jme3.util.BufferUtils;
 import eu.opends.basics.SimulationBasics;
 import eu.opends.opendrive.processed.LinkData;
 import eu.opends.opendrive.processed.SpeedLimit;
-import eu.opends.opendrive.data.Color;
-import eu.opends.opendrive.data.ContactPoint;
-import eu.opends.opendrive.data.Lane;
-import eu.opends.opendrive.data.LaneType;
-import eu.opends.opendrive.data.RoadmarkType;
-import eu.opends.opendrive.data.SingleSide;
-import eu.opends.opendrive.data.Weight;
+import eu.opends.opendrive.data.*;
 import eu.opends.opendrive.util.IntersectionComparator;
 import eu.opends.opendrive.util.ODPosition;
 import eu.opends.opendrive.util.SpeedLimitComparator;
-import eu.opends.opendrive.data.Lane.Link;
-import eu.opends.opendrive.data.Lane.Width;
-import eu.opends.opendrive.data.LaneChange;
-import eu.opends.opendrive.data.Lane.Link.Predecessor;
-import eu.opends.opendrive.data.Lane.Link.Successor;
-import eu.opends.opendrive.data.Lane.RoadMark;
-import eu.opends.opendrive.data.Lane.Speed;
 import eu.opends.tools.Vector3d;
 import eu.opends.traffic.OpenDRIVECar;
 import eu.opends.traffic.PhysicalTraffic;
@@ -67,11 +54,11 @@ public class ODLane
 	private ODLaneSection laneSection;
 	private double laneStartS;
 	private double laneEndS;
-	private Lane lane;
-	private int laneID;
+	private TRoadLanesLaneSectionLrLane lane;
+	private int laneID = 0;
 	private LaneSide laneSide;
-	private LaneType type;
-	private SingleSide level;
+	private ELaneType type;
+	private TBool level;
 	private Integer predecessorID = null;
 	private Integer successorID = null;
 	private ArrayList<ODPoint> borderPointList = new ArrayList<ODPoint>();
@@ -79,7 +66,7 @@ public class ODLane
 	private ODPoint outerPoint = null;
 	private ODLink successorLink = null;
 	private ODLink predecessorLink = null;
-	private RoadMark defaultRoadMark;
+	private TRoadLanesLaneSectionLcrLaneRoadMark defaultRoadMark;
 	
 	
 	public enum LaneSide
@@ -96,7 +83,7 @@ public class ODLane
 	}
 	
 	
-	public ODLane(SimulationBasics sim, ODRoad road, ODLaneSection laneSection, Lane lane, LaneSide laneSide)
+	public ODLane(SimulationBasics sim, ODRoad road, ODLaneSection laneSection, TRoadLanesLaneSectionLrLane lane, LaneSide laneSide)
 	{
 		this.sim = sim;
 		this.road = road;
@@ -105,29 +92,35 @@ public class ODLane
 		this.laneEndS = laneSection.getEndS();
 		this.laneSide = laneSide;
 		this.lane = lane;
-		laneID = lane.getId();
+		if(lane instanceof TRoadLanesLaneSectionLeftLane)
+			laneID = ((TRoadLanesLaneSectionLeftLane)lane).getId().intValueExact();
+		else if(lane instanceof TRoadLanesLaneSectionRightLane)
+			laneID = ((TRoadLanesLaneSectionRightLane)lane).getId().intValueExact();
+		
 		type = lane.getType();
 		level = lane.getLevel();
 
-		Link link = lane.getLink();
+		TRoadLanesLaneSectionLcrLaneLink link = lane.getLink();
 		if(link != null)
 		{
-			Predecessor predecessor = link.getPredecessor();
-			if(predecessor != null)
-				predecessorID = predecessor.getId();
+			List<TRoadLanesLaneSectionLcrLaneLinkPredecessorSuccessor> predecessorList = link.getPredecessor();
+			if(!predecessorList.isEmpty())
+				// TODO consider ALL predecessors
+				predecessorID = predecessorList.get(0).getId().intValueExact();
 			
-			Successor successor = link.getSuccessor();
-			if(successor != null)
-				successorID = successor.getId();
+			List<TRoadLanesLaneSectionLcrLaneLinkPredecessorSuccessor> successorList = link.getSuccessor();
+			if(!successorList.isEmpty())
+				// TODO consider ALL successors
+				successorID = successorList.get(0).getId().intValueExact();
 		}
 		
-		defaultRoadMark = new RoadMark();
-		defaultRoadMark.setType(RoadmarkType.NONE);
+		defaultRoadMark = new TRoadLanesLaneSectionLcrLaneRoadMark();
+		defaultRoadMark.setType(ERoadMarkType.NONE);
 		defaultRoadMark.setSOffset(0.0);
-		defaultRoadMark.setWeight(Weight.STANDARD);
-		defaultRoadMark.setColor(Color.STANDARD);
+		defaultRoadMark.setWeight(ERoadMarkWeight.STANDARD);
+		defaultRoadMark.setColor(ERoadMarkColor.STANDARD);
 		defaultRoadMark.setWidth(0.13);
-		defaultRoadMark.setLaneChange(LaneChange.BOTH);
+		defaultRoadMark.setLaneChange(ERoadLanesLaneSectionLcrLaneRoadMarkLaneChange.BOTH);
 	}
 
 
@@ -164,30 +157,60 @@ public class ODLane
 	public double getWidth(double s)
 	{
 		double laneSection_s = laneSection.getS();
-		List<Width> widthList = lane.getWidth();
+		List<Object> widthOrBorderList = lane.getWidthOrBorder();
 		
-		for(int i=widthList.size()-1; i>=0; i--)
+		for(int i=widthOrBorderList.size()-1; i>=0; i--)
 		{
-			double offset = laneSection_s + widthList.get(i).getSOffset();
-			if(s >= offset)
+			if(widthOrBorderList.get(i) instanceof TRoadLanesLaneSectionLrLaneWidth)
 			{
-				double a = widthList.get(i).getA();
-				double b = widthList.get(i).getB();
-				double c = widthList.get(i).getC();
-				double d = widthList.get(i).getD();
+				TRoadLanesLaneSectionLrLaneWidth width = ((TRoadLanesLaneSectionLrLaneWidth) widthOrBorderList.get(i));
+				double offset = laneSection_s + width.getSOffset();
+				if(s >= offset)
+				{
+					double a = width.getA();
+					double b = width.getB();
+					double c = width.getC();
+					double d = width.getD();
 				
-				double ds = s - offset;
+					double ds = s - offset;
 				
-				return a + b*ds + c*ds*ds + d*ds*ds*ds;
+					return a + b*ds + c*ds*ds + d*ds*ds*ds;
+				}
+			}
+			else if(widthOrBorderList.get(i) instanceof TRoadLanesLaneSectionLrLaneBorder)
+			{
+				TRoadLanesLaneSectionLrLaneBorder border = ((TRoadLanesLaneSectionLrLaneBorder) widthOrBorderList.get(i));
+				
+				double offset = laneSection_s + border.getSOffset();
+				if(s >= offset)
+				{
+					double a = border.getA();
+					double b = border.getB();
+					double c = border.getC();
+					double d = border.getD();
+				
+					double ds = s - offset;
+				
+					// lateral position (t) of outer (= farther away from center line) lane border
+					double outerBorderT = a + b*ds + c*ds*ds + d*ds*ds*ds;
+					
+					if(this.getLaneSide() == LaneSide.RIGHT)
+						outerBorderT = -outerBorderT;
+					
+					// lateral position (t) of inner (= closer to center line) lane border
+					double innerBorderT = laneSection.getDistanceFromCenterLine(this, s);
+					
+					return outerBorderT - innerBorderT;
+				}
 			}
 		}
 		return 0;
 	}
 	
 	
-	public RoadMark getRoadMark(double s)
+	public TRoadLanesLaneSectionLcrLaneRoadMark getRoadMark(double s)
 	{
-		List<RoadMark> roadMarkList = lane.getRoadMark();
+		List<TRoadLanesLaneSectionLcrLaneRoadMark> roadMarkList = lane.getRoadMark();
 		
 		// if RoadMark information is missing (optional!) use default settings
 		if(roadMarkList.size() == 0)
@@ -228,7 +251,7 @@ public class ODLane
 		
 		// get lane segments for texturing road markers
 		double laneSection_s = laneSection.getS();
-		List<RoadMark> roadMarkList = lane.getRoadMark();
+		List<TRoadLanesLaneSectionLcrLaneRoadMark> roadMarkList = lane.getRoadMark();
 		
 		// if RoadMark information is missing (optional!) use default settings
 		if(roadMarkList.size() == 0)
@@ -242,10 +265,10 @@ public class ODLane
 					", roadMark: " + roadMarkList.get(i).getType().toString());
 			*/
 			
-			RoadmarkType roadmarkType = roadMarkList.get(i).getType();
+			ERoadMarkType roadmarkType = roadMarkList.get(i).getType();
 			ArrayList<ODPoint> pointlist2 = new ArrayList<ODPoint>();
 			
-			RoadMark roadMark = roadMarkList.get(i);
+			TRoadLanesLaneSectionLcrLaneRoadMark roadMark = roadMarkList.get(i);
 			double startS = laneSection_s + roadMark.getSOffset();
 			
 			double endS = laneSection.getEndS();
@@ -291,7 +314,7 @@ public class ODLane
 	}
 	
 
-	private void drawLaneSegment(ArrayList<ODPoint> pointlist, boolean visualize, RoadmarkType roadmarkType)
+	private void drawLaneSegment(ArrayList<ODPoint> pointlist, boolean visualize, ERoadMarkType roadmarkType)
 	{
 		if(pointlist.size()<2)
 		{
@@ -314,17 +337,17 @@ public class ODLane
 
 			double textureOffset = 0;
 			
-			if(nextToCenterLine(s) /*laneID == -1 || laneID == 1*/)
+			if(nextToCenterLine(s))
 			{
-				eu.opends.opendrive.data.CenterLane.RoadMark centerLineRoadMark = laneSection.getCenterLineRoadMarkAtPos(s);
+				TRoadLanesLaneSectionLcrLaneRoadMark centerLineRoadMark = laneSection.getCenterLineRoadMarkAtPos(s);
 				if(centerLineRoadMark != null)
 				{
 					if(centerLineRoadMark.getWidth() != null)	
 					{
 						if(laneSide == LaneSide.LEFT)
-							textureOffset = -0.5f * centerLineRoadMark.getWidth();
+							textureOffset = -centerLineRoadMark.getWidth();
 						else
-							textureOffset = 0.5f * centerLineRoadMark.getWidth();
+							textureOffset = centerLineRoadMark.getWidth();
 					}
 					else
 						System.err.println("WARNING: Road: " + getODRoad().getID() + ", Lane: " + laneID + "; centerLineRoadMark width == null (ODLane)");
@@ -386,22 +409,22 @@ public class ODLane
 		Geometry geo = new Geometry("ODarea_" + road.getID() + "_" + laneID, mesh);
 		geo.setMaterial(getMaterial(roadmarkType));
 		
-		if(!visualize || type == LaneType.NONE)
+		if(!visualize || type == ELaneType.NONE)
 			geo.setCullHint(CullHint.Always);
-		
-		if(type == LaneType.DRIVING)
-			mesh.scaleTextureCoordinates(new Vector2f(1f,1f));
-		else if(type == LaneType.SIDEWALK)
-			mesh.scaleTextureCoordinates(new Vector2f(1f,1f));
-		else if(type == LaneType.BORDER)
-			mesh.scaleTextureCoordinates(new Vector2f(1f,3f));
-		else if(type == LaneType.SHOULDER)
+
+		if(type == ELaneType.DRIVING)
 			mesh.scaleTextureCoordinates(new Vector2f(1f,0.5f));
-		else if(type == LaneType.RESTRICTED)
-			mesh.scaleTextureCoordinates(new Vector2f(1f,0.08f));
-		else if(type == LaneType.PARKING)
+		else if(type == ELaneType.SIDEWALK)
 			mesh.scaleTextureCoordinates(new Vector2f(1f,1f));
-		
+		else if(type == ELaneType.BORDER)
+			mesh.scaleTextureCoordinates(new Vector2f(1f,3f));
+		else if(type == ELaneType.SHOULDER)
+			mesh.scaleTextureCoordinates(new Vector2f(2f,1f));
+		else if(type == ELaneType.RESTRICTED)
+			mesh.scaleTextureCoordinates(new Vector2f(1f,0.08f));
+		else if(type == ELaneType.PARKING)
+			mesh.scaleTextureCoordinates(new Vector2f(1f,1f));
+
 		sim.getOpenDriveNode().attachChild(geo);
 		laneSection.addToBulletPhysicsSpace(geo);
 		
@@ -412,7 +435,12 @@ public class ODLane
 	private boolean nextToCenterLine(double s)
 	{
 		if(laneID == -1 || laneID == 1)
-			return true;
+		{
+			if(getWidth(s) <= 0)
+				return false;
+			else
+				return true;
+		}
 		
 		ODLane innerNeighbor = getInnerNeighbor();
 		while(innerNeighbor != null && innerNeighbor.getWidth(s) == 0)
@@ -427,7 +455,7 @@ public class ODLane
 	}
 
 
-	private Material getMaterial(RoadmarkType roadmarkType)
+	private Material getMaterial(ERoadMarkType roadmarkType)
 	{
 		switch(type)
 		{
@@ -448,13 +476,13 @@ public class ODLane
 	}
 
 
-	public LaneType getType()
+	public ELaneType getType()
 	{
 		return type;
 	}
 
 
-	public SingleSide getLevel()
+	public TBool getLevel()
 	{
 		return level;
 	}
@@ -572,7 +600,7 @@ public class ODLane
 
 	public AdasisLaneType getAdasisLaneType(double s, boolean isWrongWay)
 	{	
-		if(type == LaneType.DRIVING)
+		if(type == ELaneType.DRIVING)
 		{
 			boolean hasInnerNeighbor = hasInnerNeighbor(s);
 			boolean hasOuterNeighbor = hasOuterNeighbor(s);
@@ -596,7 +624,7 @@ public class ODLane
 			else
 				return AdasisLaneType.SingleLaneRoad;			
 		}
-		else if(type == LaneType.SHOULDER)
+		else if(type == ELaneType.SHOULDER)
 			return AdasisLaneType.EmergencyLane;
 		else 
 			return AdasisLaneType.Unknown;
@@ -616,22 +644,22 @@ public class ODLane
 		if(laneSide == LaneSide.LEFT)
 		{
 			if(laneSection.getLeftLaneMap().containsKey(laneID-1))
-				return (laneSection.getLeftLaneMap().get(laneID-1).getType() == LaneType.DRIVING
+				return (laneSection.getLeftLaneMap().get(laneID-1).getType() == ELaneType.DRIVING
 						&& laneSection.getLeftLaneMap().get(laneID-1).getWidth(s) > 0);
 			/**/
 			else if(laneID == 1 && laneSection.getRightLaneMap().containsKey(-1))
-				return (laneSection.getRightLaneMap().get(-1).getType() == LaneType.DRIVING
+				return (laneSection.getRightLaneMap().get(-1).getType() == ELaneType.DRIVING
 						&& laneSection.getRightLaneMap().get(-1).getWidth(s) > 0);
 			/**/
 		}
 		else
 		{
 			if(laneSection.getRightLaneMap().containsKey(laneID+1))
-				return (laneSection.getRightLaneMap().get(laneID+1).getType() == LaneType.DRIVING
+				return (laneSection.getRightLaneMap().get(laneID+1).getType() == ELaneType.DRIVING
 						&& laneSection.getRightLaneMap().get(laneID+1).getWidth(s) > 0);
 			/**/
 			else if(laneID == -1 && laneSection.getLeftLaneMap().containsKey(1))
-				return (laneSection.getLeftLaneMap().get(1).getType() == LaneType.DRIVING
+				return (laneSection.getLeftLaneMap().get(1).getType() == ELaneType.DRIVING
 						&& laneSection.getLeftLaneMap().get(1).getWidth(s) > 0);
 			/**/
 		}
@@ -681,13 +709,13 @@ public class ODLane
 		if(laneSide == LaneSide.LEFT)
 		{
 			if(laneSection.getLeftLaneMap().containsKey(laneID+1))
-				return (laneSection.getLeftLaneMap().get(laneID+1).getType() == LaneType.DRIVING
+				return (laneSection.getLeftLaneMap().get(laneID+1).getType() == ELaneType.DRIVING
 						&& laneSection.getLeftLaneMap().get(laneID+1).getWidth(s) > 0);
 		}
 		else
 		{
 			if(laneSection.getRightLaneMap().containsKey(laneID-1))
-				return (laneSection.getRightLaneMap().get(laneID-1).getType() == LaneType.DRIVING
+				return (laneSection.getRightLaneMap().get(laneID-1).getType() == ELaneType.DRIVING
 						&& laneSection.getRightLaneMap().get(laneID-1).getWidth(s) > 0);
 		}
 		
@@ -786,7 +814,7 @@ public class ODLane
 					ODLane successorLane = successorLinkData.getLane();
 					double successorS = successorLane.getStartS();
 					
-					if(successorLinkData.getContactPoint() == ContactPoint.END)
+					if(successorLinkData.getContactPoint() == EContactPoint.END)
 					{
 						increasingS = !increasingS;
 						successorS = successorLane.getEndS();
@@ -814,7 +842,7 @@ public class ODLane
 					ODLane predecessorLane = predecessorLinkData.getLane();
 					double predecessorS = predecessorLane.getEndS();
 					
-					if(predecessorLinkData.getContactPoint() == ContactPoint.START)
+					if(predecessorLinkData.getContactPoint() == EContactPoint.START)
 					{
 						increasingS = !increasingS;
 						predecessorS = predecessorLane.getStartS();
@@ -914,7 +942,7 @@ public class ODLane
 					ODLane successorLane = successorLinkData.getLane();
 					double successorS = successorLane.getStartS();
 					
-					if(successorLinkData.getContactPoint() == ContactPoint.END)
+					if(successorLinkData.getContactPoint() == EContactPoint.END)
 					{
 						increasingS = !increasingS;
 						successorS = successorLane.getEndS();
@@ -941,7 +969,7 @@ public class ODLane
 					ODLane predecessorLane = predecessorLinkData.getLane();
 					double predecessorS = predecessorLane.getEndS();
 					
-					if(predecessorLinkData.getContactPoint() == ContactPoint.START)
+					if(predecessorLinkData.getContactPoint() == EContactPoint.START)
 					{
 						increasingS = !increasingS;
 						predecessorS = predecessorLane.getStartS();
@@ -964,7 +992,7 @@ public class ODLane
 	{
 		ArrayList<SpeedLimit> list = new ArrayList<SpeedLimit>();
 		
-		List<Speed> speedList = lane.getSpeed();
+		List<TRoadLanesLaneSectionLrLaneSpeed> speedList = lane.getSpeed();
 		
 		if(increasingS)
 		{
@@ -1093,7 +1121,7 @@ public class ODLane
 				ODLane successorLane = successorLinkData.getLane();
 				double successorS = successorLane.getStartS();
 				
-				if(successorLinkData.getContactPoint() == ContactPoint.END)
+				if(successorLinkData.getContactPoint() == EContactPoint.END)
 				{
 					increasingS = !increasingS;
 					successorS = successorLane.getEndS();
@@ -1119,7 +1147,7 @@ public class ODLane
 				ODLane predecessorLane = predecessorLinkData.getLane();
 				double predecessorS = predecessorLane.getEndS();
 				
-				if(predecessorLinkData.getContactPoint() == ContactPoint.START)
+				if(predecessorLinkData.getContactPoint() == EContactPoint.START)
 				{
 					increasingS = !increasingS;
 					predecessorS = predecessorLane.getStartS();
@@ -1190,7 +1218,7 @@ public class ODLane
 					ODLane successorLane = successorLinkData.getLane();
 					double successorS = successorLane.getStartS();
 					
-					if(successorLinkData.getContactPoint() == ContactPoint.END)
+					if(successorLinkData.getContactPoint() == EContactPoint.END)
 					{
 						increasingS = !increasingS;
 						successorS = successorLane.getEndS();
@@ -1217,7 +1245,7 @@ public class ODLane
 					ODLane predecessorLane = predecessorLinkData.getLane();
 					double predecessorS = predecessorLane.getEndS();
 					
-					if(predecessorLinkData.getContactPoint() == ContactPoint.START)
+					if(predecessorLinkData.getContactPoint() == EContactPoint.START)
 					{
 						increasingS = !increasingS;
 						predecessorS = predecessorLane.getStartS();
@@ -1270,7 +1298,7 @@ public class ODLane
 	public double getSpeedLimit(double s)
 	{
 		double laneSection_s = laneSection.getS();
-		List<Speed> speedLimitList = lane.getSpeed();
+		List<TRoadLanesLaneSectionLrLaneSpeed> speedLimitList = lane.getSpeed();
 		
 		for(int i=speedLimitList.size()-1; i>=0; i--)
 		{
@@ -1331,16 +1359,16 @@ public class ODLane
 	
 	public AdasisLineType getLineType(Position linePosition, double s, boolean isWrongWay)
 	{
-		if(type == LaneType.DRIVING)
+		if(type == ELaneType.DRIVING)
 		{
 			ODLane neighborLane = getNeighbor(linePosition, s, isWrongWay);
-			if(neighborLane != null && neighborLane.getType() == LaneType.DRIVING)
+			if(neighborLane != null && neighborLane.getType() == ELaneType.DRIVING)
 			{
 				boolean useRoadMarkOfThisLane = isWrongWay;
 				if(linePosition == Position.Right)
 					useRoadMarkOfThisLane = !useRoadMarkOfThisLane;
 				
-				RoadmarkType roadMarkType = null;
+				ERoadMarkType roadMarkType = null;
 				if(useRoadMarkOfThisLane)
 					// road mark belongs to this lane
 					roadMarkType = getRoadMark(s).getType();
@@ -1389,7 +1417,7 @@ public class ODLane
 	{
 		ODLane neighborLane = getNeighbor(lanePosition, s, isWrongWay);
 		
-		if(/*type == LaneType.DRIVING && */neighborLane != null && neighborLane.getType() == LaneType.DRIVING)
+		if(/*type == ELaneType.DRIVING && */neighborLane != null && neighborLane.getType() == ELaneType.DRIVING)
 		{			
 			boolean increasingS = isWrongWay;
 			
@@ -1461,7 +1489,7 @@ public class ODLane
 					ODLane successorLane = successorLinkData.getLane();
 					double successorS = successorLane.getStartS();
 					
-					if(successorLinkData.getContactPoint() == ContactPoint.END)
+					if(successorLinkData.getContactPoint() == EContactPoint.END)
 					{
 						increasingS = !increasingS;
 						successorS = successorLane.getEndS();
@@ -1490,7 +1518,7 @@ public class ODLane
 					ODLane predecessorLane = predecessorLinkData.getLane();
 					double predecessorS = predecessorLane.getEndS();
 					
-					if(predecessorLinkData.getContactPoint() == ContactPoint.START)
+					if(predecessorLinkData.getContactPoint() == EContactPoint.START)
 					{
 						increasingS = !increasingS;
 						predecessorS = predecessorLane.getStartS();

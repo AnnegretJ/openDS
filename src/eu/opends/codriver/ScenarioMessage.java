@@ -37,7 +37,7 @@ import eu.opends.environment.TrafficLight.TrafficLightState;
 import eu.opends.environment.TrafficLightForecast;
 import eu.opends.environment.TrafficLightInternalProgram;
 import eu.opends.main.Simulator;
-import eu.opends.opendrive.data.LaneType;
+import eu.opends.opendrive.data.ELaneType;
 import eu.opends.opendrive.processed.Intersection;
 import eu.opends.opendrive.processed.ODLane;
 import eu.opends.opendrive.processed.ODPoint;
@@ -190,7 +190,7 @@ public class ScenarioMessage
 	public int RLMetrics(ODLane lane, double[] reward){
 		// In Road
 		int end = 0;
-		if (lane.getType() == LaneType.BORDER) {
+		if (lane.getType() == ELaneType.BORDER) {
 			reward[0] = -1;
 			end = 1;
 			//System.out.println("ESCO!!!!!!!!!!!!!");

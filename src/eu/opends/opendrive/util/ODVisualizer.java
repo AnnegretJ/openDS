@@ -36,9 +36,11 @@ import com.jme3.scene.shape.Curve;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
+import com.jme3.texture.Texture.WrapAxis;
+import com.jme3.texture.Texture.WrapMode;
 
 import eu.opends.basics.SimulationBasics;
-import eu.opends.opendrive.data.RoadmarkType;
+import eu.opends.opendrive.data.ERoadMarkType;
 import eu.opends.opendrive.processed.ODPoint;
 import eu.opends.tools.Vector3d;
 
@@ -134,43 +136,47 @@ public class ODVisualizer
         
 	    
         // lane textures (with line)
-	    roadSolidLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_basic_solid.png");
-	    roadSolidSolidLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_solid_solid.png");
-	    roadBrokenSolidLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_broken_solid.png");
-	    roadSolidBrokenLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_solid_broken.png");
-	    roadBrokenLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_basic_broken.png");
-	    roadBrokenBrokenLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_broken_broken.png");
-	    roadCurbSolidLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_curb_solid.png");
-	    roadGrassSolidLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_grass_solid.png");
-	    roadBottsDotsBrokenLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_bottsdots_broken.png");	    
-	    roadNoLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_basic_noline.png");
+	    roadSolidLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_basic_solid.png", null, null);
+	    roadSolidSolidLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_solid_solid.png", null, null);
+	    roadBrokenSolidLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_broken_solid.png", null, null);
+	    roadSolidBrokenLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_solid_broken.png", null, null);
+	    roadBrokenLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_basic_broken.png", null, null);
+	    roadBrokenBrokenLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_broken_broken.png", null, null);
+	    roadCurbSolidLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_curb_solid.png", null, null);
+	    roadGrassSolidLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_grass_solid.png", null, null);
+	    roadBottsDotsBrokenLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_bottsdots_broken.png", null, null);	    
+	    roadNoLineLaneTextureMaterial = createTexturedMaterial("Textures/Road/road_basic_noline.png", null, null);
 	    
 	    // center line textures
-	    roadSolidLineTextureMaterial = createTexturedMaterial("Textures/Road/solidline.png");
-	    roadSolidSolidLineTextureMaterial = createTexturedMaterial("Textures/Road/solidsolidline.png");
-	    roadBrokenSolidLineTextureMaterial = createTexturedMaterial("Textures/Road/brokensolidline.png");
-	    roadSolidBrokenLineTextureMaterial = createTexturedMaterial("Textures/Road/solidbrokenline.png");
-	    roadBrokenLineTextureMaterial = createTexturedMaterial("Textures/Road/brokenline.png");
-	    roadBrokenBrokenLineTextureMaterial = createTexturedMaterial("Textures/Road/brokenbrokenline.png");
-	    roadCurbSolidLineTextureMaterial = createTexturedMaterial("Textures/Road/curbline.png");
-	    roadGrassSolidLineTextureMaterial = createTexturedMaterial("Textures/Road/grassline.png");
-	    roadBottsDotsBrokenLineTextureMaterial = createTexturedMaterial("Textures/Road/bottsdotsline.png");
-	    roadNoLineTextureMaterial = createTexturedMaterial("Textures/Road/noline.png");
+	    roadSolidLineTextureMaterial = createTexturedMaterial("Textures/Road/solidline.png", null, null);
+	    roadSolidSolidLineTextureMaterial = createTexturedMaterial("Textures/Road/solidsolidline.png", null, null);
+	    roadBrokenSolidLineTextureMaterial = createTexturedMaterial("Textures/Road/brokensolidline.png", null, null);
+	    roadSolidBrokenLineTextureMaterial = createTexturedMaterial("Textures/Road/solidbrokenline.png", null, null);
+	    roadBrokenLineTextureMaterial = createTexturedMaterial("Textures/Road/brokenline.png", null, null);
+	    roadBrokenBrokenLineTextureMaterial = createTexturedMaterial("Textures/Road/brokenbrokenline.png", null, null);
+	    roadCurbSolidLineTextureMaterial = createTexturedMaterial("Textures/Road/curbline.png", null, null);
+	    roadGrassSolidLineTextureMaterial = createTexturedMaterial("Textures/Road/grassline.png", null, null);
+	    roadBottsDotsBrokenLineTextureMaterial = createTexturedMaterial("Textures/Road/bottsdotsline.png", null, null);
+	    roadNoLineTextureMaterial = createTexturedMaterial("Textures/Road/noline.png", null, null);
 	    
 	    // other textures
-	    roadParkingParallelTextureMaterial = createTexturedMaterial("Textures/Road/road_basic_parking_parallel.png");
-	    curbTextureMaterial = createTexturedMaterial("Textures/Road/curb.png");
-	    sidewalkTextureMaterial = createTexturedMaterial("Textures/Road/sidewalk.jpg");
-	    shoulderTextureMaterial = createTexturedMaterial("Textures/Road/shoulder.jpg");
-	    restrictedTextureMaterial = createTexturedMaterial("Textures/Road/restricted.jpg");
+	    roadParkingParallelTextureMaterial = createTexturedMaterial("Textures/Road/road_basic_parking_parallel.png", null, null);
+	    curbTextureMaterial = createTexturedMaterial("Textures/Road/curb.png", null, null);
+	    sidewalkTextureMaterial = createTexturedMaterial("Textures/Road/sidewalk.jpg", null, null);
+	    shoulderTextureMaterial = createTexturedMaterial("Textures/Road/shoulder.jpg", WrapAxis.S, WrapMode.Repeat);
+	    restrictedTextureMaterial = createTexturedMaterial("Textures/Road/restricted.jpg", null, null);
     }
     
     
-    private Material createTexturedMaterial(String texturePath)
+    private Material createTexturedMaterial(String texturePath, WrapAxis wrapAxis, WrapMode wrapMode)
     {
 	    Material material = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 	    Texture texture = sim.getAssetManager().loadTexture(texturePath);
 	    texture.setAnisotropicFilter(32);
+	    
+	    if(wrapAxis != null && wrapMode != null)
+	    	texture.setWrap(wrapAxis, wrapMode);
+
 	    material.setTexture("ColorMap", texture);
 	    return material;
 	}
@@ -355,7 +361,7 @@ public class ODVisualizer
 	}
 
 	
-	public Material getLaneMaterial(RoadmarkType roadmarkType)
+	public Material getLaneMaterial(ERoadMarkType roadmarkType)
 	{
 		switch(roadmarkType)
 		{
@@ -373,7 +379,7 @@ public class ODVisualizer
 	}
 	
 
-	public Material getCenterLineMaterial(RoadmarkType roadmarkType)
+	public Material getCenterLineMaterial(ERoadMarkType roadmarkType)
 	{
 		switch(roadmarkType)
 		{

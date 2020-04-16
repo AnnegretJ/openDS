@@ -35,10 +35,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
-import eu.opends.opendrive.data.OpenDRIVE.Road.PlanView.Geometry;
-import eu.opends.opendrive.data.OpenDRIVE.Road.PlanView.Geometry.Arc;
-import eu.opends.opendrive.data.OpenDRIVE.Road.PlanView.Geometry.Line;
-import eu.opends.opendrive.data.OpenDRIVE.Road.PlanView.Geometry.Spiral;
+import eu.opends.opendrive.data.*;
 import eu.opends.opendrive.geometryGenerator.ArcType;
 import eu.opends.opendrive.geometryGenerator.GeometryDescription;
 import eu.opends.opendrive.geometryGenerator.LineType;
@@ -57,7 +54,7 @@ public class GeometryReader
 {
 	private String schemaFile = "geometryDescription.xsd";
 	
-	ArrayList<Geometry> geometryList = new ArrayList<Geometry>();
+	ArrayList<TRoadPlanViewGeometry> geometryList = new ArrayList<TRoadPlanViewGeometry>();
 	private Road road = null;	
 	
 	private double initialX = 0;
@@ -113,7 +110,7 @@ public class GeometryReader
 	}
 	
 	
-	public ArrayList<Geometry> getGeometries()
+	public ArrayList<TRoadPlanViewGeometry> getGeometries()
 	{
 		return geometryList;
 	}
@@ -157,9 +154,9 @@ public class GeometryReader
 	}
 	
 	
-	private ArrayList<Geometry> getGeometries(Road road)
+	private ArrayList<TRoadPlanViewGeometry> getGeometries(Road road)
 	{
-		ArrayList<Geometry> geometryList = new ArrayList<Geometry>();
+		ArrayList<TRoadPlanViewGeometry> geometryList = new ArrayList<TRoadPlanViewGeometry>();
 		List<Object> list = road.getGeometries().getLineOrSpiralOrArc();
 		for(Object item : list)
 		{
@@ -205,32 +202,32 @@ public class GeometryReader
 	}
 	
 	
-	private Geometry line(double length)
+	private TRoadPlanViewGeometry line(double length)
 	{
-	    Geometry geometry = new Geometry();
+		TRoadPlanViewGeometry geometry = new TRoadPlanViewGeometry();
 	    
 	    geometry.setLength(length);
 	    geometry.setHdg(initialHdg);
 	    geometry.setS(0.0);
 	    geometry.setX(initialX);
 	    geometry.setY(initialY);
-	    Line l = new Line();
+	    TRoadPlanViewGeometryLine l = new TRoadPlanViewGeometryLine();
 	    geometry.setLine(l);
 	    
 		return geometry;
 	}
 	
 	
-	private Geometry spiral(double length, double curvStart, double curvEnd)
+	private TRoadPlanViewGeometry spiral(double length, double curvStart, double curvEnd)
 	{
-	    Geometry geometry = new Geometry();
+		TRoadPlanViewGeometry geometry = new TRoadPlanViewGeometry();
 	    
 	    geometry.setLength(length);
 	    geometry.setHdg(initialHdg);
 	    geometry.setS(0.0);
 	    geometry.setX(initialX);
 	    geometry.setY(initialY);
-	    Spiral s = new Spiral();
+	    TRoadPlanViewGeometrySpiral s = new TRoadPlanViewGeometrySpiral();
 	    s.setCurvStart(curvStart);
 	    s.setCurvEnd(curvEnd);
 	    geometry.setSpiral(s);
@@ -239,16 +236,16 @@ public class GeometryReader
 	}
 	
 	
-	private Geometry arc(double length, double curvature)
+	private TRoadPlanViewGeometry arc(double length, double curvature)
 	{
-	    Geometry geometry = new Geometry();
+		TRoadPlanViewGeometry geometry = new TRoadPlanViewGeometry();
 	    
 	    geometry.setLength(length);
 	    geometry.setHdg(initialHdg);
 	    geometry.setS(0.0);
 	    geometry.setX(initialX);
 	    geometry.setY(initialY);
-	    Arc a = new Arc();
+	    TRoadPlanViewGeometryArc a = new TRoadPlanViewGeometryArc();
 	    a.setCurvature(curvature);
 	    geometry.setArc(a);
 	
@@ -261,7 +258,7 @@ public class GeometryReader
     	String output = "";
 		for(int i=0; i<geometryList.size(); i++)
 		{
-			Geometry geometry = geometryList.get(i);
+			TRoadPlanViewGeometry geometry = geometryList.get(i);
 			
 			double s = geometry.getS();
 			double x = geometry.getX();
@@ -399,7 +396,7 @@ public class GeometryReader
     	
     	if(geometryList.size()>0)
     	{
-    		Geometry lastGeometry = geometryList.get(geometryList.size()-1);
+    		TRoadPlanViewGeometry lastGeometry = geometryList.get(geometryList.size()-1);
     		totalLength = lastGeometry.getS() + lastGeometry.getLength();
     	}
 		

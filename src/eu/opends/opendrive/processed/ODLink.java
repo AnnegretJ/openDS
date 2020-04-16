@@ -23,10 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.opends.basics.SimulationBasics;
-import eu.opends.opendrive.data.ContactPoint;
-import eu.opends.opendrive.data.OpenDRIVE.Junction;
-import eu.opends.opendrive.data.OpenDRIVE.Junction.Connection;
-import eu.opends.opendrive.data.OpenDRIVE.Junction.Connection.LaneLink;
+import eu.opends.opendrive.data.*;
+
 
 public class ODLink
 {
@@ -37,7 +35,7 @@ public class ODLink
 	
 	
 	// linked lane within same road
-	public ODLink(SimulationBasics sim, ODLane linkedLane, ContactPoint contactPoint)
+	public ODLink(SimulationBasics sim, ODLane linkedLane, EContactPoint contactPoint)
 	{
 		this.sim = sim;
 		
@@ -46,7 +44,7 @@ public class ODLink
 
 	
 	// linked lane on given road
-	public ODLink(SimulationBasics sim, String roadID, Integer laneID, ContactPoint contactPoint) 
+	public ODLink(SimulationBasics sim, String roadID, Integer laneID, EContactPoint contactPoint) 
 	{
 		this.sim = sim;
 		
@@ -60,30 +58,30 @@ public class ODLink
 
 	
 	// linked lanes at junction
-	public ODLink(SimulationBasics sim, List<Junction> junctionList, String junctionID, String incomingRoadID, int fromLaneID)
+	public ODLink(SimulationBasics sim, List<TJunction> junctionList, String junctionID, String incomingRoadID, int fromLaneID)
 	{
 		this.sim = sim;
 		this.isJunction = true;
 		this.junctionID = junctionID;
 		
-		for(Junction junction : junctionList)
+		for(TJunction junction : junctionList)
 		{
 			if(junction.getId().equals(junctionID))
 			{
-				for(Connection connection : junction.getConnection())
+				for(TJunctionConnection connection : junction.getConnection())
 				{
 					if(connection.getIncomingRoad().equals(incomingRoadID))
 					{
 						String connectingRoadID = connection.getConnectingRoad();
-						ContactPoint contactPoint = connection.getContactPoint();
+						EContactPoint contactPoint = connection.getContactPoint();
 						String connectionID = connection.getId();
 						
-						for(LaneLink laneLink : connection.getLaneLink())
+						for(TJunctionConnectionLaneLink laneLink : connection.getLaneLink())
 						{
 							if(laneLink.getFrom().equals(fromLaneID))
 							{
 								// lane with roadID "connectingRoadID" and laneID "toLane"
-								ODLane toLane = getLane(connectingRoadID, laneLink.getTo(), contactPoint);
+								ODLane toLane = getLane(connectingRoadID, laneLink.getTo().intValueExact(), contactPoint);
 								
 								// add lane and contact point to result list
 								if(toLane != null)
@@ -106,7 +104,7 @@ public class ODLink
 
 
 	// get lane with given laneID on road with given roadID (either in first or last lane section)
-	private ODLane getLane(String roadID, Integer laneID, ContactPoint contactPoint)
+	private ODLane getLane(String roadID, Integer laneID, EContactPoint contactPoint)
 	{
 		if(roadID != null && !roadID.isEmpty() && laneID != null)
 		{
@@ -118,7 +116,7 @@ public class ODLink
 				if(laneSectionList.size() > 0)
 				{
 					int item = 0;
-					if(contactPoint == ContactPoint.END)
+					if(contactPoint == EContactPoint.END)
 						item = laneSectionList.size()-1;
 
 					ODLaneSection laneSection = laneSectionList.get(item);
