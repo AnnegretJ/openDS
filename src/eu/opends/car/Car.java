@@ -20,6 +20,7 @@ package eu.opends.car;
 
 import java.io.File;
 
+import com.jme3.audio.AudioNode;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.VehicleControl;
 import com.jme3.bullet.joints.HingeJoint;
@@ -39,6 +40,8 @@ import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.shape.Box;
 
 import eu.opends.audio.AudioCenter;
+import eu.opends.car.AudioContainer.AudioLocation;
+import eu.opends.car.AudioContainer.AudioType;
 import eu.opends.car.LightTexturesContainer.TurnSignalState;
 import eu.opends.environment.GeoPosition;
 import eu.opends.main.Simulator;
@@ -65,6 +68,7 @@ public abstract class Car
     protected CarControl trailerControl;
     protected Node trailerNode;
     protected LightTexturesContainer lightTexturesContainer;
+    protected AudioContainer audioContainer;
     
     private float steeringWheelState;
     protected float steeringInfluenceByCrosswind = 0;
@@ -143,6 +147,10 @@ public abstract class Car
         resetPedals();
         
         setupReferencePoints();
+        
+        // load audio container
+        String audioPath = modelFile.getPath().replace(modelFile.getName(), "audioFiles.xml");
+     	audioContainer = new AudioContainer(sim, this, audioPath);
     }
 
 	
@@ -661,11 +669,53 @@ public abstract class Car
 		showEngineStatusMessage(engineOn);
 		
 		if(engineOn)
-			AudioCenter.startEngine();
+			startEngine();
 		else
-			AudioCenter.stopEngine();
+			stopEngine();
 	}
 
+	
+	private void startEngine() 
+	{
+		if(this instanceof SteeringCar)
+		{
+			// play idle sound after end of start up sound (inside) --> steering car only
+			AudioNode insideEngineStartAudioNode = audioContainer.getAudioNode(AudioLocation.inside, AudioType.engineStart);
+			int durationIn = (int) (1000 * insideEngineStartAudioNode.getAudioData().getDuration());
+		
+			AudioCenter.playSound(insideEngineStartAudioNode);
+			AudioCenter.fadeOut(insideEngineStartAudioNode, durationIn-600);
+		
+			AudioNode insideEngineIdleAudioNode = audioContainer.getAudioNode(AudioLocation.inside, AudioType.engineIdle);
+			AudioCenter.playSoundDelayed(insideEngineIdleAudioNode, durationIn-400);
+		}
+		
+		// play idle sound after end of start up sound (outside) --> all cars (steering & traffic)
+		AudioNode outsideEngineStartAudioNode = audioContainer.getAudioNode(AudioLocation.outside, AudioType.engineStart);
+		int durationOut = (int) (1000 * outsideEngineStartAudioNode.getAudioData().getDuration());
+		
+		AudioCenter.playSound(outsideEngineStartAudioNode);
+		AudioCenter.fadeOut(outsideEngineStartAudioNode, durationOut-600);
+		
+		AudioNode outsideEngineIdleAudioNode = audioContainer.getAudioNode(AudioLocation.outside, AudioType.engineIdle);
+		AudioCenter.playSoundDelayed(outsideEngineIdleAudioNode, durationOut-400);
+	}
+
+
+	private void stopEngine() 
+	{
+		if(this instanceof SteeringCar)
+		{
+			// play stop sound (inside) --> steering car only
+			AudioCenter.playSound(audioContainer.getAudioNode(AudioLocation.inside,AudioType.engineStop));
+			AudioCenter.stopSound(audioContainer.getAudioNode(AudioLocation.inside,AudioType.engineIdle));
+		}
+		
+		// play stop sound (outside) --> all cars (steering & traffic)
+		AudioCenter.playSound(audioContainer.getAudioNode(AudioLocation.outside,AudioType.engineStop));
+		AudioCenter.stopSound(audioContainer.getAudioNode(AudioLocation.outside,AudioType.engineIdle));
+	}
+	
 
 	protected void showEngineStatusMessage(boolean engineOn) 
 	{
@@ -765,5 +815,10 @@ public abstract class Car
 	public Spatial getCenterGeometry()
 	{
 		return centerGeometry;
+	}
+	
+	public AudioContainer getAudioContainer()
+	{
+		return audioContainer;
 	}
 }

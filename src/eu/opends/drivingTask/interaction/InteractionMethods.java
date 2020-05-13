@@ -511,7 +511,7 @@ public class InteractionMethods
 				throw new Exception();
 			
 			// create ResetCarToResetPointAction
-			return new ResetCarToResetPointAction(delay, repeat, resetPointID, (Simulator)sim);
+			return new ResetCarToResetPointTriggerAction(delay, repeat, resetPointID, (Simulator)sim);
 			
 		} catch (Exception e) {
 	
@@ -649,7 +649,7 @@ public class InteractionMethods
 				laneID = Integer.parseInt(laneIDString);
 			
 			// create SetODCarTargetLaneAction
-			return new SetODCarTargetLaneAction(sim, delay, repeat, trafficObjectID, laneID);
+			return new SetODCarTargetLaneTriggerAction(sim, delay, repeat, trafficObjectID, laneID);
 			
 		} catch (Exception e) {
 
@@ -719,7 +719,7 @@ public class InteractionMethods
 				throw new Exception();
 			
 			// create ChangeLaneODCarAction
-			return new ChangeLaneODCarAction(sim, delay, repeat, trafficObjectID, lanePos);
+			return new ChangeLaneODCarTriggerAction(sim, delay, repeat, trafficObjectID, lanePos);
 			
 		} catch (Exception e) {
 			
@@ -777,7 +777,7 @@ public class InteractionMethods
 			}
 			
 			// create PresentationTaskAction
-			return new PresentationTaskAction(delay, repeat, presentationModel, (Simulator)sim);
+			return new PresentationTaskTriggerAction(delay, repeat, presentationModel, (Simulator)sim);
 			
 		} catch (Exception e) {
 	
@@ -931,7 +931,7 @@ public class InteractionMethods
 			int speedLimit = Integer.parseInt(speedLimitString);
 			
 			// create SetSpeedLimitAction
-			return new SetSpeedLimitAction(delay, repeat, speedLimit, true);
+			return new SetSpeedLimitTriggerAction(delay, repeat, speedLimit, true);
 			
 		} catch (Exception e) {
 	
@@ -985,7 +985,7 @@ public class InteractionMethods
 			int speedLimit = Integer.parseInt(speedLimitString);
 			
 			// create SetSpeedLimitAction
-			return new SetSpeedLimitAction(delay, repeat, speedLimit, false);
+			return new SetSpeedLimitTriggerAction(delay, repeat, speedLimit, false);
 			
 		} catch (Exception e) {
 	
@@ -1039,7 +1039,7 @@ public class InteractionMethods
 				throw new Exception();
 			
 			// create GetTimeUntilBrakeAction
-			return new GetTimeUntilBrakeAction(delay, repeat, triggerName);
+			return new GetTimeUntilBrakeTriggerAction(delay, repeat, triggerName);
 			
 		} catch (Exception e) {
 			
@@ -1098,7 +1098,7 @@ public class InteractionMethods
 			int speedChange = Integer.parseInt(speedChangeString);
 			
 			// create GetTimeUntilBrakeAction
-			return new GetTimeUntilSpeedChangeAction(delay, repeat, triggerName, speedChange, (Simulator)sim);
+			return new GetTimeUntilSpeedChangeTriggerAction(delay, repeat, triggerName, speedChange, (Simulator)sim);
 			
 		} catch (Exception e) {
 			
@@ -1148,12 +1148,114 @@ public class InteractionMethods
 			if(soundID == null)
 				throw new Exception();
 
-			// create PlaySoundAction
-			return new PlaySoundAction(delay, repeat, soundID);
+			// create PlaySoundTriggerAction
+			return new PlaySoundTriggerAction(delay, repeat, soundID);
 			
 		} catch (Exception e) {
 			
 			reportError("playSound", parameter);
+			return null;
+		}
+	}
+	
+	
+	/**
+	 * Pauses the given sound file.
+	 * 
+	 * @param sim
+	 * 			Simulator.
+	 * 
+	 * @param delay
+	 * 			Amount of seconds (float) to wait before the TriggerAction will be executed.
+	 * 
+	 * @param repeat
+	 * 			Number of maximum repetitions (0 = infinite).
+	 * 
+	 * @param parameterList
+	 * 			List of additional parameters.
+	 * 
+	 * @return
+	 * 			PauseSound trigger action.
+	 */
+	@Action(
+			name = "pauseSound",
+			layer = Layer.SCENE,
+			description = "Pauses a sound file specified in the scene layer",
+			defaultDelay = 0,
+			defaultRepeat = 0,
+			param = {@Parameter(name="soundID", type="String", defaultValue="soundEffect01", 
+								description="ID of sound file to pause")
+					}
+		)
+	public TriggerAction pauseSound(SimulationBasics sim, float delay, int repeat, Properties parameterList)
+	{	
+		String parameter = "";
+		
+		try {
+			
+			// extract ID of sound
+			parameter = "soundID";
+			String soundID = parameterList.getProperty(parameter);
+			if(soundID == null)
+				throw new Exception();
+
+			// create PauseSoundTriggerAction
+			return new PauseSoundTriggerAction(delay, repeat, soundID);
+			
+		} catch (Exception e) {
+			
+			reportError("pauseSound", parameter);
+			return null;
+		}
+	}
+	
+	
+	/**
+	 * Stop the given sound file.
+	 * 
+	 * @param sim
+	 * 			Simulator.
+	 * 
+	 * @param delay
+	 * 			Amount of seconds (float) to wait before the TriggerAction will be executed.
+	 * 
+	 * @param repeat
+	 * 			Number of maximum repetitions (0 = infinite).
+	 * 
+	 * @param parameterList
+	 * 			List of additional parameters.
+	 * 
+	 * @return
+	 * 			StopSound trigger action.
+	 */
+	@Action(
+			name = "stopSound",
+			layer = Layer.SCENE,
+			description = "Stops a sound file specified in the scene layer",
+			defaultDelay = 0,
+			defaultRepeat = 0,
+			param = {@Parameter(name="soundID", type="String", defaultValue="soundEffect01", 
+								description="ID of sound file to stop")
+					}
+		)
+	public TriggerAction stopSound(SimulationBasics sim, float delay, int repeat, Properties parameterList)
+	{	
+		String parameter = "";
+		
+		try {
+			
+			// extract ID of sound
+			parameter = "soundID";
+			String soundID = parameterList.getProperty(parameter);
+			if(soundID == null)
+				throw new Exception();
+
+			// create StopSoundTriggerAction
+			return new StopSoundTriggerAction(delay, repeat, soundID);
+			
+		} catch (Exception e) {
+			
+			reportError("stopSound", parameter);
 			return null;
 		}
 	}
@@ -1200,7 +1302,7 @@ public class InteractionMethods
 				throw new Exception();
 
 			// create PlayMovieAction
-			return new PlayMovieAction((Simulator)sim, delay, repeat, movieID);
+			return new PlayMovieTriggerAction((Simulator)sim, delay, repeat, movieID);
 			
 		} catch (Exception e) {
 			
@@ -1239,7 +1341,7 @@ public class InteractionMethods
 	public TriggerAction playNextMovie(SimulationBasics sim, float delay, int repeat, Properties parameterList)
 	{	
 		// create PlayNextMovieAction
-		return new PlayNextMovieAction((Simulator)sim, delay, repeat);
+		return new PlayNextMovieTriggerAction((Simulator)sim, delay, repeat);
 	}
 	
 	
@@ -1273,7 +1375,7 @@ public class InteractionMethods
 	{
 			
 			// create StopMovieAction
-			return new StopMovieAction((Simulator)sim, delay, repeat);
+			return new StopMovieTriggerAction((Simulator)sim, delay, repeat);
 	}
 	
 	
@@ -1319,7 +1421,7 @@ public class InteractionMethods
 				throw new Exception();
 
 			// create RequestGreenTrafficLightAction
-			return new RequestGreenTrafficLightAction(delay, repeat, (Simulator)sim, trafficLightID);
+			return new RequestGreenTrafficLightTriggerAction(delay, repeat, (Simulator)sim, trafficLightID);
 			
 		} catch (Exception e) {
 			

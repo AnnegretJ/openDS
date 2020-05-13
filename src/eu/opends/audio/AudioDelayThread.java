@@ -18,20 +18,22 @@
 
 package eu.opends.audio;
 
+import com.jme3.audio.AudioNode;
+
 /**
  * 
  * @author Rafael Math
  */
 public class AudioDelayThread extends Thread
 {
-	private String soundID;
+	private AudioNode audioNode;
 	private int milliSeconds;
 	private String callMethod;
 	
 	
-	public AudioDelayThread(String soundID, int milliSeconds, String callMethod) 
+	public AudioDelayThread(AudioNode audioNode, int milliSeconds, String callMethod) 
 	{
-		this.soundID = soundID;
+		this.audioNode = audioNode;
 		this.milliSeconds = milliSeconds;
 		this.callMethod = callMethod;
 	}
@@ -50,11 +52,11 @@ public class AudioDelayThread extends Thread
 		
 		if(callMethod.equals("playSound"))
 		{
-			AudioCenter.playSound(soundID);
+			AudioCenter.playSound(audioNode);
 		}
 		else if(callMethod.equals("fadeOut"))
 		{
-			float volume = AudioCenter.getAudioNode(soundID).getVolume();
+			float volume = audioNode.getVolume();
 			float initialVolume = volume;
 			
 			while(volume>0)
@@ -68,13 +70,12 @@ public class AudioDelayThread extends Thread
 					e.printStackTrace();
 				}
 				
-				volume = Math.max(AudioCenter.getAudioNode(soundID).getVolume() - 0.1f,0);
-				AudioCenter.setVolume(soundID, volume);
-				
+				volume = Math.max(audioNode.getVolume() - 0.1f,0);
+				AudioCenter.setVolume(audioNode, volume);
 			}
 			
-			AudioCenter.stopSound(soundID);
-			AudioCenter.setVolume(soundID, initialVolume);
+			AudioCenter.stopSound(audioNode);
+			AudioCenter.setVolume(audioNode, initialVolume);
 		}
 		else
 			System.err.println("AudioDelayThread: unknown method");

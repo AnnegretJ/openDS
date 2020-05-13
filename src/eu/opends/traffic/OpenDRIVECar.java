@@ -25,11 +25,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
+import com.jme3.audio.AudioNode;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 
+import eu.opends.audio.AudioCenter;
 import eu.opends.car.Car;
+import eu.opends.car.AudioContainer.AudioLocation;
+import eu.opends.car.AudioContainer.AudioType;
 import eu.opends.environment.TrafficLight;
 import eu.opends.environment.TrafficLight.TrafficLightState;
 import eu.opends.infrastructure.Segment;
@@ -129,6 +133,10 @@ public class OpenDRIVECar extends Car implements TrafficObject
 		modelPath = trafficCarData.getModelPath();
 		
 		init();
+		
+		// play engine idle sound (outside only) if engine is running initially
+		if(engineOn)
+			AudioCenter.playSound(audioContainer.getAudioNode(AudioLocation.outside, AudioType.engineIdle));
 	}
 	
 	
@@ -413,6 +421,10 @@ public class OpenDRIVECar extends Car implements TrafficObject
 		
 		//System.out.print(" *** " + appliedBrakeForce + currentFriction);
 		//System.out.println("");
+		
+		// set pitch of traffic vehicle relative to its current speed
+		AudioNode engineIdleNode = audioContainer.getAudioNode(AudioLocation.outside, AudioType.engineIdle);
+		engineIdleNode.setPitch(1f + Math.min(currentSpeed/100.0f, 1f));
 	}
 
 

@@ -431,9 +431,6 @@ public class Simulator extends SimulationBasics
 		
         // setup key binding
 		keyBindingCenter = new KeyBindingCenter(this);
-        
-        if(!isHeadLess)
-        	AudioCenter.init(this);
 
         // setup camera settings
         cameraFactory = new SimulatorCam(this, car);
@@ -547,6 +544,9 @@ public class Simulator extends SimulationBasics
 		physicalTraffic = new PhysicalTraffic(this);
 		//physicalTraffic.start(); //TODO
 		
+        if(!isHeadLess)
+        	AudioCenter.init(this);
+        
         codriverConnector = new CodriverConnector(this);
         
         onScreenVisualizer = new OnScreenVisualizer(this);

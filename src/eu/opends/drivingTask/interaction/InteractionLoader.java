@@ -89,7 +89,9 @@ public class InteractionLoader
 		// get activity name
 		//String activityName = dtData.getValue(Layer.INTERACTION, 
 		//		path + "/@id", String.class);
-		String activityName = currentNode.getAttributes().getNamedItem("id").getNodeValue();
+		String activityName = "null";
+		if(currentNode.getAttributes().getNamedItem("id") != null)
+			activityName = currentNode.getAttributes().getNamedItem("id").getNodeValue();
 	
 		List<ActionDescription> actionList = new ArrayList<ActionDescription>();
 		
@@ -186,14 +188,19 @@ public class InteractionLoader
 			// get trigger name
 			//String triggerName = dtData.getValue(Layer.INTERACTION, 
 			//		"/interaction:interaction/interaction:triggers/interaction:trigger["+i+"]/@id", String.class);
-			String triggerName = currentNode.getAttributes().getNamedItem("id").getNodeValue();
+			String triggerName = "null";
+			if(currentNode.getAttributes().getNamedItem("id") != null)
+				triggerName = currentNode.getAttributes().getNamedItem("id").getNodeValue();
 			
 			// get trigger priority
 			//int triggerPriority = dtData.getValue(Layer.INTERACTION, 
 			//		"/interaction:interaction/interaction:triggers/interaction:trigger["+i+"]/@priority", Integer.class);
-			String triggerPriorityString = currentNode.getAttributes().getNamedItem("priority").getNodeValue();
-			int triggerPriority = Integer.parseInt(triggerPriorityString);
-			
+			int triggerPriority = 1;
+			if(currentNode.getAttributes().getNamedItem("priority") != null)
+			{
+				String triggerPriorityString = currentNode.getAttributes().getNamedItem("priority").getNodeValue();
+				triggerPriority = Integer.parseInt(triggerPriorityString);
+			}
 			
 			NodeList childnodes = currentNode.getChildNodes();
 			

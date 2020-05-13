@@ -65,7 +65,12 @@ import eu.opends.basics.SimulationBasics;
 import eu.opends.car.ResetPosition;
 import eu.opends.drivingTask.DrivingTaskDataQuery;
 import eu.opends.drivingTask.DrivingTaskDataQuery.Layer;
+import eu.opends.main.Simulator;
 import eu.opends.tools.Util;
+import eu.opends.traffic.OpenDRIVECar;
+import eu.opends.traffic.Pedestrian;
+import eu.opends.traffic.TrafficCar;
+import eu.opends.traffic.TrafficObject;
 import eu.opends.visualization.MovieData;
 
 /**
@@ -133,17 +138,110 @@ public class SceneLoader
 					audioNode.setPositional(isPositional);
 					if(isPositional)
 					{
+						Node parentNodeNode = (Node) dtData.xPathQuery(Layer.SCENE, 
+								"/scene:scene/scene:sounds/scene:sound[\"+k+\"]/scene:positional/scene:parentNode", XPathConstants.NODE);
+						
+						boolean attachedToParent = false;
+						if(parentNodeNode != null && sim instanceof Simulator)
+						{
+							NodeList childNodeList = parentNodeNode.getChildNodes();
+							
+							for (int l = 1; l <= childNodeList.getLength(); l++) 
+							{
+								Node childNode = childNodeList.item(l-1);
+
+								if (childNode.getNodeName().equals("modelNode"))
+								{
+									String modelID = childNode.getTextContent();
+									
+									Spatial modelNode = sim.getRootNode().getChild(modelID);
+									
+									if(modelNode != null && modelNode instanceof com.jme3.scene.Node)
+									{
+										((com.jme3.scene.Node) modelNode).attachChild(audioNode);
+										
+										attachedToParent = true;
+										
+										System.err.println("attached to model node '" + modelID + "'");
+									}
+									else
+										System.err.println("SceneLoader: '"	+ modelID 
+												+ "' is not a valid modelID (found in soundID '" + audioNodeID + "')");
+								}
+
+								else if (childNode.getNodeName().equals("trafficNode"))
+								{
+									String trafficID = childNode.getTextContent();
+									TrafficObject trafficObject = ((Simulator) sim).getPhysicalTraffic().getTrafficObject(trafficID);
+									
+									if(trafficObject instanceof OpenDRIVECar)
+										((OpenDRIVECar) trafficObject).getCarNode().attachChild(audioNode);
+									else if(trafficObject instanceof TrafficCar)
+										((TrafficCar) trafficObject).getCarNode().attachChild(audioNode);
+									else if(trafficObject instanceof Pedestrian)
+										((Pedestrian) trafficObject).getPedestrianNode().attachChild(audioNode);
+								    
+									attachedToParent = true;
+									
+									System.err.println("attached to traffic node '" + trafficID + "'");
+								}
+
+								else if (childNode.getNodeName().equals("driverNode"))
+								{
+									((Simulator) sim).getCar().getCarNode().attachChild(audioNode);
+									
+									attachedToParent = true;
+									
+									System.err.println("attached to steering car node");
+								}
+							}
+						}
+						
+						if(!attachedToParent)
+						{
+							sim.getRootNode().attachChild(audioNode);
+
+							System.err.println("attached to root node");
+						}
+
+						
 						Vector3f translation = dtData.getVector3f(Layer.SCENE,
 								"/scene:scene/scene:sounds/scene:sound["+k+"]/scene:positional/scene:translation");
 						if(translation != null)
-							audioNode.setLocalTranslation(new Vector3f(0,0,0));
+							audioNode.setLocalTranslation(translation);
+						
+						
+						// set reference distance of attenuation (volume will halve after x meters)
+						Float refDistance = dtData.getValue(Layer.SCENE,
+								"/scene:scene/scene:sounds/scene:sound["+k+"]/scene:positional/scene:refDistance", Float.class);
+						if(refDistance == null)
+							refDistance = 5.0f; //10.0f;
+						audioNode.setRefDistance(refDistance);
+						
+						
+						// set max distance of attenuation (no further volume decrease after x meters)
+						Float maxDistance = dtData.getValue(Layer.SCENE,
+								"/scene:scene/scene:sounds/scene:sound["+k+"]/scene:positional/scene:maxDistance", Float.class);
+						if(maxDistance == null)
+							maxDistance = 2000.0f; //200.0f;
+						audioNode.setMaxDistance(maxDistance);
+						
+
+						// set reverberation status
+						Boolean isReverbEnabled = dtData.getValue(Layer.SCENE,
+								"/scene:scene/scene:sounds/scene:sound["+k+"]/scene:positional/scene:reverb", Boolean.class);
+						if(isReverbEnabled == null)
+							isReverbEnabled = false;
+						audioNode.setReverbEnabled(isReverbEnabled);
+						
+						//audioNode.setVelocity(new Vector3f(0,0,300));
 					}
 					
 					
 					// set directional
 					Boolean isDirectional = dtData.getValue(Layer.SCENE,
 							"/scene:scene/scene:sounds/scene:sound["+k+"]/scene:directional/@value", Boolean.class);
-					if(isDirectional == null)
+					if(isDirectional == null || isPositional)
 						isDirectional = false;
 					audioNode.setDirectional(isDirectional);
 					if(isDirectional)
@@ -188,7 +286,8 @@ public class SceneLoader
 							"/scene:scene/scene:sounds/scene:sound["+k+"]/scene:pitch", Float.class);
 					if(pitch == null)
 						pitch = 1.0f;
-					audioNode.setVolume(pitch);
+					audioNode.setPitch(pitch);
+
 					
 					audioNodeList.put(audioNodeID, audioNode);
 				}

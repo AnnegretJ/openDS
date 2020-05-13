@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import com.jme3.audio.AudioNode;
 import com.jme3.collision.CollisionResults;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -32,7 +33,9 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 
+import eu.opends.audio.AudioCenter;
 import eu.opends.basics.SimulationBasics;
+import eu.opends.car.AudioContainer.AudioType;
 import eu.opends.car.LightTexturesContainer.TurnSignalState;
 import eu.opends.codriver.util.DataStructures.Output_data_str;
 import eu.opends.drivingTask.DrivingTask;
@@ -106,6 +109,8 @@ public class SteeringCar extends Car implements TrafficObject
 	
 	private RadarSensor radarSensor;
 	
+	private float engineVolume;
+	
 	private ObstacleSensor obstacleSensor;
 	public ObstacleSensor getObstacleSensor()
 	{
@@ -137,7 +142,9 @@ public class SteeringCar extends Car implements TrafficObject
 		
 		minSpeed = scenarioLoader.getCarProperty(CarProperty.engine_minSpeed, SimulationDefaults.engine_minSpeed);
 		maxSpeed = scenarioLoader.getCarProperty(CarProperty.engine_maxSpeed, SimulationDefaults.engine_maxSpeed);
-			
+		
+		engineVolume = scenarioLoader.getEngineSoundIntensity(-1f);
+		
 		decelerationBrake = scenarioLoader.getCarProperty(CarProperty.brake_decelerationBrake, 
 				SimulationDefaults.brake_decelerationBrake);
 		maxBrakeForce = 0.004375f * decelerationBrake * mass;
@@ -206,6 +213,10 @@ public class SteeringCar extends Car implements TrafficObject
         obstacleSensor = new ObstacleSensor(sim, invisibleCarNode);
         
         trajectoryVisualizer = new TrajectoryVisualizer(sim, carNode);
+        
+		// play engine idle sounds (inside and outside) if engine is running initially
+		if(engineOn)
+			AudioCenter.playSound(audioContainer.getAudioNodes(AudioType.engineIdle));
 	}
 
 
@@ -304,7 +315,7 @@ public class SteeringCar extends Car implements TrafficObject
 				Vector3f vehicleCenterPos = centerGeometry.getWorldTranslation();
 				followBox.update(tpf, vehicleCenterPos);
 
-				if(!sim.isPause())
+				if(!sim.isPause()) // FIXME: always true
 				{
 					// update steering
 					Vector3f wayPoint = followBox.getPosition();
@@ -406,6 +417,34 @@ public class SteeringCar extends Car implements TrafficObject
 	        	simphynityController.update();
 			    //simphynityController.updateNervtehInstructions();
 		}
+		
+		// engine sound (pitch and volume) is adjusted to current RPM
+		float engineSpeedPercentage = carControl.getRPMPercentage();
+		
+		for(AudioNode engineIdleNode : audioContainer.getAudioNodes(AudioType.engineIdle))
+		{
+			engineIdleNode.setPitch(1f + engineSpeedPercentage);
+			
+			if(!AudioCenter.isMuted(engineIdleNode))
+			{
+				float minVolume = getMinVolume(engineIdleNode);
+				
+				if(engineVolume == -1)
+					engineIdleNode.setVolume(minVolume + engineSpeedPercentage);
+				else
+					engineIdleNode.setVolume(engineVolume);
+			}
+		}
+	}
+
+
+	private float getMinVolume(AudioNode engineIdleNode)
+	{
+		Object minVolume = engineIdleNode.getUserData("minVolume");
+		if((minVolume != null) && (minVolume instanceof Float))
+			return (Float)minVolume;
+		
+		return 0;
 	}
 
 
@@ -1270,6 +1309,7 @@ public class SteeringCar extends Car implements TrafficObject
 	{
 		return followBox!= null;
 	}
+
 
 	// AutoPilot *****************************************************************
 }

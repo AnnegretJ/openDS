@@ -113,7 +113,7 @@ public class LaneChangeReactionTimer extends ReactionTimer
 		//System.err.println("MISSED");
 
 		// play fail sound
-		AudioCenter.playSound(failSound);
+		AudioCenter.playSound(AudioCenter.getAudioNode(failSound));
 	}
 	
 
@@ -190,7 +190,7 @@ public class LaneChangeReactionTimer extends ReactionTimer
 				trialLogger.writeLog();
 				
 				// play success sound
-				AudioCenter.playSound(successSound);
+				AudioCenter.playSound(AudioCenter.getAudioNode(successSound));
 				
 				timerIsActive = false;
 			}
@@ -207,7 +207,7 @@ public class LaneChangeReactionTimer extends ReactionTimer
 				trialLogger.writeLog();
 				
 				// play fail sound
-				AudioCenter.playSound(failSound);
+				AudioCenter.playSound(AudioCenter.getAudioNode(failSound));
 				
 				timerIsActive = false;
 			}
@@ -217,7 +217,7 @@ public class LaneChangeReactionTimer extends ReactionTimer
 		{
 			if(timeExceeded() || distanceExceeded())
 			{
-				AudioCenter.playSound(failSound);
+				AudioCenter.playSound(AudioCenter.getAudioNode(failSound));
 				soundTimerIsActive = false;
 			}
 		}

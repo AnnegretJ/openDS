@@ -18,8 +18,12 @@
 
 package eu.opends.car;
 
+import java.util.ArrayList;
+
+import com.jme3.audio.AudioNode;
+
 import eu.opends.audio.AudioCenter;
-import eu.opends.camera.CameraFactory.CameraMode;
+import eu.opends.car.AudioContainer.AudioType;
 import eu.opends.car.LightTexturesContainer.LightState;
 import eu.opends.car.LightTexturesContainer.TurnSignalState;
 import eu.opends.main.Simulator;
@@ -110,17 +114,12 @@ public class TurnSignalThread extends Thread
 		PanelCenter.setLeftTurnSignalArrow(leftIsOn);
 		PanelCenter.setRightTurnSignalArrow(rightIsOn);	
 		
-		if(sim.getCameraFactory().getCamMode().equals(CameraMode.EGO))
+		ArrayList<AudioNode> turnSignalAudioNodes = sim.getCar().getAudioContainer().getAudioNodes(AudioType.turnSignal);
+		if(leftIsOn || rightIsOn)
 		{
-			if(leftIsOn || rightIsOn)
-			{
-				// play turn signal sound
-				AudioCenter.setVolume("turnSignal", 0.25f);
-				AudioCenter.playSound("turnSignal");
-			}
+			// play turn signal sound
+			AudioCenter.playSound(turnSignalAudioNodes);
 		}
-		else
-			AudioCenter.setVolume("turnSignal", 0f);
 	}
 
 

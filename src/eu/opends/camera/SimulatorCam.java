@@ -18,6 +18,9 @@
 
 package eu.opends.camera;
 
+import java.util.Collection;
+
+import com.jme3.audio.AudioNode;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -30,6 +33,7 @@ import com.jme3.scene.control.CameraControl;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.texture.Image.Format;
 
+import eu.opends.audio.AudioCenter;
 import eu.opends.camera.ScreenshotAppState.ScreenshotFormat;
 import eu.opends.car.Car;
 import eu.opends.drivingTask.settings.SettingsLoader.Setting;
@@ -102,6 +106,9 @@ public class SimulatorCam extends CameraFactory
 
 	public void setCamMode(CameraMode mode)
 	{
+		Collection<AudioNode> insideAudio = car.getAudioContainer().getInsideVehicleAudioMap().values();
+		Collection<AudioNode> outsideAudio = car.getAudioContainer().getOutsideVehicleAudioMap().values();
+		
 		switch (mode)
 		{
 			case EGO:
@@ -113,6 +120,8 @@ public class SimulatorCam extends CameraFactory
 				((CameraControl) frontCameraNode.getChild("CamNode1").getControl(0)).setEnabled(true);
 				frontCameraNode.setLocalTranslation(car.getCarModel().getEgoCamPos());
 				frontCameraNode.setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
+				AudioCenter.unmute(insideAudio);
+				AudioCenter.mute(outsideAudio);
 				break;
 	
 			case CHASE:
@@ -123,6 +132,8 @@ public class SimulatorCam extends CameraFactory
 				chaseCam.setDragToRotate(false);
 				setCarVisible(true);
 				((CameraControl) frontCameraNode.getChild("CamNode1").getControl(0)).setEnabled(false);
+				AudioCenter.mute(insideAudio);
+				AudioCenter.unmute(outsideAudio);
 				break;
 	
 			case TOP:
@@ -133,6 +144,8 @@ public class SimulatorCam extends CameraFactory
 				chaseCam.setEnabled(false);
 				setCarVisible(true);
 				((CameraControl) frontCameraNode.getChild("CamNode1").getControl(0)).setEnabled(true);
+				AudioCenter.mute(insideAudio);
+				AudioCenter.unmute(outsideAudio);
 				break;
 				
 			case OUTSIDE:
@@ -143,6 +156,8 @@ public class SimulatorCam extends CameraFactory
 				chaseCam.setEnabled(false);
 				setCarVisible(true);
 				((CameraControl) frontCameraNode.getChild("CamNode1").getControl(0)).setEnabled(true);
+				AudioCenter.mute(insideAudio);
+				AudioCenter.unmute(outsideAudio);
 				break;
 	
 			case STATIC_BACK:
@@ -154,12 +169,16 @@ public class SimulatorCam extends CameraFactory
 				((CameraControl) frontCameraNode.getChild("CamNode1").getControl(0)).setEnabled(true);
 				frontCameraNode.setLocalTranslation(car.getCarModel().getStaticBackCamPos());
 				frontCameraNode.setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
+				AudioCenter.mute(insideAudio);
+				AudioCenter.unmute(outsideAudio);
 				break;
 				
 			case OFF:
 				camMode = CameraMode.OFF;
 				chaseCam.setEnabled(false);
 				setCarVisible(false);
+				AudioCenter.mute(insideAudio);
+				AudioCenter.mute(outsideAudio);
 				break;
 		}
 	}

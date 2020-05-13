@@ -501,5 +501,11 @@ public class Pedestrian implements AnimationListener, TrafficObject
 		return currentHdgDiffDerivative;
 	}
 
+
+	public Node getPedestrianNode()
+	{
+		return personNode;
+	}
+
   
 }

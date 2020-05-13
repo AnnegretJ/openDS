@@ -18,6 +18,9 @@
 
 package eu.opends.input;
 
+import java.util.ArrayList;
+
+import com.jme3.audio.AudioNode;
 import com.jme3.input.controls.ActionListener;
 
 import eu.opends.audio.AudioCenter;
@@ -25,6 +28,7 @@ import eu.opends.camera.CameraFactory;
 import eu.opends.camera.CameraFactory.MirrorMode;
 import eu.opends.canbus.CANClient;
 import eu.opends.car.SteeringCar;
+import eu.opends.car.AudioContainer.AudioType;
 import eu.opends.car.LightTexturesContainer.TurnSignalState;
 import eu.opends.effects.EffectCenter;
 import eu.opends.main.Simulator;
@@ -454,10 +458,11 @@ public class SimulatorActionListener implements ActionListener
 		
 		else if (binding.equals(KeyMapping.HORN.getID())) 
 		{
+			ArrayList<AudioNode> hornAudioNodes = sim.getCar().getAudioContainer().getAudioNodes(AudioType.horn);
 			if (value)
-				AudioCenter.playSound("horn");
+				AudioCenter.playSound(hornAudioNodes);
 			else
-				AudioCenter.stopSound("horn");
+				AudioCenter.stopSound(hornAudioNodes);
 		}
 		
 		else if (binding.equals(KeyMapping.TOGGLE_KEYMAPPING.getID())) 

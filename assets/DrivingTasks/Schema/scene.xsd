@@ -346,18 +346,38 @@ This list can be considered as static declaration where unique identifiers have 
 
     <xs:complexType name="sound">
         <xs:all>
-        	<xs:element type="positional" name="positional" maxOccurs="1" minOccurs="0"/>
-        	<xs:element name="directional" type="directional" maxOccurs="1" minOccurs="0"></xs:element>
-        	<xs:element type="xs:boolean" name="loop" maxOccurs="1" minOccurs="0">
+        	<xs:element type="positional" name="positional"
+        		maxOccurs="1" minOccurs="0" />
+        	<xs:element name="directional" type="directional"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element type="xs:boolean" name="loop" maxOccurs="1"
+        		minOccurs="0">
         		<xs:annotation>
-        			<xs:documentation>True if the audio should keep looping after it is done playing. The default is false.</xs:documentation>
-        		</xs:annotation></xs:element>
-        	<xs:element type="xs:float" name="volume" maxOccurs="1" minOccurs="0">
+        			<xs:documentation>
+        				True if the audio should keep looping after it
+        				is done playing. The default is false.
+        			</xs:documentation>
+        		</xs:annotation>
+        	</xs:element>
+        	<xs:element type="xs:float" name="volume" maxOccurs="1"
+        		minOccurs="0">
         		<xs:annotation>
-        			<xs:documentation>Set the volume of this audio node. The volume is specified as gain. 1.0 is the default. </xs:documentation></xs:annotation></xs:element>
-        	<xs:element name="pitch" type="xs:float" maxOccurs="1" minOccurs="0">
+        			<xs:documentation>
+        				Set the volume of this audio node. The volume is
+        				specified as gain. 1.0 is the default.
+        			</xs:documentation>
+        		</xs:annotation>
+        	</xs:element>
+        	<xs:element name="pitch" type="xs:float" maxOccurs="1"
+        		minOccurs="0">
         		<xs:annotation>
-        			<xs:documentation>Set the pitch of the audio, also the speed of playback. The value must be between 0.5 and 2.0. </xs:documentation></xs:annotation></xs:element>
+        			<xs:documentation>
+        				Set the pitch of the audio, also the speed of
+        				playback. The value must be between 0.5 and 2.0.
+        			</xs:documentation>
+        		</xs:annotation>
+        	</xs:element>
         </xs:all>
         <xs:attribute name="id" type="xs:string">
         	<xs:annotation>
@@ -370,13 +390,27 @@ This list can be considered as static declaration where unique identifiers have 
     </xs:complexType>
 
     <xs:complexType name="positional">
-        <xs:sequence>
-        	<xs:element type="translation" name="translation" maxOccurs="1" minOccurs="0">
+        <xs:all>
+        	<xs:element name="parentNode" type="parentNode"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element type="translation" name="translation"
+        		maxOccurs="1" minOccurs="0">
         		<xs:annotation>
-        			<xs:documentation>Position of sound source.</xs:documentation>
-        		</xs:annotation></xs:element>
+        			<xs:documentation>
+        				Position of sound source.
+        			</xs:documentation>
+        		</xs:annotation>
+        	</xs:element>
 
-        </xs:sequence>
+        	<xs:element name="refDistance" type="xs:float" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="maxDistance" type="xs:float" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="reverb" type="xs:boolean" maxOccurs="1" minOccurs="0"></xs:element>
+        </xs:all>
         <xs:attribute name="value" type="xs:boolean" use="required" >
         	<xs:annotation>
         		<xs:documentation>Specifies whether this sound is positional. If true, a translation (position) from where the sound is emanating has to be given.</xs:documentation>
@@ -828,5 +862,14 @@ This list can be considered as static declaration where unique identifiers have 
     	<xs:attribute name="s" type="xs:float"></xs:attribute>
     	<xs:attribute name="lateralOffset" type="xs:float"></xs:attribute>
     	<xs:attribute name="verticalOffset" type="xs:float"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="parentNode">
+        <xs:choice>
+    		<xs:element name="rootNode" type="xs:string"></xs:element>
+    		<xs:element name="modelNode" type="xs:string"></xs:element>
+    		<xs:element name="trafficNode" type="xs:string"></xs:element>
+    		<xs:element name="driverNode" type="xs:string"></xs:element>
+    	</xs:choice>
     </xs:complexType>
 </xs:schema>

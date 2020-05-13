@@ -23,6 +23,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import com.jme3.asset.TextureKey;
+import com.jme3.audio.AudioNode;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -34,7 +35,10 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 
+import eu.opends.audio.AudioCenter;
 import eu.opends.car.Car;
+import eu.opends.car.AudioContainer.AudioLocation;
+import eu.opends.car.AudioContainer.AudioType;
 import eu.opends.car.LightTexturesContainer.TurnSignalState;
 import eu.opends.environment.TrafficLightCenter;
 import eu.opends.infrastructure.Segment;
@@ -96,6 +100,9 @@ public class TrafficCar extends Car implements TrafficObject
 
 		init();
 
+		// play engine idle sound (outside only) if engine is running initially
+		if(engineOn)
+			AudioCenter.playSound(audioContainer.getAudioNode(AudioLocation.outside, AudioType.engineIdle));
 		
 		/*
 		//---------------------------------
@@ -203,6 +210,9 @@ public class TrafficCar extends Car implements TrafficObject
 			carControl.setBrakePedalIntensity(brakePedalIntensity);
 		}
 			
+		// set pitch of traffic vehicle relative to its current speed
+		AudioNode engineIdleNode = audioContainer.getAudioNode(AudioLocation.outside, AudioType.engineIdle);
+		engineIdleNode.setPitch(1f + Math.min(getCurrentSpeedKmh()/100.0f, 1f));
 	}
 	
 	
