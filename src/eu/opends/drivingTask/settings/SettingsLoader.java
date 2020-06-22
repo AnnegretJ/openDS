@@ -221,7 +221,14 @@ public class SettingsLoader
 		ScenarioMessage_VehicleLength("settings:scenarioMessage/settings:vehicleLength"),
 		ScenarioMessage_VehicleWidth("settings:scenarioMessage/settings:vehicleWidth"),
 		ScenarioMessage_VehicleBarLongPos("settings:scenarioMessage/settings:vehicleBarLongPos"),
-		ScenarioMessage_RequestedCruisingSpeed("settings:scenarioMessage/settings:requestedCruisingSpeed");
+		ScenarioMessage_RequestedCruisingSpeed("settings:scenarioMessage/settings:requestedCruisingSpeed"),
+		OpenDrive_visualizeRoads("settings:openDrive/settings:visualizeRoads"),
+		OpenDrive_visualizeGeometries("settings:openDrive/settings:visualizeGeometries"),
+		OpenDrive_visualizeGeometryDetails("settings:openDrive/settings:visualizeGeometryDetails"),
+		OpenDrive_interpolationStepSize("settings:openDrive/settings:interpolationStepSize"),
+		OpenDrive_projectOntoTerrain("settings:openDrive/settings:projectOntoTerrain"),
+		OpenDrive_projectionOffset("settings:openDrive/settings:projectionOffset"),
+		OpenDrive_addToPhysicsEngine("settings:openDrive/settings:addToPhysicsEngine");
 		
 		
 		private String path;

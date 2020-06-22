@@ -257,10 +257,8 @@ public class ScenarioMessage
 			
 		// current vehicle position
 		Vector3f carPos = sim.getCar().getPosition();
-		carPos.y = 0;
 		
-		// get most probable lane from result list according to expected lane list (and least heading deviation)
-
+		
 		// Message Header
 		// header part
 		long timeStampMS = System.currentTimeMillis();
@@ -295,8 +293,9 @@ public class ScenarioMessage
 
 		int Status = 0;
 		Input_data_str scenario_msg = new Input_data_str();
-		//
-		
+
+		// get most probable lane from result list according to expected lane list (and 
+		// highest score concerning least heading deviation and least elevation difference)
 		ODLane lane = sim.getOpenDriveCenter().getMostProbableLane(carPos, expectedLanes);
 		if(lane != null)
 		{
@@ -502,14 +501,29 @@ public class ScenarioMessage
 
 //--------------------------------------------------------------------------------------------------------------
 
+				
+				PreferredConnections preferredConnections = sim.getCar().getPreferredConnectionsList();//Simulator.getDrivingTask().getScenarioLoader().getPreferredConnectionsList();
+
+				
+				// setup expected lanes
 				expectedLanes.clear();
-
-				PreferredConnections preferredConnections = Simulator.getDrivingTask().getScenarioLoader().getPreferredConnectionsList();
-
+				
+				// add current lane
+				expectedLanes.add(refLane);
+				
+				// add lane 3 meters ahead (along preferred connections)
+				HashSet<ODLane> traversedLaneSet = new HashSet<ODLane>();
+				
+				// filling traversedLaneSet with all lanes between refLane (including)
+				// and the lane of lanePoint (including) in order of increasing distance
+				ODPoint lanePoint = refLane.getLaneCenterPointAhead(refLaneIsWrongWay, s, 3, preferredConnections, traversedLaneSet);
+				if(lanePoint != null)
+					expectedLanes.addAll(traversedLaneSet);
+				
 				// get points on center of current lane for 200 meters behind of the current position
 				for(int i=-rangeOfTrajectoryBackcast; i<=-1; i++)
 				{
-					ODPoint point = refLane.getLaneCenterPointBack(refLaneIsWrongWay, s, -i, preferredConnections);
+					ODPoint point = refLane.getLaneCenterPointBack(refLaneIsWrongWay, s, -i, preferredConnections, null);
 					if(point != null)
 					{
 						// visualize point (red)
@@ -528,7 +542,7 @@ public class ScenarioMessage
 				// get points on center of current lane for 200 meters ahead of the current position
 				for(int i=1; i<=rangeOfTrajectoryForecast; i++)
 				{
-					ODPoint point = refLane.getLaneCenterPointAhead(refLaneIsWrongWay, s, i, preferredConnections);
+					ODPoint point = refLane.getLaneCenterPointAhead(refLaneIsWrongWay, s, i, preferredConnections, null);
 					if(point != null)
 					{
 						// visualize point (yellow)
@@ -538,13 +552,11 @@ public class ScenarioMessage
 						Double curvature = point.getLaneCurvature();
 						if(curvature != null)
 							curvatureDistList.add(new AdasisCurvature(i, curvature));
-
-						expectedLanes.add(point.getParentLane());
 					}
 					else
 						visualizer.hideMarker("roadPoint_" + i);
 				}
-
+				
 
 				// remove redundant entries of the Adasis curvature distance list
 				ArrayList<AdasisCurvature> reducedCurvatureDistList = reduceList(curvatureDistList);
@@ -592,12 +604,12 @@ public class ScenarioMessage
 
 
 				// removed in update 11.13 --> 12.04
-				ArrayList<Intersection> intersectionList = refLane.getIntersectionAhead(refLaneIsWrongWay, s, rangeOfIntersectionForecast, preferredConnections);
+				ArrayList<Intersection> intersectionList = refLane.getIntersectionListAhead(refLaneIsWrongWay, s, rangeOfIntersectionForecast, preferredConnections);
 				double IntersectionDistance = -1;
 				if(intersectionList.size()>0)
 					IntersectionDistance = intersectionList.get(0).getDistance();
 
-
+				//refLane.getODRoad().getElevation(s));
 
 				// calculate distance (in meters) to target point - if set and reachable. Otherwise, -1 will be returned
 				ODPosition targetPosition = Simulator.getDrivingTask().getScenarioLoader().getOpenDriveTargetPosition(sim);
@@ -702,7 +714,8 @@ public class ScenarioMessage
 									+ "leftLine: " + adasisLeftLineType + "   "
 									+ "rightLine: " + adasisRightLineType +  "                            "
 									+ "hdgDiff: " + f.format(hdgDiff)+ "     "
-									+ "laneCrvt: " + f.format(LaneCrvt), 1);
+									+ "laneCrvt: " + f.format(LaneCrvt)+ "     "
+									+ "target: " + f.format(distToTarget) , 1);
 				}
 
 

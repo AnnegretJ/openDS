@@ -20,8 +20,10 @@ package eu.opends.opendrive;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.XMLConstants;
@@ -43,12 +45,25 @@ import com.jme3.scene.Geometry;
 import eu.opends.basics.SimulationBasics;
 import eu.opends.car.SteeringCar;
 import eu.opends.codriver.ScenarioMessage;
+import eu.opends.drivingTask.settings.SettingsLoader;
+import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.main.Simulator;
 import eu.opends.opendrive.data.*;
+import eu.opends.opendrive.processed.LinkData;
 import eu.opends.opendrive.processed.ODLane;
+import eu.opends.opendrive.processed.ODLaneSection;
+import eu.opends.opendrive.processed.ODLink;
 import eu.opends.opendrive.processed.ODPoint;
 import eu.opends.opendrive.processed.ODRoad;
+import eu.opends.opendrive.roadGraph.Edge;
+import eu.opends.opendrive.roadGraph.Node;
+import eu.opends.opendrive.roadGraph.RoadGraph;
+import eu.opends.opendrive.util.JunctionLink;
+import eu.opends.opendrive.util.JunctionLinkComparator;
 import eu.opends.opendrive.util.ODVisualizer;
+import eu.opends.opendrive.util.SpeedLimitComparator;
+import eu.opends.tools.Util;
+import eu.opends.tools.Vector3d;
 
 
 public class OpenDriveCenter
@@ -57,7 +72,7 @@ public class OpenDriveCenter
 	private boolean drawCompass = false;
 	private boolean drawMarker = true;
 	private boolean textureProjectionEnabled = true;
-	private float projectionOffset = 0.1f;
+	private double projectionOffset = 0.1;
 	
 	private SimulationBasics sim;
 	private OpenDRIVE od;
@@ -66,11 +81,17 @@ public class OpenDriveCenter
 	private HashMap<String,ODRoad> roadMap = new HashMap<String, ODRoad>();
 	private ODVisualizer visualizer;
 	private ScenarioMessage scenarioMessage = null;
+	private RoadGraph roadGraph;
 	private boolean enabled = false;
 
 	
 	public OpenDriveCenter(SimulationBasics sim)
 	{
+		// init projection settings
+		SettingsLoader settingsLoader = SimulationBasics.getSettingsLoader();
+		textureProjectionEnabled = settingsLoader.getSetting(Setting.OpenDrive_projectOntoTerrain, true);
+		projectionOffset = settingsLoader.getSetting(Setting.OpenDrive_projectionOffset, 0.1);
+		
 		this.sim = sim;
 		visualizer = new ODVisualizer(sim, drawCompass, drawMarker);
 		
@@ -97,6 +118,12 @@ public class OpenDriveCenter
 		}
 	}
 
+	
+	public boolean isTextureProjectionEnabled()
+	{
+		return textureProjectionEnabled;
+	}
+	
 
 	public void update(float tpf)
 	{
@@ -120,6 +147,12 @@ public class OpenDriveCenter
 	public HashMap<String,ODRoad> getRoadMap()
 	{
 		return roadMap;
+	}
+	
+	
+	public RoadGraph getRoadGraph()
+	{
+		return roadGraph;
 	}
 	
 	
@@ -163,8 +196,14 @@ public class OpenDriveCenter
 				*/	
 					
 //				System.out.println();
-				
 			}
+			
+			//printAllJunctionLinks();
+			
+			// extract list of edges that can be explored by Dijkstra's algorithm for navigation
+			// along OpenDRIVE roads (must be placed after initialization of road/lane links)
+			roadGraph = new RoadGraph(roadMap, false);
+
 			
 			/*
 	    	for(Geometry geometry : Util.getAllGeometries(rootNode))
@@ -184,6 +223,83 @@ public class OpenDriveCenter
 		}
 	}
 
+	/*
+	private void printAllJunctionLinks()
+	{
+		ArrayList<JunctionLink> junctionLinkList = new ArrayList<JunctionLink>();
+		
+		// for each road
+		for(ODRoad road : roadMap.values())
+		{
+			// for each lane section
+			for(ODLaneSection laneSection : road.getLaneSectionList())
+			{
+				// for each lane
+				for(ODLane lane : laneSection.getLaneMap().values())
+				{
+					//collect junction links at end of a lane
+					ODLink successor = lane.getSuccessor();
+					collectLinks(junctionLinkList, lane, successor, true);
+				
+					//collect junction links at beginning of a lane
+					ODLink predecessor = lane.getPredecessor();
+					collectLinks(junctionLinkList, lane, predecessor, false);
+				}
+			}
+		}
+		
+		// sort collected junction links by roadID/successor tag/laneID ascending
+		Collections.sort(junctionLinkList, new JunctionLinkComparator());
+		
+		// print sorted list of junction links
+		for(JunctionLink junctionLink : junctionLinkList)
+		{
+			String successorTag = "SUC";
+			if(!junctionLink.isSuccessor())
+				successorTag = "PRE";
+			
+			System.err.println(junctionLink.getFromRoadID() + "/" + junctionLink.getFromLaneID() + " " + successorTag  + " --> "
+				+ junctionLink.getViaRoadID() + "/" + junctionLink.getViaLaneID() + " --> "
+				+ junctionLink.getToRoadID() + "/" + junctionLink.getToLaneID() + " (Junction: " 
+				+ junctionLink.getJunctionID() + "/"	+ junctionLink.getConnectionID() + ")");
+		}
+	}
+
+
+	private void collectLinks(ArrayList<JunctionLink> junctionLinkList, ODLane lane, ODLink link, boolean isSuccessor)
+	{
+		String fromRoadID = lane.getODRoad().getID();
+		int fromLaneID = lane.getID();
+
+		if(link != null && link.isJunction())
+		{
+			String junctionID = link.getJunctionID();
+			ArrayList<LinkData> linkDataList = link.getLinkDataList();
+			for(LinkData linkData : linkDataList)
+			{
+				String connectionID = linkData.getConnectionID();
+				ODLane viaLane = linkData.getLane();
+				String viaRoadID = viaLane.getODRoad().getID();
+				int viaLaneID = viaLane.getID();
+				
+				ODLink successor = viaLane.getSuccessor();
+				if(successor != null && !successor.isJunction())
+				{
+					for(LinkData linkDataSuccessor : successor.getLinkDataList())
+					{
+						ODLane toLane = linkDataSuccessor.getLane();
+						String toRoadID = toLane.getODRoad().getID();
+						int toLaneID = toLane.getID();
+						
+						junctionLinkList.add(new JunctionLink(fromRoadID, fromLaneID, viaRoadID, 
+								viaLaneID, toRoadID, toLaneID, junctionID, connectionID, isSuccessor));
+					}
+				}
+			}
+		}
+	}
+	*/
+	
 
 	public ODLane getMostProbableLane(Vector3f carPos, HashSet<ODLane> expectedLanes)
 	{
@@ -202,11 +318,9 @@ public class OpenDriveCenter
 	
 			// collect intersections between ray and scene elements in results list.
 			sim.getOpenDriveNode().collideWith(ray, results);
-					
-			
-			float minAbsHdgDiff = 181;
-			
-	
+
+			float overallBestScore = -1;
+
 			for(int i=0; i<results.size(); i++)
 			{
 				String geometryName = results.getCollision(i).getGeometry().getName();
@@ -222,7 +336,8 @@ public class OpenDriveCenter
 					String roadID = array[1];
 					ODRoad road = roadMap.get(roadID);
 	
-					HashMap<Integer,ODLane> laneMap = road.getLaneInformationAtPosition(carPos);
+					Vector3f carPos2D = new Vector3f(carPos.x, 0, carPos.z);
+					HashMap<Integer,ODLane> laneMap = road.getLaneInformationAtPosition(carPos2D);
 					if(laneMap!=null)
 					{
 						int laneID = Integer.parseInt(array[2]);
@@ -234,12 +349,33 @@ public class OpenDriveCenter
 							if(expectedLanes.contains(lane))
 								return lane;
 							
-							// otherwise choose lane with minimum heading difference
-							float absHdgDiff = FastMath.abs(lane.getHeadingDiff(((Simulator)sim).getCar().getHeadingDegree()));
+							// otherwise choose lane with highest score
 							
-							if(absHdgDiff < minAbsHdgDiff)
+							// get linear heading score:
+							// diff <= 20 degree --> 100 %
+							// diff >= 90 degree -->   0 %
+							float absHdgDiff = FastMath.abs(lane.getHeadingDiff(((Simulator)sim).getCar().getHeadingDegree()));
+							float hdgScore = Util.map(absHdgDiff, 20f, 90f, 1.0f, 0.0f);
+
+							// get linear vertical distance score (e.g. bridge):
+							// diff <= 0.5 meters --> 100 %
+							// diff >= 2.0 meters -->   0 %
+							float absDistDiff = FastMath.abs(carPos.getY() - results.getCollision(i).getContactPoint().getY());
+							float distScore = Util.map(absDistDiff, 0.5f, 2.0f, 1.0f, 0.0f);
+							
+							// get weighted total score (40 % of heading and 60 % of distance score)
+							float totalScore = (0.4f * hdgScore) + (0.6f * distScore);
+							
+							/*
+							System.err.println("roadID: " + roadID + "; absHdgDiff:" + absHdgDiff + "; " + 
+									"hdgScore: " + hdgScore + "; absDistDiff:" + absDistDiff + "; " + 
+									"distScore: " + distScore + "; totalScore:" + totalScore + "; ");
+							*/
+							
+							// choose lane with highest score
+							if(totalScore > overallBestScore)
 							{
-								minAbsHdgDiff = absHdgDiff;
+								overallBestScore = totalScore;
 								mostProbableLane = lane;
 							}
 						}
@@ -254,11 +390,11 @@ public class OpenDriveCenter
 	}
 
 	
-	public double getHeightAt(double x, double z)
+	public double getHeightAt(Vector3d position)
 	{
 		if(textureProjectionEnabled && !(sim instanceof OpenDRIVELoader))
 		{
-			Vector3f origin = new Vector3f((float)x, 10000, (float)z);
+			Vector3f origin = new Vector3f((float) position.getX(), 10000, (float) position.getZ());
 			
 			// reset collision results list
 			CollisionResults results = new CollisionResults();
@@ -285,7 +421,7 @@ public class OpenDriveCenter
 			}
 		}
 		
-		return 0;
+		return position.getY();
 	}
 
 	
@@ -308,6 +444,5 @@ public class OpenDriveCenter
 
 		return true;
 	}
-	
 	
 }

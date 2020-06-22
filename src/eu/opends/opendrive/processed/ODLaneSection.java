@@ -38,6 +38,8 @@ import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.util.BufferUtils;
 
 import eu.opends.basics.SimulationBasics;
+import eu.opends.drivingTask.settings.SettingsLoader;
+import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.opendrive.OpenDRIVELoader;
 import eu.opends.opendrive.data.*;
 import eu.opends.opendrive.processed.ODLane.LaneSide;
@@ -49,6 +51,7 @@ public class ODLaneSection
 {
 	private SimulationBasics sim;
 	private ODRoad road;
+	private int laneSectionIndex;
 	private TRoadLanesLaneSection laneSection;
 	private double endS;
 	private ArrayList<ODPoint> laneSectionReferencePointlist;
@@ -58,16 +61,22 @@ public class ODLaneSection
 	private HashMap<Integer, ODLane> rightODLaneMap = new HashMap<Integer, ODLane>();
 	private List<TRoadLanesLaneSectionLcrLaneRoadMark> centerLaneRoadMarkList = 
 			new ArrayList<TRoadLanesLaneSectionLcrLaneRoadMark>();
-
+	private boolean addToPhysicsEngine = true;
 	
-	public ODLaneSection(SimulationBasics sim, ODRoad road, ArrayList<ODPoint> laneSectionReferencePointlist, 
+	
+	public ODLaneSection(SimulationBasics sim, ODRoad road, int laneSectionIndex, 
+			ArrayList<ODPoint> laneSectionReferencePointlist, 
 			TRoadLanesLaneSection laneSection, double endS) 
 	{
 		this.sim = sim;
 		this.road = road;
+		this.laneSectionIndex = laneSectionIndex;
 		this.laneSection = laneSection;
 		this.endS = endS;
 		this.laneSectionReferencePointlist = laneSectionReferencePointlist;
+		
+		SettingsLoader settingsLoader = SimulationBasics.getSettingsLoader();
+		addToPhysicsEngine = settingsLoader.getSetting(Setting.OpenDrive_addToPhysicsEngine, true);
 		
 		TRoadLanesLaneSectionLeft left = laneSection.getLeft();
 		if(left != null)
@@ -186,6 +195,13 @@ public class ODLaneSection
 	}
 
 	
+	public int getIndex() 
+	{
+		// index of lane section in road element
+		return laneSectionIndex;
+	}
+
+	
 	public void initLanes(boolean visualize)
 	{
 		for(ODPoint point : laneSectionReferencePointlist)
@@ -267,20 +283,23 @@ public class ODLaneSection
 			TRoadLanesLaneSectionLcrLaneRoadMark roadMark = getCenterLineRoadMarkAtPos(s);
 			if(roadMark.getWidth() != null)
 				textureOffset = roadMark.getWidth();
-			else	
-				System.err.println("WARNING: Road: " + getODRoad().getID() + "; centerLineRoadMark width == null (ODLaneSection)");
+			else
+			{
+				if(roadMark.getType() != ERoadMarkType.NONE)
+					System.err.println("WARNING: Road: " + getODRoad().getID() + "; centerLineRoadMark width == null (ODLaneSection)");
+			}
 			
 			Vector3d textureLeftPos = position.subtract(new Vector3d((textureOffset)*Math.sin(ortho), 0, (textureOffset)*Math.cos(ortho)));
 			
 			// place vertex on top of underlying surface (if enabled)
-			textureLeftPos.setY(sim.getOpenDriveCenter().getHeightAt(textureLeftPos.getX(), textureLeftPos.getZ()));
+			textureLeftPos.setY(sim.getOpenDriveCenter().getHeightAt(textureLeftPos));
 			
 			verticesLeft[2*i] = textureLeftPos.toVector3f();
 			
 			Vector3d textureMiddlePos = position;
 
 			// place vertex on top of underlying surface (if enabled)
-			textureMiddlePos.setY(sim.getOpenDriveCenter().getHeightAt(textureMiddlePos.getX(), textureMiddlePos.getZ()));
+			textureMiddlePos.setY(sim.getOpenDriveCenter().getHeightAt(textureMiddlePos));
 			
 			verticesLeft[2*i+1] = textureMiddlePos.toVector3f();
 			
@@ -289,7 +308,7 @@ public class ODLaneSection
 			Vector3d textureRightPos = position.add(new Vector3d((textureOffset)*Math.sin(ortho), 0, (textureOffset)*Math.cos(ortho)));
 
 			// place vertex on top of underlying surface (if enabled)
-			textureRightPos.setY(sim.getOpenDriveCenter().getHeightAt(textureRightPos.getX(), textureRightPos.getZ()));
+			textureRightPos.setY(sim.getOpenDriveCenter().getHeightAt(textureRightPos));
 			
 			verticesRight[2*i+1] = textureRightPos.toVector3f();
 			
@@ -360,10 +379,12 @@ public class ODLaneSection
 		
 		
 		Material material = sim.getOpenDriveCenter().getVisualizer().getCenterLineMaterial(roadmarkType);
-		com.jme3.scene.Geometry geoLeft = new com.jme3.scene.Geometry("ODarea_" + road.getID() + "_1", meshLeft);
+		String geoLeftID = "ODarea_" + road.getID() + "_1";
+		com.jme3.scene.Geometry geoLeft = new com.jme3.scene.Geometry(geoLeftID, meshLeft);
 		geoLeft.setMaterial(material);
 
-		com.jme3.scene.Geometry geoRight = new com.jme3.scene.Geometry("ODarea_" + road.getID() + "_-1", meshRight);
+		String geoRightID = "ODarea_" + road.getID() + "_-1";
+		com.jme3.scene.Geometry geoRight = new com.jme3.scene.Geometry(geoRightID, meshRight);
 		geoRight.setMaterial(material);
 		
 		if(!visualize)
@@ -374,12 +395,14 @@ public class ODLaneSection
 		
 		if(leftODLaneMap.containsKey(1))
 		{
+			road.getLaneGeometryMap().put(1, geoLeft);
 			sim.getOpenDriveNode().attachChild(geoLeft);	
 			addToBulletPhysicsSpace(geoLeft);
 		}
 		
 		if(rightODLaneMap.containsKey(-1))
 		{
+			road.getLaneGeometryMap().put(-1, geoRight);
 			sim.getOpenDriveNode().attachChild(geoRight);
 			addToBulletPhysicsSpace(geoRight);
 		}
@@ -390,7 +413,7 @@ public class ODLaneSection
 
 	public void addToBulletPhysicsSpace(Spatial spatial)
 	{
-		if(!(sim instanceof OpenDRIVELoader))
+		if(addToPhysicsEngine && (!(sim instanceof OpenDRIVELoader)))
 		{
 			CollisionShape collisionShape = CollisionShapeFactory.createMeshShape(spatial);		        
 			RigidBodyControl physicsControl = new RigidBodyControl(collisionShape, 0);
@@ -489,6 +512,12 @@ public class ODLaneSection
 	}
 
 
+	public ODPoint getPointOnRefernceLine(double s) 
+	{
+		return road.getPointOnReferenceLine(s, "refpoint_s_" + s);
+	}
+	
+	
 	public ODPoint getLaneCenterPointAt(ODLane lane, double s) 
 	{
 		ODPoint roadReferencePoint = road.getPointOnReferenceLine(s, "point_s_" + s);
@@ -527,9 +556,12 @@ public class ODLaneSection
 		Vector3d position = laneReferencePoint.getPosition();
 		Vector3d centerPos = position.add(new Vector3d((width)*Math.sin(ortho), 0, (width)*Math.cos(ortho)));
 		
-		Vector3f closestVertex = getClosestVertex(laneID, centerPos.toVector3f());
-		if(closestVertex != null)
-			centerPos.y = closestVertex.getY();
+		if(sim.getOpenDriveCenter().isTextureProjectionEnabled())
+		{
+			Vector3f closestVertex = getClosestVertex(laneID, centerPos.toVector3f());
+			if(closestVertex != null)
+				centerPos.y = closestVertex.getY();
+		}
 		
 		TRoadPlanViewGeometry geometry = laneReferencePoint.getGeometry();
 
@@ -563,10 +595,9 @@ public class ODLaneSection
 	{
 		Vector3f closestVertex = null;
 		
-		Spatial spatial = sim.getOpenDriveNode().getChild("ODarea_" + road.getID() + "_" + laneID);
-		if(spatial != null && spatial instanceof com.jme3.scene.Geometry)
+		com.jme3.scene.Geometry geometry = road.getLaneGeometryMap().get(laneID);
+		if(geometry != null)
 		{
-			com.jme3.scene.Geometry geometry = (com.jme3.scene.Geometry) spatial;
 			Mesh mesh = geometry.getMesh();
 			VertexBuffer vertexBuffer = mesh.getBuffer(Type.Position);
 			FloatBuffer floatBuffer = (FloatBuffer) vertexBuffer.getDataReadOnly();

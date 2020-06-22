@@ -296,5 +296,23 @@ public class Util
 		return vectorBA.angleBetween(vectorBC);
 	}
 
-    
+
+	public static float map(float input, float input_start, float input_end, float output_start, float output_end)
+	{
+		float input_clamped = clamp(input, input_start, input_end);
+		float slope = (output_end - output_start) / (input_end - input_start);
+		float output = output_start + slope * (input_clamped - input_start);
+		return clamp(output, output_start, output_end);
+	}
+	
+	
+	private static float clamp(float input, float limit1, float limit2)
+	{
+		// output value must lie within limit1 and limit2
+		if(limit1 < limit2)
+			return Math.min(Math.max(input, limit1), limit2);
+		else
+			return Math.min(Math.max(input, limit2), limit1);
+	}
+
 }

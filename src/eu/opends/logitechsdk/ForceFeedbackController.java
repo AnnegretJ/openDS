@@ -15,6 +15,7 @@ import eu.opends.logitechsdk.util.LogitechLibrary;
 import eu.opends.main.Simulator;
 import eu.opends.opendrive.data.ELaneType;
 import eu.opends.opendrive.processed.ODLane;
+import eu.opends.tools.Util;
 import eu.opends.logitechsdk.util.ForceFeedbackPropertiesReader;
 import eu.opends.logitechsdk.util.LogitechDataStructures;
 import eu.opends.logitechsdk.util.LogitechDataStructures.LogiControllerPropertiesData;
@@ -228,7 +229,7 @@ public class ForceFeedbackController
 		//		+ satPercent1 + "; satPercent2: " + satPercent2);
 		
 		// intensity of center spring depends on speed (higher speed --> higher saturation)
-		int saturationPercentage = Math.round(map(speed, satSpeed1, satSpeed2, satPercent1, satPercent2));
+		int saturationPercentage = Math.round(Util.map(speed, satSpeed1, satSpeed2, satPercent1, satPercent2));
 		//System.err.println("SpringForce_saturationPercentage: " + saturationPercentage);
 		
 		//  0 km/h --> 15%
@@ -241,7 +242,7 @@ public class ForceFeedbackController
 		//		+ coPercent1 + "; coPercent2: " + coPercent2);
 		
 		// slope of the effect strength increase relative to the amount of deflection from the center
-		int coefficientPercentage = Math.round(map(speed, coSpeed1, coSpeed2, coPercent1, coPercent2));
+		int coefficientPercentage = Math.round(Util.map(speed, coSpeed1, coSpeed2, coPercent1, coPercent2));
 		//System.err.println("SpringForce_coefficientPercentage: " + coefficientPercentage);
 		
 		logitechLib.LogiPlaySpringForce(deviceID, offsetPercentage, saturationPercentage, coefficientPercentage);
@@ -262,7 +263,7 @@ public class ForceFeedbackController
 		//		+ coPercent1 + "; coPercent2: " + coPercent2);
 		
 		// intensity of center spring depends on speed (higher speed --> higher saturation)
-		int coefficientPercentage = Math.round(map(speed, coSpeed1, coSpeed2, coPercent1, coPercent2));
+		int coefficientPercentage = Math.round(Util.map(speed, coSpeed1, coSpeed2, coPercent1, coPercent2));
 		//System.err.println("DamperForce_coefficientPercentage: " + coefficientPercentage);
 		
 		logitechLib.LogiPlayDamperForce(deviceID, coefficientPercentage);
@@ -314,8 +315,8 @@ public class ForceFeedbackController
 				//System.err.println("maSpeed1: " + maSpeed1 + "; maSpeed2: " + maSpeed2 + "; maPercent1: " 
 				//		+ maPercent1 + "; maPercent2: " + maPercent2);
 				
-				int magnitudePercentage = Math.round(map(speed, maSpeed1, maSpeed2, maPercent1, maPercent2));
-				int period = Math.round(map(speed, 0, 100, 120, 40));
+				int magnitudePercentage = Math.round(Util.map(speed, maSpeed1, maSpeed2, maPercent1, maPercent2));
+				int period = Math.round(Util.map(speed, 0, 100, 120, 40));
 				logitechLib.LogiPlaySurfaceEffect(deviceID, type, magnitudePercentage, period);
     		}
     		else if(surfaceType.equals(ELaneType.BORDER)) // wooden bridge
@@ -331,8 +332,8 @@ public class ForceFeedbackController
 				//System.err.println("maSpeed1: " + maSpeed1 + "; maSpeed2: " + maSpeed2 + "; maPercent1: " 
 				//		+ maPercent1 + "; maPercent2: " + maPercent2);
 				
-				int magnitudePercentage = Math.round(map(speed, maSpeed1, maSpeed2, maPercent1, maPercent2));
-				int period = Math.round(map(speed, 0, 100, 200, 100));
+				int magnitudePercentage = Math.round(Util.map(speed, maSpeed1, maSpeed2, maPercent1, maPercent2));
+				int period = Math.round(Util.map(speed, 0, 100, 200, 100));
 				logitechLib.LogiPlaySurfaceEffect(deviceID, type, magnitudePercentage, period);
     		}
     		else if(surfaceType.equals(ELaneType.NONE))  // rough surface
@@ -348,7 +349,7 @@ public class ForceFeedbackController
 				//System.err.println("maSpeed1: " + maSpeed1 + "; maSpeed2: " + maSpeed2 + "; maPercent1: " 
 				//		+ maPercent1 + "; maPercent2: " + maPercent2);
 				
-				int magnitudePercentage = Math.round(map(speed, maSpeed1, maSpeed2, maPercent1, maPercent2));
+				int magnitudePercentage = Math.round(Util.map(speed, maSpeed1, maSpeed2, maPercent1, maPercent2));
 				int period = 40;
 				logitechLib.LogiPlaySurfaceEffect(deviceID, type, magnitudePercentage, period);
     		}
@@ -363,7 +364,7 @@ public class ForceFeedbackController
 				//System.err.println("maSpeed1: " + maSpeed1 + "; maSpeed2: " + maSpeed2 + "; maPercent1: " 
 				//		+ maPercent1 + "; maPercent2: " + maPercent2);
 				
-				int magnitudePercentage = Math.round(map(speed, maSpeed1, maSpeed2, maPercent1, maPercent2));
+				int magnitudePercentage = Math.round(Util.map(speed, maSpeed1, maSpeed2, maPercent1, maPercent2));
     			logitechLib.LogiPlaySlipperyRoadEffect(deviceID, magnitudePercentage);
     		}
 
@@ -604,25 +605,6 @@ public class ForceFeedbackController
 				}
     		}
     	}
-	}
-    
-	
-	private float map(float input, float input_start, float input_end, float output_start, float output_end)
-	{
-		float input_clamped = clamp(input, input_start, input_end);
-		float slope = (output_end - output_start) / (input_end - input_start);
-		float output = output_start + slope * (input_clamped - input_start);
-		return clamp(output, output_start, output_end);
-	}
-	
-	
-	private float clamp(float input, float limit1, float limit2)
-	{
-		// output value must lie within limit1 and limit2
-		if(limit1 < limit2)
-			return Math.min(Math.max(input, limit1), limit2);
-		else
-			return Math.min(Math.max(input, limit2), limit1);
 	}
 	
 	

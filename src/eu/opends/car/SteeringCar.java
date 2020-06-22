@@ -54,8 +54,11 @@ import eu.opends.main.Simulator;
 import eu.opends.opendrive.processed.ODLane;
 import eu.opends.opendrive.processed.ODPoint;
 import eu.opends.opendrive.processed.PreferredConnections;
+import eu.opends.opendrive.processed.SpeedLimit;
 import eu.opends.opendrive.processed.ODLane.Position;
 import eu.opends.opendrive.roadGenerator.OffroadPositionType;
+import eu.opends.opendrive.roadGraph.Node;
+import eu.opends.opendrive.roadGraph.RoadGraph;
 import eu.opends.opendrive.util.ODPosition;
 import eu.opends.opendrive.util.ODVisualizer;
 import eu.opends.simphynity.SimphynityController;
@@ -88,10 +91,11 @@ public class SteeringCar extends Car implements TrafficObject
     private SimphynityController simphynityController;
     
     // adaptive cruise control
+	private boolean useSpeedDependentForwardSafetyDistance = true;
 	private boolean isAdaptiveCruiseControl = false;
-	private float minLateralSafetyDistance;
-	private float minForwardSafetyDistance;
-	private float emergencyBrakeDistance;
+	private float minLateralSafetyDistance = 2;
+	private float minForwardSafetyDistance = 8;
+	private float emergencyBrakeDistance = 5;
 	private boolean suppressDeactivationByBrake = false;
 	
 	private boolean openDrivePositionSet = false;
@@ -107,6 +111,8 @@ public class SteeringCar extends Car implements TrafficObject
 	
 	private HashMap<String,Float> frictionMap;
 	
+	private PreferredConnections preferredConnections;
+	
 	private RadarSensor radarSensor;
 	
 	private float engineVolume;
@@ -119,6 +125,7 @@ public class SteeringCar extends Car implements TrafficObject
 	
 	private TrajectoryVisualizer trajectoryVisualizer;
     
+	private boolean adjustSpeedToCurvature = true;
 	
 	public SteeringCar(Simulator sim) 
 	{		
@@ -172,11 +179,11 @@ public class SteeringCar extends Car implements TrafficObject
         trafficObjectLocator = new TrafficObjectLocator(sim, this);
         
         // load settings of adaptive cruise control
-        isAdaptiveCruiseControl = scenarioLoader.getCarProperty(CarProperty.cruiseControl_acc, SimulationDefaults.cruiseControl_acc);
-    	minLateralSafetyDistance = scenarioLoader.getCarProperty(CarProperty.cruiseControl_safetyDistance_lateral, SimulationDefaults.cruiseControl_safetyDistance_lateral);
-    	minForwardSafetyDistance = scenarioLoader.getCarProperty(CarProperty.cruiseControl_safetyDistance_forward, SimulationDefaults.cruiseControl_safetyDistance_forward);
-    	emergencyBrakeDistance = scenarioLoader.getCarProperty(CarProperty.cruiseControl_emergencyBrakeDistance, SimulationDefaults.cruiseControl_emergencyBrakeDistance);
-    	suppressDeactivationByBrake = scenarioLoader.getCarProperty(CarProperty.cruiseControl_suppressDeactivationByBrake, SimulationDefaults.cruiseControl_suppressDeactivationByBrake);
+        isAdaptiveCruiseControl = scenarioLoader.getCarProperty(CarProperty.cruiseControl_acc, isAdaptiveCruiseControl);
+    	minLateralSafetyDistance = scenarioLoader.getCarProperty(CarProperty.cruiseControl_safetyDistance_lateral, minLateralSafetyDistance);
+    	minForwardSafetyDistance = scenarioLoader.getCarProperty(CarProperty.cruiseControl_safetyDistance_forward, minForwardSafetyDistance);
+    	emergencyBrakeDistance = scenarioLoader.getCarProperty(CarProperty.cruiseControl_emergencyBrakeDistance, emergencyBrakeDistance);
+    	suppressDeactivationByBrake = scenarioLoader.getCarProperty(CarProperty.cruiseControl_suppressDeactivationByBrake, suppressDeactivationByBrake);
     	
     	// if initialSpeed > 0 --> cruise control will be on at startup
     	targetSpeedCruiseControl = scenarioLoader.getCarProperty(CarProperty.cruiseControl_initialSpeed, SimulationDefaults.cruiseControl_initialSpeed);
@@ -207,7 +214,8 @@ public class SteeringCar extends Car implements TrafficObject
         	isODAutoPilot = false;
         // ODAutoPilot ************************************************************
         
-        
+        preferredConnections = scenarioLoader.getPreferredConnectionsList();
+
         radarSensor = new RadarSensor(sim, carNode);
         
         obstacleSensor = new ObstacleSensor(sim, invisibleCarNode);
@@ -290,12 +298,29 @@ public class SteeringCar extends Car implements TrafficObject
 		if(!openDrivePositionSet)
 		{
 			ScenarioLoader scenarioLoader = SimulationBasics.getDrivingTask().getScenarioLoader();
-			ResetPosition openDriveStartPosition = scenarioLoader.getOpenDriveStartPosition(sim);
+			ResetPosition openDriveStartPosition = scenarioLoader.getOpenDriveStartResetPosition(sim);
 			if(openDriveStartPosition != null)
 			{
 				setPositionRotation(openDriveStartPosition.getLocation(), openDriveStartPosition.getRotation());
 				Simulator.getResetPositionList().add(openDriveStartPosition);
 			}
+			
+	        ODPosition startPos = scenarioLoader.getOpenDriveStartPosition(sim);
+	        ODPosition targetPos = scenarioLoader.getOpenDriveTargetPosition(sim);
+	        
+	        if(preferredConnections.isEmpty() && startPos != null && targetPos != null)
+	        {
+	        	RoadGraph roadGraph = sim.getOpenDriveCenter().getRoadGraph();
+	        	PreferredConnections pc = roadGraph.getShortestPath(startPos, targetPos);
+	        	if(pc != null)
+	        	{
+	        		preferredConnections = pc;
+	        		//System.err.println("PreferredConnections of steering car: \n" + preferredConnections);
+	        	}
+	        	else
+	        		System.err.println("No route from " + startPos + " to " + targetPos 
+	        				+ " could be found for steering car! (SteeringCar.java)");
+	        }
 			
 			openDrivePositionSet = true;
 		}
@@ -330,7 +355,6 @@ public class SteeringCar extends Car implements TrafficObject
 			else if(isODAutoPilot)
 			{
 				updateODAutopilot(tpf, vehicleList);
-				acceleratorPedalIntensity = getAdaptiveAccIntensity(acceleratorPedalIntensity);
 			}
 			else
 			{
@@ -528,9 +552,8 @@ public class SteeringCar extends Car implements TrafficObject
 			{
 				elapsedBulletTimeAtLastUpdate = elapsedBulletTime;
 
-				// vehicle position (without elevation)
+				// vehicle position
 				Vector3f position = getPosition();
-				position.y = 0;
 
 				// get most probable lane from result list according to expected lane list (and least heading deviation)
 				ODLane lane = sim.getOpenDriveCenter().getMostProbableLane(position, expectedLanes);
@@ -540,15 +563,7 @@ public class SteeringCar extends Car implements TrafficObject
 				steerTowardsPosition(tpf, targetPos);
 
 				// update speed
-				float targetSpeed = 80;
-				if(lane != null)
-				{
-					double s = lane.getCurrentInnerBorderPoint().getS();
-					double speedLimit = lane.getSpeedLimit(s);
-
-					if(speedLimit != -1)
-						targetSpeed = (float) speedLimit;
-				}
+				float targetSpeed = Float.MAX_VALUE;
 				updateSpeed(targetSpeed, vehicleList);
 			}
 		}
@@ -556,21 +571,25 @@ public class SteeringCar extends Car implements TrafficObject
 
 
 	private Vector3f targetPos = new Vector3f(0,0,0);
-	private float distanceFromPath = 5;
+	private float distanceFromPath = 3;
 	private void updateTargetPosition(ODLane lane)
 	{
 		if(lane != null)
 		{
-			ODPoint point = getTargetPoint(lane);
+			HashSet<ODLane> traversedLaneSet = new HashSet<ODLane>();
+			
+			// filling traversedLaneSet with all lanes between current lane (including)
+			// and the lane of target point (including) in order of increasing distance
+			ODPoint point = getTargetPoint(lane, traversedLaneSet);
 			if(point != null)
 			{
 				// visualize point (green)
 				targetPos = point.getPosition().toVector3f();
 				visualizer.setMarkerPosition("steeringCar_followBox", targetPos, getPosition(), visualizer.greenMaterial, false);
 
-				// set expected lane
+				// set expected lanes
 				expectedLanes.clear();
-				expectedLanes.add(point.getParentLane());
+				expectedLanes.addAll(traversedLaneSet);
 				return;
 			}
 		}
@@ -587,18 +606,19 @@ public class SteeringCar extends Car implements TrafficObject
 	
 	private ODLane previousLane = null;
 	private boolean isWrongWay = false; //assumption: vehicle is placed initially on road in driving direction
-	public ODPoint getTargetPoint(ODLane lane)
+	public ODPoint getTargetPoint(ODLane lane, HashSet<ODLane> traversedLaneSet)
 	{
+		// traversedLaneSet will be filled with all lanes between current lane (including)
+		// and the lane of target point (including) in order of increasing distance
+		
 		double s = lane.getCurrentInnerBorderPoint().getS();
 		
 		currentLane = lane;
 		currentS = s;
 		
-		PreferredConnections preferredConnections = SimulationBasics.getDrivingTask().getScenarioLoader().getPreferredConnectionsList();
-		
 		ODPoint point = null;
-		
-		if(previousLane != null && 	targetLaneID != null)
+	
+		if(previousLane != null && targetLaneID != null)
 		{
 			if(previousLane.isOppositeTo(lane))
 				isWrongWay = !isWrongWay;
@@ -630,14 +650,14 @@ public class SteeringCar extends Car implements TrafficObject
 			
 			
 			if(targetLane.isOppositeTo(lane))
-				point = targetLane.getLaneCenterPointAhead(!isWrongWay, s, distanceFromPath, preferredConnections);
+				point = targetLane.getLaneCenterPointAhead(!isWrongWay, s, distanceFromPath, preferredConnections, traversedLaneSet);
 			else
-				point = targetLane.getLaneCenterPointAhead(isWrongWay, s, distanceFromPath, preferredConnections);
+				point = targetLane.getLaneCenterPointAhead(isWrongWay, s, distanceFromPath, preferredConnections, traversedLaneSet);
 		}
 		else
 		{
 			// get point on center of current lane x meters ahead of the current position
-			point = lane.getLaneCenterPointAhead(false, s, distanceFromPath, preferredConnections);
+			point = lane.getLaneCenterPointAhead(false, s, distanceFromPath, preferredConnections, traversedLaneSet);
 		}
 		
 		previousLane = lane;
@@ -685,10 +705,15 @@ public class SteeringCar extends Car implements TrafficObject
 
 		boolean obstacleInTheWay = obstaclesInTheWay(vehicleList);
 		if(obstacleInTheWay)
+		{
 			targetSpeed = 0;
-
+		}
+		
 		targetSpeed = Math.min(targetSpeed, maxSpeed);
-
+		
+		if(adjustSpeedToCurvature)
+			targetSpeed = Math.min(targetSpeed, calculateRoadDependentMaxSpeedKmh());
+		
 		float currentSpeed = getCurrentSpeedKmh();
 
 		//System.out.print(name + ": " + targetSpeed + " *** " + currentSpeed);
@@ -728,6 +753,75 @@ public class SteeringCar extends Car implements TrafficObject
 		}
 	}
 
+
+	private float calculateRoadDependentMaxSpeedKmh()
+	{
+		// default return value (if no curve or speed limit detected)
+		float maxSpeedAtVehiclePositionKmh = 200;
+		
+		if(currentLane != null)
+		{
+			// (average) possible speed reduction per meter while approaching to curve or speed limit
+			float decelerationKmhPerMeter = 0.8f;
+
+			// inspect road profile (comparing 200 road points of 200 meters road ahead)
+			for (int i = 200; i >= 1; i--)
+			{
+				// inspect curvature and speed limit in 200, 199, 198, ... meters
+				ODPoint point = currentLane.getLaneCenterPointAhead(isWrongWay, currentS, i, preferredConnections, null);
+				if (point != null)
+				{
+					float maxSpeedDueToCurveKmh = 200;
+					
+					Double curvature = point.getGeometryCurvature();
+					if(curvature != null)
+					{
+						// get max speed a curvature can be handled for each road point
+						float absCurvature = FastMath.abs(curvature.floatValue());
+						absCurvature = Math.min(absCurvature, 0.2f);
+						//maxSpeedDueToCurveKmh = 3500 * absCurvature * absCurvature - 1400 * absCurvature + 150;
+						maxSpeedDueToCurveKmh = Math.min(200,FastMath.sqrt(100.0f/absCurvature)-10.0f);
+						
+						// curvature --> km/h
+						// 0.000 --> 200
+						// 0.012 -->  81
+						// 0.024 -->  55
+						// 0.100 -->  22
+						// 0.200 -->  12
+					}
+					
+					float maxSpeedDueToLimit = 200;
+					ODLane lane = point.getParentLane(); 
+					if(lane != null)
+					{
+						// get highest speed without exceeding lane or road speed limit
+						double maxSpeed = lane.getSpeedLimit(point.getS());
+						if(maxSpeed != -1)
+							maxSpeedDueToLimit = (float)maxSpeed;
+					}
+					
+					// pick least speed (curve speed vs. speed limit)
+					float maxSpeedAtPointKmh = Math.min(maxSpeedDueToCurveKmh, maxSpeedDueToLimit);
+					
+					// calculate vehicle speed at current position in order not to exceed
+					// the maximum curve speed or speed limit (in a range of 200 meters) ahead 
+					
+					// consider distance to speed restriction (the farther away, the higher the 
+					// speed at the current position may be)
+					maxSpeedAtVehiclePositionKmh += decelerationKmhPerMeter;
+					
+					// find the most critical speed restriction (low speed and short distance)
+					if (maxSpeedAtPointKmh < maxSpeedAtVehiclePositionKmh)
+						maxSpeedAtVehiclePositionKmh = maxSpeedAtPointKmh;
+				}
+				
+			}
+		}
+		//System.err.println("maxSpeedAtVehiclePositionKmh: " + maxSpeedAtVehiclePositionKmh);	
+		
+		return maxSpeedAtVehiclePositionKmh;
+	}
+	
 	
 	//This we need because in the interface there is not the angle of the vehicle only the relative curvature.
 	private double previousAngle = 0;
@@ -1174,7 +1268,7 @@ public class SteeringCar extends Car implements TrafficObject
 			if(obstacleTooClose(vehicle.getPosition()))
 				return true;
 		}
-		
+
 		// check if red traffic light ahead
 		for(TrafficLight trafficLight : Simulator.getDrivingTask().getScenarioLoader().getTrafficLights())
 		{
@@ -1185,16 +1279,15 @@ public class SteeringCar extends Car implements TrafficObject
 				
 				if(openDrivePosition != null && affectedLane != null && currentLane != null)
 				{
-					PreferredConnections preferredConnections = SimulationBasics.getDrivingTask().getScenarioLoader().getPreferredConnectionsList();
+					//PreferredConnections preferredConnections = SimulationBasics.getDrivingTask().getScenarioLoader().getPreferredConnectionsList();
 					ODPosition trafficLightPosition = new ODPosition(openDrivePosition.getSegment(), affectedLane, openDrivePosition.getS());
 					float distToTrafficLight = (float) currentLane.getDistanceToTargetAhead(false, currentS, preferredConnections, trafficLightPosition);
-
 					if(belowSafetyDistance(0, distToTrafficLight))
 						return true;
 				}
 			}
 		}
-		
+
 		if(followBox != null)
 		{
 			// check if red traffic light ahead
@@ -1248,15 +1341,15 @@ public class SteeringCar extends Car implements TrafficObject
 		
 		float speedDependentForwardSafetyDistance = 0;
 		
-		//if(useSpeedDependentForwardSafetyDistance)
-		//	speedDependentForwardSafetyDistance = 0.5f * getCurrentSpeedKmh();
+		if(useSpeedDependentForwardSafetyDistance)
+			speedDependentForwardSafetyDistance = 0.5f * getCurrentSpeedKmh();
 		
 		if((lateralDistance < minLateralSafetyDistance) && (forwardDistance > 0) && 
 				(forwardDistance < Math.max(speedDependentForwardSafetyDistance , minForwardSafetyDistance)))
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -1308,6 +1401,12 @@ public class SteeringCar extends Car implements TrafficObject
 	public boolean hasFollowBox()
 	{
 		return followBox!= null;
+	}
+
+
+	public PreferredConnections getPreferredConnectionsList()
+	{
+		return preferredConnections;
 	}
 
 

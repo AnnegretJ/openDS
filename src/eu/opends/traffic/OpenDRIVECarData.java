@@ -40,16 +40,15 @@ public class OpenDRIVECarData
 	private boolean isSpeedLimitedToSteeringCar;
 	private float distanceFromPath;
 	private float maxSpeed;
-	private String startRoadID;
-	private int startLane;
-	private double startS;
+	private ODPosition startPosition;
+	private ODPosition targetPosition;
 	private PreferredConnections preferredConnections;
 	private HashMap<ODPosition, Trigger> openDRIVECarTriggerActionListMap = new HashMap<ODPosition, Trigger>();
 	
 	
-	public OpenDRIVECarData(String name, float mass, float acceleration,	float decelerationBrake, 
+	public OpenDRIVECarData(String name, float mass, float acceleration, float decelerationBrake, 
 			float decelerationFreeWheel, boolean engineOn, String modelPath, boolean isSpeedLimitedToSteeringCar,
-			Float distanceFromPath, Float maxSpeed, String startRoadID, Integer startLane, Double startS, 
+			Float distanceFromPath, Float maxSpeed, ODPosition startPosition, ODPosition targetPosition, 
 			PreferredConnections preferredConnections) 
 	{
 		this.name = name;
@@ -62,9 +61,8 @@ public class OpenDRIVECarData
 		this.isSpeedLimitedToSteeringCar = isSpeedLimitedToSteeringCar;
 		this.distanceFromPath = distanceFromPath;
 		this.maxSpeed = maxSpeed;
-		this.startRoadID = startRoadID;
-		this.startLane = startLane;
-		this.startS = startS;
+		this.startPosition = startPosition;
+		this.targetPosition = targetPosition;
 		this.preferredConnections = preferredConnections;
 	}
 
@@ -79,129 +77,59 @@ public class OpenDRIVECarData
 		return mass;
 	}
 	
-	
-	public void setMass(float mass)	{
-		this.mass = mass;
-	}
-
 
 	public float getAcceleration() {
 		return acceleration;
 	}
 
 	
-	public void setAcceleration(float acceleration)	{
-		this.acceleration = acceleration;
-	}
-	
-
 	public float getDecelerationBrake() {
 		return decelerationBrake;
 	}
 
 	
-	public void setDecelerationBrake(float decelerationBrake) {
-		this.decelerationBrake = decelerationBrake;
-	}
-	
-	
 	public float getDecelerationFreeWheel() {
 		return decelerationFreeWheel;
 	}
 
-	
-	public void setDecelerationFreeWheel(float decelerationFreeWheel) {
-		this.decelerationFreeWheel = decelerationFreeWheel;
-	}
-	
 
 	public boolean isEngineOn() {
 		return engineOn;
 	}
 
 	
-	public void setEngineOn(boolean engineOn) {
-		this.engineOn = engineOn;
-	}
-	
-	
 	public String getModelPath() {
 		return modelPath;
 	}
 
-	
-	public void setModelPath(String modelPath) {
-		this.modelPath = modelPath;
-	}
 
-	
 	public boolean isSpeedLimitedToSteeringCar() {
 		return isSpeedLimitedToSteeringCar;
 	}
-	
 
-	public void setSpeedLimitedToSteeringCar(boolean isSpeedLimitedToSteeringCar) {
-		this.isSpeedLimitedToSteeringCar = isSpeedLimitedToSteeringCar;
-	}
-	
 	
 	public float getDistanceFromPath() {
 		return distanceFromPath;
 	}
 
 	
-	public void setDistanceFromPath(float distanceFromPath) {
-		this.distanceFromPath = distanceFromPath;
-	}
-	
-	
 	public float getMaxSpeed() {
 		return maxSpeed;
 	}
 
-	
-	public void setMaxSpeed(float maxSpeed) {
-		this.maxSpeed = maxSpeed;
-	}
-	
-	
-	public String getStartRoadID() {
-		return startRoadID;
+
+	public ODPosition getStartPosition() {
+		return startPosition;
 	}
 
 	
-	public void setStartRoadID(String startRoadID) {
-		this.startRoadID = startRoadID;
+	public ODPosition getTargetPosition() {
+		return targetPosition;
 	}
 	
-	
-	public int getStartLane() {
-		return startLane;
-	}
-
-	
-	public void setStartLane(int startLane) {
-		this.startLane = startLane;
-	}
-	
-	
-	public double getStartS() {
-		return startS;
-	}
-
-	
-	public void setStartS(double startS) {
-		this.startS = startS;
-	}
-
 	
 	public PreferredConnections getPreferredConnections() {
 		return preferredConnections;
-	}
-	
-	
-	public void SetPreferredConnections(PreferredConnections preferredConnections) {
-		this.preferredConnections = preferredConnections;
 	}
 	
 
@@ -222,9 +150,12 @@ public class OpenDRIVECarData
 			   "\t\t\t<engineOn>"+ engineOn + "</engineOn>\n" + 
 			   "\t\t\t<distanceFromPath>"+ distanceFromPath + "</distanceFromPath>\n" + 
 			   "\t\t\t<neverFasterThanSteeringCar>"+ isSpeedLimitedToSteeringCar + "</neverFasterThanSteeringCar>\n" + 
-			   "\t\t\t<startRoadID>"+ startRoadID + "</startRoadID>\n" + 
-			   "\t\t\t<startLane>"+ startLane + "</startLane>\n" + 
-			   "\t\t\t<startS>"+ startS + "</startS>\n" + 
+			   "\t\t\t<startRoadID>"+ startPosition.getRoadID() + "</startRoadID>\n" + 
+			   "\t\t\t<startLane>"+ startPosition.getLane() + "</startLane>\n" + 
+			   "\t\t\t<startS>"+ startPosition.getS() + "</startS>\n" + 
+			   "\t\t\t<targetRoadID>"+ targetPosition.getRoadID() + "</targetRoadID>\n" + 
+			   "\t\t\t<targetLane>"+ targetPosition.getLane() + "</targetLane>\n" + 
+			   "\t\t\t<targetS>"+ targetPosition.getS() + "</targetS>\n" + 
 			   "\t\t</vehicle>";	
 	}
 

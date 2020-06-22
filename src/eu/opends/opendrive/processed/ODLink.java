@@ -78,7 +78,7 @@ public class ODLink
 						
 						for(TJunctionConnectionLaneLink laneLink : connection.getLaneLink())
 						{
-							if(laneLink.getFrom().equals(fromLaneID))
+							if(laneLink.getFrom().intValue() == fromLaneID)
 							{
 								// lane with roadID "connectingRoadID" and laneID "toLane"
 								ODLane toLane = getLane(connectingRoadID, laneLink.getTo().intValueExact(), contactPoint);
@@ -129,7 +129,7 @@ public class ODLink
 		return null;
 	}
 
-
+	
 	public LinkData getLinkData(PreferredConnections path)
 	{
 		if(linkDataList.size() > 1)
@@ -150,7 +150,7 @@ public class ODLink
 
 		return null;
 	}
-
+	
 	
 	public boolean isJunction()
 	{
@@ -167,5 +167,11 @@ public class ODLink
 	public int getNrOfLinkTargets() 
 	{
 		return linkDataList.size();
+	}
+
+
+	public ArrayList<LinkData> getLinkDataList()
+	{
+		return linkDataList;		
 	}
 }

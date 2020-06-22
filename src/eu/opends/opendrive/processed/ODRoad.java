@@ -23,8 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 
 import eu.opends.basics.SimulationBasics;
+import eu.opends.drivingTask.settings.SettingsLoader;
+import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.main.Simulator;
 import eu.opends.opendrive.data.*;
 import eu.opends.opendrive.processed.ODPoint.GeometryType;
@@ -48,7 +51,7 @@ public class ODRoad
 	private boolean vizOrtho = false;
 	private boolean vizArrows = false;
 	private boolean vizOrthoArrows = false;
-	private double interpolationStep = 1;
+	private double interpolationStep = 1.0;
 	
 	private SimulationBasics sim;
 	private ODVisualizer visualizer;
@@ -56,11 +59,30 @@ public class ODRoad
 	private List<TRoadPlanViewGeometry> geometryList = new ArrayList<TRoadPlanViewGeometry>();
 	private ArrayList<ODPoint> roadReferencePointlist = new ArrayList<ODPoint>();
 	private ArrayList<ODLaneSection> ODLaneSectionList = new ArrayList<ODLaneSection>();
+	private HashMap<Integer, Geometry> laneGeometryMap = new HashMap<Integer, Geometry>();
 	private int pointCounter = 1;
 	
 	
 	public ODRoad(SimulationBasics sim, TRoad road) 
 	{
+		// init road builder settings
+		SettingsLoader settingsLoader = SimulationBasics.getSettingsLoader();
+		vizLanes = settingsLoader.getSetting(Setting.OpenDrive_visualizeRoads, true);
+		boolean vizGeometries = settingsLoader.getSetting(Setting.OpenDrive_visualizeGeometries, false);
+		vizLine = vizGeometries;
+		vizArc = vizGeometries;
+		vizSpiral = vizGeometries;
+		vizPoly3 = vizGeometries;
+		vizParamPoly3 = vizGeometries;
+		boolean vizGeometryDetails = settingsLoader.getSetting(Setting.OpenDrive_visualizeGeometryDetails, false);
+		vizStartBox = vizGeometryDetails;
+		vizTargetBox = vizGeometryDetails;
+		vizIntermediateBox = vizGeometryDetails;
+		vizOrtho = vizGeometryDetails;
+		vizArrows = vizGeometryDetails;
+		interpolationStep = settingsLoader.getSetting(Setting.OpenDrive_interpolationStepSize, 1.0);
+		
+		
 		this.sim = sim;
 		this.visualizer = sim.getOpenDriveCenter().getVisualizer();
 		this.road = road;
@@ -100,7 +122,7 @@ public class ODRoad
 		
 			ArrayList<ODPoint> sectionReferencePointList = getReferencePointsOnSection(startS, endS);
 			//System.err.println(road.getId() + "->" + sectionReferencePointList.size());				
-			ODLaneSection laneSection = new ODLaneSection(sim, this, sectionReferencePointList, ls, endS);
+			ODLaneSection laneSection = new ODLaneSection(sim, this, i, sectionReferencePointList, ls, endS);
 			laneSection.initLanes(vizLanes);
 			ODLaneSectionList.add(laneSection);
 		}
@@ -267,7 +289,13 @@ public class ODRoad
 			}
 		}	
 	}
+	
 
+	public HashMap<Integer, Geometry> getLaneGeometryMap()
+	{
+		return laneGeometryMap;
+	}
+	
 
 	public double getLaneOffset(double s)
 	{
@@ -510,6 +538,7 @@ public class ODRoad
 		// extract start point
 		String startPointID = lineID + "_startPoint";
 		Vector3d startPos = getStartPos(geometry);
+		startPos = addElevation(startPos, startPointS);
 		ODPoint startPoint = new ODPoint(startPointID, startPointS, startPos, ortho, geometry, null);
 		//pointList.add(startPoint); // already added in loop below
 		if(vizLine && vizStartBox)
@@ -557,13 +586,14 @@ public class ODRoad
 			visualizer.drawConnector(lineID, pointList, visualizer.blueMaterial, vizArrows);
 		
         return pointList;
-	}    
-	
-	
+	}
+
+
 	private ODPoint getPointOnLine(double ds, TRoadPlanViewGeometry geometry, String pointID)
 	{
 		double startPointS = geometry.getS();
     	Vector3d pos = getPositionOnLine(geometry, ds);
+    	pos = addElevation(pos, startPointS + ds);
     	double ortho = geometry.getHdg();
         return new ODPoint(pointID, startPointS + ds, pos, ortho, geometry, null);
 	}
@@ -604,6 +634,7 @@ public class ODRoad
 		// extract start point
 		String startPointID = arcID + "_startPoint";
 		Vector3d startPos = getStartPos(geometry);
+		//startPos = addElevation(startPos, startPointS);
 		//double ortho_s = geometry.getHdg();
 		//pointList.add(new ODPoint(startPointID, startPointS, startPos, ortho_s)); // already added in loop below
 		if(vizArc && vizStartBox)
@@ -658,6 +689,7 @@ public class ODRoad
 	    CurvePoint curvePoint = ordArc(ds, -curvature);
     	Vector3d pos = curvePoint.getCoordinates();
         Vector3d resultingPos = translate(rotate(pos, hdg), startPos);
+        resultingPos = addElevation(resultingPos, startPointS + ds);
         double ortho = 2*Math.PI-curvePoint.getOrtho() + hdg;		
         return new ODPoint(pointID, startPointS + ds, resultingPos, ortho, geometry, null);
 	}
@@ -688,6 +720,7 @@ public class ODRoad
 		// extract start point
 		String startPointID = spiralID + "_startPoint";
 		Vector3d startPos = getStartPos(geometry);
+		//startPos = addElevation(startPos, startPointS);
 		//double ortho_s = geometry.getHdg();
 		//pointList.add(new ODPoint(startPointID, startPointS, startPos, ortho_s)); // already added in loop below
         if(vizSpiral && vizStartBox)
@@ -755,6 +788,7 @@ public class ODRoad
     	CurvePoint curvePoint = Spiral.odrSpiral(runFrom + ds, cDot);
     	Vector3d oos = curvePoint.getCoordinates().subtract(pivotPos);
         Vector3d resultingPos = translate(rotate(oos, angle), startPos);
+        resultingPos = addElevation(resultingPos, startPointS + ds);
         double ortho = 2*Math.PI - curvePoint.getOrtho() + angle;
         double pointS = startPointS + ds;
 		return new ODPoint(pointID, pointS, resultingPos, ortho, geometry, null);
@@ -774,6 +808,7 @@ public class ODRoad
 		// extract start point
 		String startPointID = poly3ID + "_startPoint";
 		Vector3d startPos = getStartPos(geometry);
+		//startPos = addElevation(startPos, startPointS);
 		//double ortho_s = geometry.getHdg();
 		//pointList.add(new ODPoint(startPointID, startPointS, startPos, ortho_s)); // already added in loop below
 		if(vizPoly3 && vizStartBox)
@@ -827,6 +862,7 @@ public class ODRoad
 	    CurvePoint curvePoint = ordPoly3(ds, geometry);
     	Vector3d pos = curvePoint.getCoordinates();
         Vector3d resultingPos = translate(rotate(pos, hdg), startPos);
+        resultingPos = addElevation(resultingPos, startPointS + ds);
         double ortho = 2*Math.PI-curvePoint.getOrtho() + hdg;		
         return new ODPoint(pointID, startPointS + ds, resultingPos, ortho, geometry, null);
 	}
@@ -857,6 +893,7 @@ public class ODRoad
 		// extract start point
 		String startPointID = paramPoly3ID + "_startPoint";
 		Vector3d startPos = getStartPos(geometry);
+		//startPos = addElevation(startPos, startPointS);
 		//double ortho_s = geometry.getHdg();
 		//pointList.add(new ODPoint(startPointID, startPointS, startPos, ortho_s)); // already added in loop below
 		if(vizParamPoly3 && vizStartBox)
@@ -910,6 +947,7 @@ public class ODRoad
 	    CurvePoint curvePoint = ordParamPoly3(ds, geometry);
     	Vector3d pos = curvePoint.getCoordinates();
         Vector3d resultingPos = translate(rotate(pos, hdg), startPos);
+        resultingPos = addElevation(resultingPos, startPointS + ds);
         double ortho = 2*Math.PI-curvePoint.getOrtho() + hdg;		
         return new ODPoint(pointID, startPointS + ds, resultingPos, ortho, geometry, null);
 	}
@@ -979,10 +1017,106 @@ public class ODRoad
 		return new Vector3d(x, 0, z);
 	}
 
+	
+	private Vector3d addElevation(Vector3d originalPos, double s)
+	{
+		double elevation = getElevation(s);
+		if(elevation == 0)
+			return originalPos;
+		else
+			return new Vector3d(originalPos.getX(), elevation, originalPos.getZ());
+	}
+	
+	
+	public double getElevation(double s)
+	{
+		List<TRoadElevationProfileElevation> elevationList = road.getElevationProfile().getElevation();
+		for (int i = elevationList.size() - 1; i >= 0; i--)
+		{
+			double sOffset = elevationList.get(i).getS();
+			if (s >= sOffset)
+			{
+				double a = elevationList.get(i).getA();
+				double b = elevationList.get(i).getB();
+				double c = elevationList.get(i).getC();
+				double d = elevationList.get(i).getD();
 
+				double ds = s - sOffset;
+
+				return a + b * ds + c * ds * ds + d * ds * ds * ds;
+			}
+		}
+		
+		return 0;
+	}
+	
+	
 	public ArrayList<ODLaneSection> getLaneSectionList()
 	{
 		return ODLaneSectionList;
+	}
+
+	
+	public double getSpeedLimit(double s)
+	{
+		// lookup road speed limit
+		List<TRoadType> roadTypeList = road.getType();
+		
+		for(int i=roadTypeList.size()-1; i>=0; i--)
+		{
+			if(s >= roadTypeList.get(i).getS())
+			{
+				TRoadTypeSpeed speedEntry = roadTypeList.get(i).getSpeed();
+				
+				if(speedEntry != null)
+				{
+					String maxSpeedString = speedEntry.getMax();
+				
+					if(maxSpeedString.equals("no limit") || maxSpeedString.equals("unlimited"))
+						return Double.MAX_VALUE;
+					
+					try {
+						
+						double maxSpeed = Double.parseDouble(maxSpeedString);
+					
+						if(maxSpeed >= 0)
+						{
+							double conversionFactor = 1;
+				
+							if(speedEntry.getUnit() == EUnitSpeed.MPH)
+								conversionFactor =  1.61; // convert mph to km/h
+							else if(speedEntry.getUnit() == EUnitSpeed.M_S)
+								conversionFactor = 3.6; // convert m/s to km/h
+				
+							return conversionFactor * maxSpeed;
+						}
+					
+					} catch (Exception e) {
+						System.err.println("ODRoad.java: Invalid max speed string (" + maxSpeedString 
+								+ ") in road " + road.getId() + " at s=" + s);
+					}
+				}
+			}
+		}
+		
+		// if road speed limit not set
+		return -1;
+	}
+	
+	
+	public ERoadType getType(double s)
+	{
+		// lookup road type
+		List<TRoadType> roadTypeList = road.getType();
+		
+		for(int i=roadTypeList.size()-1; i>=0; i--)
+		{
+			if(s >= roadTypeList.get(i).getS())
+				return roadTypeList.get(i).getType();
+		}
+		
+		// if road type not set
+		return null;
 	}
 
 

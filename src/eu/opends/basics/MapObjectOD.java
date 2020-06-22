@@ -221,13 +221,13 @@ public class MapObjectOD extends MapObject
 		if(isValidOffroadPosition(name + "_mapObject_position", roadID, lateralOffset, verticalOffset, s))
 		{
 			ODPoint point = openDriveCenter.getRoadMap().get(roadID).getPointOnReferenceLine(s, name+"_mapObject");
-			Vector3f position = point.getPosition().toVector3f();
+			Vector3f referencePosition = point.getPosition().toVector3f();
 			float ortho = (float)point.getOrtho();
 			
-			float x = lateralOffset*FastMath.sin(ortho);
-			float z = lateralOffset*FastMath.cos(ortho);
+			float x = referencePosition.getX() + lateralOffset*FastMath.sin(ortho);
+			float z = referencePosition.getZ() + lateralOffset*FastMath.cos(ortho);
 			float y = getElevationAt(x,z) + verticalOffset;
-			location = position.add(new Vector3f(x, y, z));
+			location = new Vector3f(x, y, z);
 			
 			// overwrite original map object rotation with its relative rotation wrt road object
 			float[] angles = new float[3];
@@ -317,7 +317,6 @@ public class MapObjectOD extends MapObject
 					&& !geometryName.startsWith("Sky") && !geometryName.startsWith("ODarea")
 					&& !geometryName.startsWith("pedestrian"))
 			{
-				//System.out.println(geometryName);
 				return results.getCollision(i).getContactPoint().getY();
 			}
 		}

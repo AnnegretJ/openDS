@@ -104,11 +104,6 @@ public class SimulationDefaults
 	public static Quaternion initialCarRotation = new Quaternion(0, 0, 0, 1);
 	public static String skyTexture = "Textures/Sky/Bright/mountain.dds";
 	
-	public static Boolean cruiseControl_acc = false;
-	public static Float cruiseControl_safetyDistance_lateral = 20f;
-	public static Float cruiseControl_safetyDistance_forward = 5f;
-	public static Float cruiseControl_emergencyBrakeDistance = 20f;
-	public static Boolean cruiseControl_suppressDeactivationByBrake = false;
 	public static Float cruiseControl_initialSpeed = 0f;
 
 }

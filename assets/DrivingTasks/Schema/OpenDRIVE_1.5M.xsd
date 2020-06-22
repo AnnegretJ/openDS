@@ -624,7 +624,7 @@
                                 <xs:attribute name="sOffset"        type="t_grEqZero"                                               use="required"/>
                                 <xs:attribute name="type"           type="e_roadMarkType"                                           use="required"/>
                                 <xs:attribute name="weight"         type="e_roadMarkWeight"                                         use="optional"/>
-                                <xs:attribute name="color"          type="e_roadMarkColor"                                          use="required"/>
+                                <xs:attribute name="color"          type="e_roadMarkColor"                                          use="optional"/>
                                 <xs:attribute name="material"       type="xs:string"                                                use="optional"/>
                                 <xs:attribute name="width"          type="t_grEqZero"                                               use="optional"/>
                                 <xs:attribute name="laneChange"     type="e_road_lanes_laneSection_lcr_lane_roadMark_laneChange"    use="optional"/>
@@ -930,7 +930,7 @@
                             <xs:attribute name="side"           type="e_sideType"       use="required"/>
                             <xs:attribute name="weight"         type="e_roadMarkWeight" use="required"/>
                             <xs:attribute name="width"          type="t_grEqZero"       use="optional"/>
-                            <xs:attribute name="color"          type="e_roadMarkColor"  use="required"/>
+                            <xs:attribute name="color"          type="e_roadMarkColor"  use="optional"/>
                             <xs:attribute name="zOffset"        type="t_grEqZero"       use="optional"/>
                             <xs:attribute name="spaceLength"    type="t_grEqZero"       use="required"/>
                             <xs:attribute name="lineLength"     type="t_grEqZero"       use="required"/>
@@ -1375,8 +1375,8 @@
             <xs:sequence>
                 <xs:any processContents="skip"  minOccurs="0"   maxOccurs="unbounded"/>
             </xs:sequence>
-            <xs:attribute name="code"   type="xs:string"    use="required"/>
-            <xs:attribute name="value"  type="xs:string"    use="required"/>
+            <xs:attribute name="code"   type="xs:string"    use="optional"/>
+            <xs:attribute name="value"  type="xs:string"    use="optional"/>
         </xs:complexType> <!-- end t_userData -->
         
         <!-- 5.9 Include Tag -->

@@ -50,4 +50,11 @@ public class ODPosition
 	{
 		return s;
 	}
+	
+	
+	@Override
+	public String toString()
+	{
+		return roadID + "/" + lane + "/" + s;
+	}
 }

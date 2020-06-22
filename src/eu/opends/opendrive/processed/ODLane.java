@@ -20,6 +20,7 @@ package eu.opends.opendrive.processed;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,8 +33,11 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.util.BufferUtils;
+import com.mysql.jdbc.Connection;
 
 import eu.opends.basics.SimulationBasics;
+import eu.opends.drivingTask.settings.SettingsLoader;
+import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.opendrive.processed.LinkData;
 import eu.opends.opendrive.processed.SpeedLimit;
 import eu.opends.opendrive.data.*;
@@ -67,6 +71,7 @@ public class ODLane
 	private ODLink successorLink = null;
 	private ODLink predecessorLink = null;
 	private TRoadLanesLaneSectionLcrLaneRoadMark defaultRoadMark;
+	private boolean addToPhysicsEngine = true;
 	
 	
 	public enum LaneSide
@@ -121,6 +126,9 @@ public class ODLane
 		defaultRoadMark.setColor(ERoadMarkColor.STANDARD);
 		defaultRoadMark.setWidth(0.13);
 		defaultRoadMark.setLaneChange(ERoadLanesLaneSectionLcrLaneRoadMarkLaneChange.BOTH);
+		
+		SettingsLoader settingsLoader = SimulationBasics.getSettingsLoader();
+		addToPhysicsEngine = settingsLoader.getSetting(Setting.OpenDrive_addToPhysicsEngine, true);
 	}
 
 
@@ -350,14 +358,17 @@ public class ODLane
 							textureOffset = centerLineRoadMark.getWidth();
 					}
 					else
-						System.err.println("WARNING: Road: " + getODRoad().getID() + ", Lane: " + laneID + "; centerLineRoadMark width == null (ODLane)");
+					{
+						if(centerLineRoadMark.getType() != ERoadMarkType.NONE)
+							System.err.println("WARNING: Road: " + getODRoad().getID() + ", Lane: " + laneID + "; centerLineRoadMark width == null (ODLane)");
+					}
 				}
 			}
 
 			Vector3d textureStartPos = position.add(new Vector3d((textureOffset)*Math.sin(ortho), 0, (textureOffset)*Math.cos(ortho)));
 			
 			// place vertex on top of underlying surface (if enabled)
-			textureStartPos.setY(sim.getOpenDriveCenter().getHeightAt(textureStartPos.getX(), textureStartPos.getZ()));
+			textureStartPos.setY(sim.getOpenDriveCenter().getHeightAt(textureStartPos));
 			
 			vertices[2*i] = textureStartPos.toVector3f();
 			
@@ -370,7 +381,7 @@ public class ODLane
 			Vector3d borderPos = position.add(new Vector3d((width)*Math.sin(ortho), 0, (width)*Math.cos(ortho)));
 			
 			// place vertex on top of underlying surface (if enabled)
-			borderPos.setY(sim.getOpenDriveCenter().getHeightAt(borderPos.getX(), borderPos.getZ()));
+			borderPos.setY(sim.getOpenDriveCenter().getHeightAt(borderPos));
 			
 			vertices[2*i+1] = borderPos.toVector3f();
 			
@@ -406,7 +417,8 @@ public class ODLane
 		mesh.setBuffer(Type.Index,    3, BufferUtils.createIntBuffer(indexes));
 		mesh.updateBound();
 		
-		Geometry geo = new Geometry("ODarea_" + road.getID() + "_" + laneID, mesh);
+		String geoID = "ODarea_" + road.getID() + "_" + laneID;
+		Geometry geo = new Geometry(geoID, mesh);
 		geo.setMaterial(getMaterial(roadmarkType));
 		
 		if(!visualize || type == ELaneType.NONE)
@@ -425,8 +437,11 @@ public class ODLane
 		else if(type == ELaneType.PARKING)
 			mesh.scaleTextureCoordinates(new Vector2f(1f,1f));
 
+		road.getLaneGeometryMap().put(laneID, geo);
 		sim.getOpenDriveNode().attachChild(geo);
-		laneSection.addToBulletPhysicsSpace(geo);
+		
+		if(addToPhysicsEngine)
+			laneSection.addToBulletPhysicsSpace(geo);
 		
 		//System.err.println(roadID + "_" + laneID);
 	}
@@ -758,11 +773,23 @@ public class ODLane
 	}
 
 
+	public ODLink getSuccessor()
+	{
+		return successorLink;		
+	}
+	
+	
 	public void setSuccessor(ODLink successorLink)
 	{
 		this.successorLink = successorLink;		
 	}
 
+
+	public ODLink getPredecessor()
+	{
+		return predecessorLink;		
+	}
+	
 	
 	public void setPredecessor(ODLink predecessorLink)
 	{
@@ -770,34 +797,122 @@ public class ODLane
 	}
 	
 	
-	public ODPoint getLaneCenterPointBack(boolean isWrongWay, double s, double range, PreferredConnections pc)
+	public ODPoint getLaneCenterPointBack(boolean isWrongWay, double s, double range,
+			PreferredConnections pc, HashSet<ODLane> traversedLaneSet)
 	{
 		if(laneID>0)
-			return getLaneCenterPointAhead(s, range, !isWrongWay, pc);//true
+			return getLaneCenterPointAhead(s, range, !isWrongWay, pc, traversedLaneSet);//true
 		else if(laneID<0)
-			return getLaneCenterPointAhead(s, range, isWrongWay, pc);//false
+			return getLaneCenterPointAhead(s, range, isWrongWay, pc, traversedLaneSet);//false
 		else
 			return null;
 	}
 	
 	
-	public ODPoint getLaneCenterPointAhead(boolean isWrongWay, double s, double range, PreferredConnections pc)
+	public ODPoint getLaneCenterPointAhead(boolean isWrongWay, double s, double range,
+			PreferredConnections pc, HashSet<ODLane> traversedLaneSet)
 	{
 		if(laneID>0)
-			return getLaneCenterPointAhead(s, range, isWrongWay, pc);//false
+			return getLaneCenterPointAhead(s, range, isWrongWay, pc, traversedLaneSet);//false
 		else if(laneID<0)
-			return getLaneCenterPointAhead(s, range, !isWrongWay, pc);//true
+			return getLaneCenterPointAhead(s, range, !isWrongWay, pc, traversedLaneSet);//true
 		else
 			return null;
 	}
 
 
-	private ODPoint getLaneCenterPointAhead(double s, double range, boolean increasingS, PreferredConnections pc)
+	private ODPoint getLaneCenterPointAhead(double s, double range, boolean increasingS,
+			PreferredConnections pc, HashSet<ODLane> traversedLaneSet)
 	{
 		if(laneStartS > s || s > laneEndS)
 		{
 			if(printDebugMsg)
 				System.err.println("s=" + s + " is out of lane " + laneID + " (road: " + road.getID() + ", getLaneCenterPointAhead)");
+			return null;
+		}
+		
+		// record all lanes explored while finding lane center point (if traversedLaneSet != null)
+		if(traversedLaneSet != null)
+			traversedLaneSet.add(this);
+		
+		if(increasingS)
+		{
+			if(s+range > laneEndS)
+			{
+				// search successor
+				double distToEnd = laneEndS - s;
+				
+				LinkData successorLinkData;
+				if(successorLink != null && (successorLinkData = successorLink.getLinkData(pc)) != null)
+				{
+					ODLane successorLane = successorLinkData.getLane();
+					double successorS = successorLane.getStartS();
+
+					if(successorLinkData.getContactPoint() == EContactPoint.END)
+					{
+						increasingS = !increasingS;
+						successorS = successorLane.getEndS();
+					}
+					
+					double remainingRange = range - distToEnd;
+					return successorLane.getLaneCenterPointAhead(successorS, remainingRange, increasingS, pc, traversedLaneSet);
+				}
+				else if(printDebugMsg)
+					System.err.println("no successor available (lane: " + laneID + "; road: " + road.getID() + "; getLaneCenterPointAhead)");
+			}
+			else
+				return laneSection.getLaneCenterPointAt(this, s+range);
+		}
+		else
+		{
+			if(s-range < laneStartS)
+			{
+				// search predecessor
+				double distToStart = s - laneStartS;
+				
+				LinkData predecessorLinkData;
+				if(predecessorLink != null && (predecessorLinkData = predecessorLink.getLinkData(pc)) != null)
+				{
+					ODLane predecessorLane = predecessorLinkData.getLane();
+					double predecessorS = predecessorLane.getEndS();
+
+					if(predecessorLinkData.getContactPoint() == EContactPoint.START)
+					{
+						increasingS = !increasingS;
+						predecessorS = predecessorLane.getStartS();
+					}
+					
+					double remainingRange = range - distToStart;
+					return predecessorLane.getLaneCenterPointAhead(predecessorS, remainingRange, increasingS, pc, traversedLaneSet);
+				}
+				else if(printDebugMsg)
+					System.err.println("no predecessor available (lane: " + laneID + "; road: " + road.getID() + "; getLaneCenterPointAhead)");
+			}
+			else
+				return laneSection.getLaneCenterPointAt(this, s-range);
+		}
+		
+		return null;
+	}
+
+
+	public ODPoint getReferencePointAhead(boolean isWrongWay, double s, double range, PreferredConnections pc)
+	{
+		if(laneID>0)
+			return getReferencePointAhead(s, range, isWrongWay, pc);//false
+		else if(laneID<0)
+			return getReferencePointAhead(s, range, !isWrongWay, pc);//true
+		else
+			return null;
+	}
+
+
+	private ODPoint getReferencePointAhead(double s, double range, boolean increasingS, PreferredConnections pc)
+	{
+		if(laneStartS > s || s > laneEndS)
+		{
+			if(printDebugMsg)
+				System.err.println("s=" + s + " is out of lane " + laneID + " (road: " + road.getID() + ", getReferencePointAhead)");
 			return null;
 		}
 			
@@ -821,13 +936,13 @@ public class ODLane
 					}
 					
 					double remainingRange = range - distToEnd;
-					return successorLane.getLaneCenterPointAhead(successorS, remainingRange, increasingS, pc);
+					return successorLane.getReferencePointAhead(successorS, remainingRange, increasingS, pc);
 				}
 				else if(printDebugMsg)
-					System.err.println("no successor available (lane: " + laneID + "; road: " + road.getID() + "; getLaneCenterPointAhead)");
+					System.err.println("no successor available (lane: " + laneID + "; road: " + road.getID() + "; getReferencePointAhead)");
 			}
 			else
-				return laneSection.getLaneCenterPointAt(this, s+range);
+				return road.getPointOnReferenceLine(s+range, "refPoint");
 		}
 		else
 		{
@@ -841,7 +956,7 @@ public class ODLane
 				{
 					ODLane predecessorLane = predecessorLinkData.getLane();
 					double predecessorS = predecessorLane.getEndS();
-					
+
 					if(predecessorLinkData.getContactPoint() == EContactPoint.START)
 					{
 						increasingS = !increasingS;
@@ -849,19 +964,19 @@ public class ODLane
 					}
 					
 					double remainingRange = range - distToStart;
-					return predecessorLane.getLaneCenterPointAhead(predecessorS, remainingRange, increasingS, pc);
+					return predecessorLane.getReferencePointAhead(predecessorS, remainingRange, increasingS, pc);
 				}
 				else if(printDebugMsg)
-					System.err.println("no predecessor available (lane: " + laneID + "; road: " + road.getID() + "; getLaneCenterPointAhead)");
+					System.err.println("no predecessor available (lane: " + laneID + "; road: " + road.getID() + "; getReferencePointAhead)");
 			}
 			else
-				return laneSection.getLaneCenterPointAt(this, s-range);
+				return road.getPointOnReferenceLine(s-range, "refPoint");
 		}
 		
 		return null;
 	}
 
-
+	
 	public ArrayList<SpeedLimit> getSpeedLimitListAhead(boolean isWrongWay, double s, int range, PreferredConnections pc)
 	{
 		ArrayList<SpeedLimit> speedLimitList;
@@ -1005,9 +1120,17 @@ public class ODLane
 				list.add(speedLimit);
 			}
 			
-			// insert "unlimited" before, if initial offset is present 
-			if(speedList.size()>0 && speedList.get(0).getSOffset() != 0)
-				list.add(new SpeedLimit(traveledDistance + laneStartS - s, null));
+			// if lane speed limit with initial offset is present or no lane speed limit present
+			// --> insert road speed limit or "unlimited"
+			if((speedList.size()>0 && speedList.get(0).getSOffset() != 0) || (speedList.size()==0))
+			{
+				Double speedLimitValue = road.getSpeedLimit(s);
+				if(speedLimitValue == -1)
+					speedLimitValue = null;
+				
+				SpeedLimit speedLimit = new SpeedLimit(traveledDistance + laneStartS - s, speedLimitValue);
+				list.add(speedLimit);
+			}
 		}
 		else
 		{
@@ -1025,19 +1148,38 @@ public class ODLane
 
 			}
 			
-			// insert "unlimited" before, if initial offset is present 
+			// if lane speed limit with initial offset is present 
+			// --> insert road speed limit or "unlimited"
 			if(speedList.size()>0 && speedList.get(0).getSOffset() != 0)
-				list.add(new SpeedLimit(traveledDistance + s - laneStartS - speedList.get(0).getSOffset(), null));
+			{
+				Double speedLimitValue = road.getSpeedLimit(s);
+				if(speedLimitValue == -1)
+					speedLimitValue = null;
+
+				SpeedLimit speedLimit = new SpeedLimit(traveledDistance + s - laneStartS - speedList.get(0).getSOffset(), speedLimitValue);
+				list.add(speedLimit);
+			}
+
+			// if no lane speed limit present
+			// --> insert road speed limit or "unlimited"
+			if(speedList.size()==0)
+			{
+				Double speedLimitValue = road.getSpeedLimit(s);
+				if(speedLimitValue == -1)
+					speedLimitValue = null;
+
+				SpeedLimit speedLimit = new SpeedLimit(traveledDistance - laneEndS + s, speedLimitValue);
+				list.add(speedLimit);
+			}
 		}
 		
-		
 		// if no speed limit available
-		if(speedList.size() == 0)
+		if(list.size() == 0)
 		{
 			SpeedLimit speedLimit = new SpeedLimit(traveledDistance, null);
 			list.add(speedLimit);
 		}
-		
+
 		return list;
 	}
 
@@ -1166,35 +1308,35 @@ public class ODLane
 		}
 	}
 	
-
-	public ArrayList<Intersection> getIntersectionAhead(boolean isWrongWay, double s, double range, PreferredConnections pc)
+	
+	public ArrayList<Intersection> getIntersectionListAhead(boolean isWrongWay, double s, double range, PreferredConnections pc)
 	{
-		ArrayList<Intersection> speedLimitList;
+		ArrayList<Intersection> intersectionList;
 		
 		if(laneID>0)
-			speedLimitList = getIntersectionAhead(0, s, range, isWrongWay, pc);//false
+			intersectionList = getIntersectionListAhead(0, s, range, isWrongWay, pc);//false
 		else if(laneID<0)
-			speedLimitList = getIntersectionAhead(0, s, range, !isWrongWay, pc);//true
+			intersectionList = getIntersectionListAhead(0, s, range, !isWrongWay, pc);//true
 		else
 			return new ArrayList<Intersection>();		
 		
 		// sort intersection list ascending by distance
-		Collections.sort(speedLimitList, new IntersectionComparator(true));
+		Collections.sort(intersectionList, new IntersectionComparator(true));
 
 		// remove intersections which are out of range (<= 0 or > range) 
-		Iterator<Intersection> it = speedLimitList.iterator();
+		Iterator<Intersection> it = intersectionList.iterator();
 		while(it.hasNext())
 		{
-			Intersection speedLimit = it.next();
-			if(speedLimit.getDistance() <= 0 || speedLimit.getDistance() > range)
+			Intersection intersection = it.next();
+			if(intersection.getDistance() <= 0 || intersection.getDistance() > range)
 				it.remove();
 		}
 
-		return speedLimitList;
+		return intersectionList;
 	}
 	
 	
-	private ArrayList<Intersection> getIntersectionAhead(double traveledDistance, double s, double range, boolean increasingS, PreferredConnections pc)
+	private ArrayList<Intersection> getIntersectionListAhead(double traveledDistance, double s, double range, boolean increasingS, PreferredConnections pc)
 	{
 		if(laneStartS > s || s > laneEndS)
 		{
@@ -1226,7 +1368,7 @@ public class ODLane
 					
 					double traveledDist = traveledDistance + distToEnd;
 					double remainingRange = range - distToEnd;
-					list.addAll(successorLane.getIntersectionAhead(traveledDist, successorS, remainingRange, increasingS, pc));
+					list.addAll(successorLane.getIntersectionListAhead(traveledDist, successorS, remainingRange, increasingS, pc));
 				}
 				else if(printDebugMsg)
 					System.err.println("no successor available (lane: " + laneID + "; road: " + road.getID() + "; getIntersectionAhead)");
@@ -1253,7 +1395,7 @@ public class ODLane
 					
 					double traveledDist = traveledDistance + distToStart;
 					double remainingRange = range - distToStart;
-					list.addAll(predecessorLane.getIntersectionAhead(traveledDist, predecessorS, remainingRange, increasingS, pc));
+					list.addAll(predecessorLane.getIntersectionListAhead(traveledDist, predecessorS, remainingRange, increasingS, pc));
 				}
 				else if(printDebugMsg)
 					System.err.println("no predecessor available (lane: " + laneID + "; road: " + road.getID() + "; getIntersectionAhead)");
@@ -1297,6 +1439,7 @@ public class ODLane
 
 	public double getSpeedLimit(double s)
 	{
+		// lookup lane speed limit
 		double laneSection_s = laneSection.getS();
 		List<TRoadLanesLaneSectionLrLaneSpeed> speedLimitList = lane.getSpeed();
 		
@@ -1304,11 +1447,20 @@ public class ODLane
 		{
 			double offset = laneSection_s + speedLimitList.get(i).getSOffset();
 			if(s >= offset)
-				return speedLimitList.get(i).getMax();
+			{
+				double conversionFactor = 1;
+				
+				if(speedLimitList.get(i).getUnit() == EUnitSpeed.MPH)
+					conversionFactor =  1.61; // convert mph to km/h
+				else if(speedLimitList.get(i).getUnit() == EUnitSpeed.M_S)
+					conversionFactor = 3.6; // convert m/s to km/h
+				
+				return conversionFactor * speedLimitList.get(i).getMax();
+			}
 		}
 		
-		// return -1 if speed limit not set
-		return -1;
+		// if no lane speed limit set --> lookup road speed limit
+		return getODRoad().getSpeedLimit(s); // returns -1 if not set
 	}
 
 	
@@ -1369,18 +1521,22 @@ public class ODLane
 					useRoadMarkOfThisLane = !useRoadMarkOfThisLane;
 				
 				ERoadMarkType roadMarkType = null;
-				if(useRoadMarkOfThisLane)
-					// road mark belongs to this lane
-					roadMarkType = getRoadMark(s).getType();
-				else
-				{
-					if(getLaneSide() != neighborLane.getLaneSide())
-						// road mark belongs to center lane
-						roadMarkType = laneSection.getCenterLineRoadMarkAtPos(s).getType();
+				
+				try {
+					if(useRoadMarkOfThisLane)
+						// road mark belongs to this lane
+						roadMarkType = getRoadMark(s).getType();
 					else
-						// road mark belongs to neighbor lane
-						roadMarkType = neighborLane.getRoadMark(s).getType();
-				}
+					{
+						if(getLaneSide() != neighborLane.getLaneSide())
+							// road mark belongs to center lane
+							roadMarkType = laneSection.getCenterLineRoadMarkAtPos(s).getType();
+						else
+							// road mark belongs to neighbor lane
+							roadMarkType = neighborLane.getRoadMark(s).getType();
+					}
+				} catch (NullPointerException e) {}
+				
 				
 				if(roadMarkType == null)
 					return AdasisLineType.Undecided;

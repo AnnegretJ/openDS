@@ -947,6 +947,9 @@ public class ScenarioLoader
 				String startRoadID = null;
 				Integer startLane = null;
 				Double startS = null;
+				String targetRoadID = null;
+				Integer targetLane = null;
+				Double targetS = null;
 				PreferredConnections preferredConnections = new PreferredConnections();
 				
 				for (int j = 1; j <= childnodes.getLength(); j++) 
@@ -1037,6 +1040,27 @@ public class ScenarioLoader
 						startS = Double.parseDouble(currentChild.getTextContent());
 					}
 					
+					//String modelPath = dtData.getValue(Layer.SCENARIO, 
+					//		"/scenario:scenario/scenario:traffic/scenario:ODvehicle["+k+"]/scenario:targetRoadID", String.class);
+					else if(currentChild.getNodeName().equals("targetRoadID"))
+					{
+						targetRoadID = currentChild.getTextContent();
+					}	
+					
+					//Integer decelerationBrake = dtData.getValue(Layer.SCENARIO, 
+					//		"/scenario:scenario/scenario:traffic/scenario:ODvehicle["+k+"]/scenario:targetLane", Integer.class);
+					else if(currentChild.getNodeName().equals("targetLane"))
+					{
+						targetLane = Integer.parseInt(currentChild.getTextContent());
+					}
+					
+					//Double decelerationFreeWheel = dtData.getValue(Layer.SCENARIO, 
+					//		"/scenario:scenario/scenario:traffic/scenario:ODvehicle["+k+"]/scenario:targetS", Double.class);
+					else if(currentChild.getNodeName().equals("targetS"))
+					{
+						targetS = Double.parseDouble(currentChild.getTextContent());
+					}
+					
 					else if(currentChild.getNodeName().equals("preferredConnections"))
 					{
 						NodeList ODconnectionNodes = currentChild.getChildNodes();
@@ -1089,9 +1113,22 @@ public class ScenarioLoader
 				if(startS == null)
 					startS = 0.0;
 				
+				ODPosition startPos = new ODPosition(startRoadID, startLane, startS);
+				
+				if(targetRoadID == null)
+					targetRoadID = "2";
+				
+				if(targetLane == null)
+					targetLane = 1;
+				
+				if(targetS == null)
+					targetS = 0.0;
+				
+				ODPosition targetPos = new ODPosition(targetRoadID, targetLane, targetS);
+				
 				OpenDRIVECarData openDRIVECarData = new OpenDRIVECarData(name, mass, acceleration, decelerationBrake, 
 						decelerationFreeWheel, engineOn, modelPath, isSpeedLimitedToSteeringCar, distanceFromPath,
-						maxSpeed, startRoadID, startLane, startS, preferredConnections);
+						maxSpeed, startPos, targetPos, preferredConnections);
 				PhysicalTraffic.getOpenDRIVECarDataList().add(openDRIVECarData);
 			}
 			
@@ -1825,7 +1862,7 @@ public class ScenarioLoader
 	}
 
 	
-	public ResetPosition getOpenDriveStartPosition(Simulator sim)
+	public ResetPosition getOpenDriveStartResetPosition(Simulator sim)
 	{
 		if(startRoadID != null && !startRoadID.isEmpty() && startLane != null)
 		{
@@ -1840,8 +1877,8 @@ public class ScenarioLoader
 					if(laneSection.getS() <= startS && startS <= laneSection.getEndS())
 					{
 						ODLane lane = laneSection.getLaneMap().get(startLane);
-						ODPoint point = lane.getLaneCenterPointAhead(false, startS, 0, preferredConnections);
-						ODPoint targetPoint = lane.getLaneCenterPointAhead(false, startS, 1, preferredConnections);
+						ODPoint point = lane.getLaneCenterPointAhead(false, startS, 0, preferredConnections, null);
+						ODPoint targetPoint = lane.getLaneCenterPointAhead(false, startS, 1, preferredConnections, null);
 						
 						Vector3f position = point.getPosition().toVector3f();
 						Vector3f targetPosition = targetPoint.getPosition().toVector3f();
@@ -1857,6 +1894,39 @@ public class ScenarioLoader
 				}
 			}
 			System.err.println("Could not set vehicle to road '" + startRoadID + "', lane '" + startLane + "', s '" + startS + "'");
+		}
+		
+		return null;
+	}
+	
+	
+	public ODPosition getOpenDriveStartPosition(Simulator sim)
+	{
+		if(startRoadID != null && !startRoadID.isEmpty() && startLane != null)
+		{
+			if(startS == null)
+				startS = 0d;
+			
+			ODRoad road = sim.getOpenDriveCenter().getRoadMap().get(startRoadID);
+			if(road != null)
+			{
+				for(ODLaneSection laneSection : road.getLaneSectionList())
+				{
+					if(laneSection.getLaneMap().containsKey(startLane))
+					{
+						if(laneSection.getS() <= startS && startS <= laneSection.getEndS())
+							return new ODPosition(startRoadID, startLane, startS);
+						else
+						{
+							System.err.println("Invalid start position (startS '" + startS + "' does not exist)");
+							return null;
+						}
+					}
+				}
+				System.err.println("Invalid start position (startLane '" + startLane + "' does not exist)");
+			}
+			else
+				System.err.println("Invalid start position (startRoadID: '" + startRoadID + "' does not exist)");
 		}
 		
 		return null;

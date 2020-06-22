@@ -22,9 +22,10 @@ package eu.opends.opendrive.processed;
 
 import java.util.ArrayList;
 
+
 public class PreferredConnections
 {
-	private class Connection
+	class Connection
 	{
 		private String junctionID;
 		private String connectionID;
@@ -33,6 +34,16 @@ public class PreferredConnections
 		{
 			this.junctionID = junctionID;
 			this.connectionID = connectionID;
+		}
+
+		public String getJunctionID()
+		{
+			return junctionID;
+		}
+		
+		public String getConnectionID()
+		{
+			return connectionID;
 		}
 	}
 	
@@ -65,6 +76,28 @@ public class PreferredConnections
 		
 		return false;
 	}
+
+
+	public ArrayList<Connection> getConnections()
+	{
+		return connectionList;
+	}
+	
+
+	public boolean isEmpty()
+	{
+		return connectionList.isEmpty();
+	}
 	
 	
+	@Override
+	public String toString()
+	{
+		String returnString = "";
+		for(Connection connection : connectionList)
+			returnString += "PreferredConnection: " + connection.getJunctionID() + 
+				"/" + connection.getConnectionID() + "\n";
+		
+		return returnString;
+	}
 }

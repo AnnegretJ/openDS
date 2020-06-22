@@ -19,6 +19,7 @@
 package eu.opends.opendrive.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.jme3.material.Material;
@@ -48,6 +49,11 @@ public class ODVisualizer
 {
 	private SimulationBasics sim;
 	private boolean drawMarker;
+	
+	// using maps to access markers/connectors by ID (much faster than accessing the OpenDRIVE node)
+	private HashMap<String, com.jme3.scene.Geometry> markerMap = new HashMap<String, com.jme3.scene.Geometry>();
+	private HashMap<String, com.jme3.scene.Node> connectorMap = new HashMap<String, com.jme3.scene.Node>();
+	
 	public Material redMaterial, greenMaterial, blueMaterial, yellowMaterial, blackMaterial, whiteMaterial;
 	
 	// wire materials
@@ -207,6 +213,7 @@ public class ODVisualizer
         box.setLocalTranslation(position);
         
         sim.getOpenDriveNode().attachChild(box);
+        markerMap.put(ID,box);
 	}
 	
 	
@@ -217,6 +224,7 @@ public class ODVisualizer
         sphere.setLocalTranslation(position);
         
         sim.getOpenDriveNode().attachChild(sphere);
+        markerMap.put(ID,sphere);
 	}
 	
 	
@@ -259,6 +267,7 @@ public class ODVisualizer
 		curveGeometry.setMaterial(material);
 
 		sim.getOpenDriveNode().attachChild(curveGeometry);
+		connectorMap.put(ID,curveGeometry);
 	}
 	
 	
@@ -325,14 +334,14 @@ public class ODVisualizer
 	
 	public void setMarkerPosition(String ID, Vector3f position, Vector3f vehiclePosition, Material material, boolean drawConnector)
 	{
-		Spatial marker = sim.getOpenDriveNode().getChild(ID);
-		
+		Spatial marker = markerMap.get(ID);
+
 		if(drawMarker && marker != null)
 		{
 			marker.setLocalTranslation(position);
 			marker.setCullHint(CullHint.Dynamic);
 			
-			Spatial connector = sim.getOpenDriveNode().getChild(ID + "_connector");
+			Spatial connector = connectorMap.get(ID + "_connector");
 			if(connector != null)
 				sim.getOpenDriveNode().detachChild(connector);
 			
@@ -348,13 +357,13 @@ public class ODVisualizer
 
 	public void hideMarker(String ID)
 	{
-		Spatial marker = sim.getOpenDriveNode().getChild(ID);
+		Spatial marker = markerMap.get(ID);
 		
 		if(drawMarker && marker != null)
 		{
 			marker.setCullHint(CullHint.Always);
 			
-			Spatial connector = sim.getOpenDriveNode().getChild(ID + "_connector");
+			Spatial connector = connectorMap.get(ID + "_connector");
 			if(connector != null)
 				sim.getOpenDriveNode().detachChild(connector);
 		}

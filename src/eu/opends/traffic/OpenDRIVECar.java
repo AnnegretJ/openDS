@@ -45,6 +45,7 @@ import eu.opends.opendrive.processed.ODPoint;
 import eu.opends.opendrive.processed.ODRoad;
 import eu.opends.opendrive.processed.PreferredConnections;
 import eu.opends.opendrive.roadGenerator.OffroadPositionType;
+import eu.opends.opendrive.roadGraph.RoadGraph;
 import eu.opends.opendrive.util.ODPosition;
 import eu.opends.opendrive.util.ODVisualizer;
 import eu.opends.tools.Util;
@@ -75,25 +76,43 @@ public class OpenDRIVECar extends Car implements TrafficObject
 	{
 		this.sim = sim;
 
+		name = trafficCarData.getName();
+		
 		initialPosition = new Vector3f(0, 0, 0);
 		initialRotation = new Quaternion();
 		
-		String startRoadID = trafficCarData.getStartRoadID();
-		int startLane = trafficCarData.getStartLane();
-		double startS = trafficCarData.getStartS();
+		ODPosition startPos = trafficCarData.getStartPosition();
+		ODPosition targetPos = trafficCarData.getTargetPosition();
 		preferredConnections = trafficCarData.getPreferredConnections();
-		openDRIVECarTriggerActionListMap = trafficCarData.getTriggerActionListMap();
-		
-		ODRoad road = sim.getOpenDriveCenter().getRoadMap().get(startRoadID);
+
+		// if empty, fill preferredConnections with shortest route from start to target position
+        if(preferredConnections.isEmpty() && startPos != null && targetPos != null)
+        {
+        	RoadGraph roadGraph = sim.getOpenDriveCenter().getRoadGraph();
+        	PreferredConnections pc = roadGraph.getShortestPath(startPos, targetPos);
+        	if(pc != null)
+        	{
+        		preferredConnections = pc;
+        		//System.err.println("PreferredConnections of OpenDRIVECar '" + name + "': \n" + preferredConnections);
+        	}
+        	else
+        		System.err.println("No route from " + startPos + " to " + targetPos 
+        				+ " could be found for OpenDRIVECar '\" + name + \"'! (OpenDRIVECar.java)");
+        }
+
+        
+		ODRoad road = sim.getOpenDriveCenter().getRoadMap().get(startPos.getRoadID());
 		if(road != null)
 		{
+			double startS = startPos.getS();
+			
 			for(ODLaneSection laneSection : road.getLaneSectionList())
 			{
 				if(laneSection.getS() <= startS && startS <= laneSection.getEndS())
 				{
-					ODLane lane = laneSection.getLaneMap().get(startLane);
-					ODPoint point = lane.getLaneCenterPointAhead(false, startS, 0, preferredConnections);
-					ODPoint targetPoint = lane.getLaneCenterPointAhead(false, startS, 1, preferredConnections);
+					ODLane lane = laneSection.getLaneMap().get(startPos.getLane());
+					ODPoint point = lane.getLaneCenterPointAhead(false, startS, 0, preferredConnections, null);
+					ODPoint targetPoint = lane.getLaneCenterPointAhead(false, startS, 1, preferredConnections, null);
 					
 					Vector3f position = point.getPosition().toVector3f();
 					Vector3f targetPosition = targetPoint.getPosition().toVector3f();
@@ -107,7 +126,7 @@ public class OpenDRIVECar extends Car implements TrafficObject
 			}
 		}
 		
-		name = trafficCarData.getName();
+		openDRIVECarTriggerActionListMap = trafficCarData.getTriggerActionListMap();
 		
 		mass = trafficCarData.getMass();
 		
@@ -169,13 +188,12 @@ public class OpenDRIVECar extends Car implements TrafficObject
 			{
 				elapsedBulletTimeAtLastUpdate = elapsedBulletTime;
 				
-				// vehicle position (without elevation)
+				// vehicle position
 				Vector3f position = getPosition();
-				position.y = 0;
 				
 				// get most probable lane from result list according to expected lane list (and least heading deviation)
 				ODLane lane = sim.getOpenDriveCenter().getMostProbableLane(position, expectedLanes);
-				
+
 				// update steering
 				updateTargetPosition(lane);
 				steerTowardsPosition(targetPos);
@@ -201,16 +219,20 @@ public class OpenDRIVECar extends Car implements TrafficObject
 			currentLane = lane;
 			currentS = s;
 			
-			ODPoint point = getTargetPoint();			
+			HashSet<ODLane> traversedLaneSet = new HashSet<ODLane>();
+			
+			// filling traversedLaneSet with all lanes between current lane (including)
+			// and the lane of target point (including) in order of increasing distance
+			ODPoint point = getTargetPoint(traversedLaneSet);			
 			if(point != null)
 			{
 				// visualize point (green)
 				targetPos = point.getPosition().toVector3f();
 				visualizer.setMarkerPosition(name + "_followBox", targetPos, getPosition(), visualizer.greenMaterial, false);
 				
-				// set expected lane
+				// set expected lanes
 				expectedLanes.clear();
-				expectedLanes.add(point.getParentLane());
+				expectedLanes.addAll(traversedLaneSet);
 				return;
 			}
 		}
@@ -227,8 +249,11 @@ public class OpenDRIVECar extends Car implements TrafficObject
 
 	private ODLane previousLane = null;
 	private boolean isWrongWay = false; //assumption: vehicle is placed initially on road in driving direction
-	public ODPoint getTargetPoint()
+	public ODPoint getTargetPoint(HashSet<ODLane> traversedLaneSet)
 	{
+		// traversedLaneSet will be filled with all lanes between current lane (including)
+		// and the lane of target point (including) in order of increasing distance
+		
 		ODPoint point = null;
 		
 		if(previousLane != null && 	targetLaneID != null)
@@ -263,14 +288,14 @@ public class OpenDRIVECar extends Car implements TrafficObject
 			
 			
 			if(targetLane.isOppositeTo(currentLane))
-				point = targetLane.getLaneCenterPointAhead(!isWrongWay, currentS, distanceFromPath, preferredConnections);
+				point = targetLane.getLaneCenterPointAhead(!isWrongWay, currentS, distanceFromPath, preferredConnections, traversedLaneSet);
 			else
-				point = targetLane.getLaneCenterPointAhead(isWrongWay, currentS, distanceFromPath, preferredConnections);
+				point = targetLane.getLaneCenterPointAhead(isWrongWay, currentS, distanceFromPath, preferredConnections, traversedLaneSet);
 		}
 		else
 		{
 			// get point on center of current lane x meters ahead of the current position
-			point = currentLane.getLaneCenterPointAhead(false, currentS, distanceFromPath, preferredConnections);
+			point = currentLane.getLaneCenterPointAhead(false, currentS, distanceFromPath, preferredConnections, traversedLaneSet);
 		}
 		
 		previousLane = currentLane;
@@ -344,16 +369,7 @@ public class OpenDRIVECar extends Car implements TrafficObject
 	
 	private void updateSpeed(ODLane lane, ArrayList<TrafficObject> vehicleList) 
 	{
-		float targetSpeed = 80;
-		
-		if(lane != null)
-		{
-			double s = lane.getCurrentInnerBorderPoint().getS();
-			double speedLimit = lane.getSpeedLimit(s);
-			
-			if(speedLimit != -1)
-				targetSpeed = (float) speedLimit;
-		}
+		float targetSpeed = Float.MAX_VALUE;
 		
 		// stop car in order to avoid collision with other traffic objects and driving car
 		// also for red traffic lights
@@ -365,6 +381,9 @@ public class OpenDRIVECar extends Car implements TrafficObject
 			targetSpeed = Math.min(targetSpeed, sim.getCar().getCurrentSpeedKmh());
 		
 		targetSpeed = Math.min(targetSpeed, maxSpeed);
+		
+		targetSpeed = Math.min(targetSpeed, calculateRoadDependentMaxSpeedKmh());
+
 		
 		float currentSpeed = getCurrentSpeedKmh();
 		
@@ -426,8 +445,77 @@ public class OpenDRIVECar extends Car implements TrafficObject
 		AudioNode engineIdleNode = audioContainer.getAudioNode(AudioLocation.outside, AudioType.engineIdle);
 		engineIdleNode.setPitch(1f + Math.min(currentSpeed/100.0f, 1f));
 	}
+	
+	
+	private float calculateRoadDependentMaxSpeedKmh()
+	{
+		// default return value (if no curve or speed limit detected)
+		float maxSpeedAtVehiclePositionKmh = 200;
+		
+		if(currentLane != null)
+		{
+			// (average) possible speed reduction per two meters while approaching to curve or speed limit
+			float decelerationKmhPerMeter = 1.6f;
 
-
+			// inspect road profile (comparing 100 road points of 200 meters road ahead)
+			for (int i = 100; i >= 1; i--)
+			{
+				// inspect curvature and speed limit in 200, 198, 196, ... meters				
+				ODPoint point = currentLane.getReferencePointAhead(isWrongWay, currentS, i*2, preferredConnections);
+				if (point != null)
+				{
+					float maxSpeedDueToCurveKmh = 200;
+					
+					Double curvature = point.getGeometryCurvature();
+					if(curvature != null)
+					{
+						// get max speed a curvature can be handled for each road point
+						float absCurvature = FastMath.abs(curvature.floatValue());
+						absCurvature = Math.min(absCurvature, 0.2f);
+						//maxSpeedDueToCurveKmh = 3500 * absCurvature * absCurvature - 1400 * absCurvature + 150;
+						maxSpeedDueToCurveKmh = Math.min(200,FastMath.sqrt(100.0f/absCurvature)-10.0f);
+						
+						// curvature --> km/h
+						// 0.000 --> 200
+						// 0.012 -->  81
+						// 0.024 -->  55
+						// 0.100 -->  22
+						// 0.200 -->  12
+					}
+					
+					float maxSpeedDueToLimit = 200;
+					ODLane lane = point.getParentLane(); 
+					if(lane != null)
+					{
+						// get highest speed without exceeding lane or road speed limit
+						double maxSpeed = lane.getSpeedLimit(point.getS());
+						if(maxSpeed != -1)
+							maxSpeedDueToLimit = (float)maxSpeed;
+					}
+					
+					// pick least speed (curve speed vs. speed limit)
+					float maxSpeedAtPointKmh = Math.min(maxSpeedDueToCurveKmh, maxSpeedDueToLimit);
+					
+					// calculate vehicle speed at current position in order not to exceed
+					// the maximum curve speed or speed limit (in a range of 200 meters) ahead 
+					
+					// consider distance to speed restriction (the farther away, the higher the 
+					// speed at the current position may be)
+					maxSpeedAtVehiclePositionKmh += decelerationKmhPerMeter;
+					
+					// find the most critical speed restriction (low speed and short distance)
+					if (maxSpeedAtPointKmh < maxSpeedAtVehiclePositionKmh)
+						maxSpeedAtVehiclePositionKmh = maxSpeedAtPointKmh;
+				}
+				
+			}
+		}
+		//System.err.println("maxSpeedAtVehiclePositionKmh: " + maxSpeedAtVehiclePositionKmh);	
+		
+		return maxSpeedAtVehiclePositionKmh;
+	}
+	
+	
 	private boolean obstaclesInTheWay(ArrayList<TrafficObject> vehicleList)
 	{
 		// check distance from driving car
