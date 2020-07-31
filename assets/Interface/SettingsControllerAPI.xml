@@ -194,5 +194,20 @@
 				<trafficLightTimesToChange></trafficLightTimesToChange>
 			</regulations>
 		</roadAttributes>
+		<driver>
+			<maxVisualCapacity></maxVisualCapacity>
+			<maxAuditoryCapacity></maxAuditoryCapacity>
+			<maxHapticCapacity></maxHapticCapacity>
+		</driver>
+		<event>
+			<name></name>
+			<number></number>
+			<duration></duration>
+			<minStartingTime></minStartingTime>
+			<maxEndingTime></maxEndingTime>
+ 			<visualDemand></visualDemand>
+			<auditoryDemand></auditoryDemand>
+			<hapticDemand></hapticDemand>
+		</event>
 	</thisVehicle>
 </root>

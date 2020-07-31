@@ -1912,18 +1912,12 @@ public class ScenarioLoader
 			{
 				for(ODLaneSection laneSection : road.getLaneSectionList())
 				{
-					if(laneSection.getLaneMap().containsKey(startLane))
-					{
-						if(laneSection.getS() <= startS && startS <= laneSection.getEndS())
-							return new ODPosition(startRoadID, startLane, startS);
-						else
-						{
-							System.err.println("Invalid start position (startS '" + startS + "' does not exist)");
-							return null;
-						}
-					}
+					if(laneSection.getLaneMap().containsKey(startLane)
+							&& laneSection.getS() <= startS 
+							&& startS <= laneSection.getEndS())
+						return new ODPosition(startRoadID, startLane, startS);
 				}
-				System.err.println("Invalid start position (startLane '" + startLane + "' does not exist)");
+				System.err.println("Invalid start position (startLane '" + startLane + "' or startS '" + startS + "' does not exist)");
 			}
 			else
 				System.err.println("Invalid start position (startRoadID: '" + startRoadID + "' does not exist)");
@@ -1945,18 +1939,12 @@ public class ScenarioLoader
 			{
 				for(ODLaneSection laneSection : road.getLaneSectionList())
 				{
-					if(laneSection.getLaneMap().containsKey(targetLane))
-					{
-						if(laneSection.getS() <= targetS && targetS <= laneSection.getEndS())
-							return new ODPosition(targetRoadID, targetLane, targetS);
-						else
-						{
-							System.err.println("Invalid target position (targetS '" + targetS + "' does not exist)");
-							return null;
-						}
-					}
+					if(laneSection.getLaneMap().containsKey(targetLane) 
+							&& laneSection.getS() <= targetS 
+							&& targetS <= laneSection.getEndS())
+						return new ODPosition(targetRoadID, targetLane, targetS);
 				}
-				System.err.println("Invalid target position (targetLane '" + targetLane + "' does not exist)");
+				System.err.println("Invalid target position (targetLane '" + targetLane + "' or targetS '" + targetS + "' does not exist)");
 			}
 			else
 				System.err.println("Invalid target position (targetRoadID: '" + targetRoadID + "' does not exist)");

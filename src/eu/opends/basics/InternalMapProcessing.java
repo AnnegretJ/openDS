@@ -28,8 +28,7 @@ import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
+import com.jme3.material.MatParamTexture;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -39,6 +38,7 @@ import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.VertexBuffer.Format;
 import com.jme3.scene.VertexBuffer.Usage;
+import com.jme3.texture.Texture;
 
 import eu.opends.main.Simulator;
 import eu.opends.tools.Util;
@@ -119,8 +119,67 @@ public class InternalMapProcessing
 		Node node = new Node(mapObject.getName());
 			
 		Spatial spatial = mapObject.getSpatial();
-		spatial.breadthFirstTraversal(new AnisotropicFilterVisitor());
+		spatial.breadthFirstTraversal(new GeometryVisitor());
+		
+		/*
+		System.err.println(spatial.getName());
+		
+		
+		if(spatial.getName().equals("schild-objnode"))
+		//if(spatial.getName().equals("Scenes/testSchild_ogre/schild-scene_node"))
+		{
+			//spatial.setQueueBucket(Bucket.Transparent);
 			
+			for(Geometry geo :Util.getAllGeometries(spatial))
+			//Geometry geo = Util.findGeom(spatial, "schild-geom-15");
+			if(geo != null)
+			{
+				
+				//if(geo.getName().equals("schild-geom-15")
+					//	|| geo.getName().equals("schild-geom-14"))
+				{
+				//geo.getMaterial().setBoolean("UseAlpha",true);
+				//geo.getMaterial().setTransparent(true);
+				
+				
+				//geo.getMaterial().getAdditionalRenderState().setBlendMode(BlendMode.Off);
+				//geo.getMaterial().getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+				//geo.getMaterial().getAdditionalRenderState().setWireframe(true);
+				//geo.getMaterial().getAdditionalRenderState().setAlphaFallOff(0.5f);
+				//geo.getMaterial().getAdditionalRenderState().setAlphaTest(true);
+				//geo.getMaterial().getAdditionalRenderState().setDepthFunc(TestFunction.NotEqual);
+				
+					
+				//RenderState rs = mat.getAdditionalRenderState();
+
+     
+				//BlendMode bm = geo.getMaterial().getAdditionalRenderState().getBlendMode();
+				//boolean dw = geo.getMaterial().getAdditionalRenderState().isApplyDepthWrite();
+				//System.err.println("GEO: " + geo.getName() + " --> " + bm.toString());
+				
+				
+				TextureKey textureKey = new TextureKey("Scenes/testSchild/Sign_Stop.png", true);
+				geo.getMaterial().setTexture("DiffuseMap", sim.getAssetManager().loadTexture(textureKey));
+				geo.getMaterial().setBoolean("UseMaterialColors", true);
+				geo.getMaterial().setColor("GlowColor", new ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f));
+				geo.getMaterial().setColor("Specular", new ColorRGBA(0.039216f, 0.039216f, 0.039216f, 1.0f));
+				geo.getMaterial().setColor("Diffuse", new ColorRGBA(1f, 1f, 1f, 1.0f));
+				geo.getMaterial().setColor("Ambient", new ColorRGBA(1f, 1f, 1f, 1.0f));
+
+				}
+				
+				
+				//geo.setQueueBucket(Bucket.Opaque);
+					
+				//else
+					//geo.setQueueBucket(Bucket.Transparent);
+			}
+		}
+		*/	
+		
+		
+		
+		
 		/*
 		Geometry geo0 = ((Geometry) Util.findGeom(spatial,"test-geom-0"));
 		if(geo0!=null)
@@ -157,7 +216,7 @@ public class InternalMapProcessing
 		*/
 		
 		
-		/**/
+		/*
 		Geometry geo1 = ((Geometry) Util.findGeom(spatial,"test-geom-0"));
 		if(geo1!=null)
 		{
@@ -200,9 +259,9 @@ public class InternalMapProcessing
 			geo1.getMesh().getBuffer(VertexBuffer.Type.Position).setupData(Usage.Static, 3, Format.Float, posData);
 			
 			skipPhysicModel = true;
-		}
+		}*/
 		
-		
+		/*
 		Geometry geo2 = ((Geometry) Util.findGeom(spatial,"test-geom-1"));
 		if(geo2!=null)
 		{
@@ -214,9 +273,35 @@ public class InternalMapProcessing
 			}
 			geo2.getMesh().getBuffer(VertexBuffer.Type.Position).setupData(Usage.Static, 3, Format.Float, posData);
 		}
-		/**/
+		/*
 		
 		
+		/*
+		skipPhysicModel = false;
+		for(Geometry geometry : Util.getAllGeometries(spatial))
+		{
+			MatParamTexture diffuseMap = geometry.getMaterial().getTextureParam("DiffuseMap");
+			if (diffuseMap != null)
+			{
+				Texture texture = diffuseMap.getTextureValue();
+				String texturePath = texture.getKey().getName();
+				if(texturePath.equals("Scenes/testFinal/Wood1_Diff.png")
+						|| texturePath.equals("Scenes/testFinal/Metal1_Diff.png"))
+				{
+					//if(spatial instanceof Node)
+						//((Node)spatial).detachChild(geometry);
+					
+					skipPhysicModel = true;
+				}
+				else
+					add(mapObject, geometry);
+			}
+			else
+				add(mapObject, geometry);
+		}
+		*/
+		
+
 		
        	// set FaceCullMode of spatial's geometries to off
 		// no longer needed, as FaceCullMode.Off is default setting
@@ -274,7 +359,7 @@ public class InternalMapProcessing
 	        // add additional map object to physics space
 	        physicsSpace.add(physicsControl);
 		}
-			
+	
         // attach additional map object to scene node
 		if(mapObject.isAddToMapNode())
 			mapNode.attachChild(node);
@@ -282,7 +367,21 @@ public class InternalMapProcessing
 			sceneNode.attachChild(node);
 	}
 	
+	/* FIXME
+	private void add(MapObject mapObject, Geometry geometry)
+	{
+		CollisionShape collisionShape = CollisionShapeFactory.createMeshShape(geometry);
+        RigidBodyControl physicsControl = new RigidBodyControl(collisionShape, 0);
+        geometry.addControl(physicsControl);
+        physicsControl.setPhysicsLocation(mapObject.getLocation());
+        physicsControl.setPhysicsRotation(mapObject.getRotation());
+
+        // add additional map object to physics space
+        physicsSpace.add(physicsControl);
+	}
+	*/
 	
+
 	/**
 	 * Generates blind triggers which replace the original boxes.
 	 * 

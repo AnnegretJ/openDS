@@ -33,7 +33,6 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.util.BufferUtils;
-import com.mysql.jdbc.Connection;
 
 import eu.opends.basics.SimulationBasics;
 import eu.opends.drivingTask.settings.SettingsLoader;
@@ -1188,6 +1187,29 @@ public class ODLane
 	{
 		if(targetPosition == null)
 			return -1;
+
+		
+		// check for valid target position
+		boolean targetIsValid = false;
+		ODRoad road = sim.getOpenDriveCenter().getRoadMap().get(targetPosition.getRoadID());
+		if(road != null)
+		{
+			for(ODLaneSection laneSection : road.getLaneSectionList())
+			{
+				if(laneSection.getLaneMap().containsKey(targetPosition.getLane())
+						&& laneSection.getS() <= targetPosition.getS() 
+						&& targetPosition.getS() <= laneSection.getEndS())
+					targetIsValid = true;
+			}
+		}
+		
+		if(!targetIsValid)
+		{
+			if(printDebugMsg)
+				System.err.println("Target position (" + targetPosition + ") is not valid (ODLane::getDistanceToTargetAhead).");
+			return -1;
+		}
+		
 		
 		ArrayList<ODLane> visitedLanes = new ArrayList<ODLane>();
 		
@@ -1218,16 +1240,8 @@ public class ODLane
 		
 		
 		// if target road and lane reached
-		if(road.getID().equals(targetRoadID) && laneID == targetLane)
+		if(road.getID().equals(targetRoadID) && laneID == targetLane && laneStartS <= targetS && targetS <= laneEndS)
 		{
-			// check for valid targetS
-			if(laneStartS > targetS || targetS > laneEndS)
-			{
-				if(printDebugMsg)
-					System.err.println("targetS=" + targetS + " is out of lane " + laneID + " (road: " + road.getID() + ", getDistanceToTargetAhead)");
-				return -1;
-			}
-			
 			// calculate distance to target from current s
 			double distToTarget;
 			

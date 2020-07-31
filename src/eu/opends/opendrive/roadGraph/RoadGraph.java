@@ -95,32 +95,40 @@ public class RoadGraph
 				
 				// target
 				ODLane toLane = linkData.getLane();
-				String toRoadID = toLane.getODRoad().getID();
-				int toLaneSectionIndex = toLane.getODLaneSection().getIndex();
-				int toLaneID = toLane.getID();
-				
-				String ascendingTokenTarget = "D";
-				if(linkData.getContactPoint() == EContactPoint.START)
-					ascendingTokenTarget = "A";
-				
-				String targetID = toRoadID + "/" + toLaneSectionIndex + "/" 
-						+ toLaneID + "/" + ascendingTokenTarget;
-				Node target = new Node(targetID);
-				
-				// junction
-				String junctionID = null;
-				String connectionID = null;
-				if(link.isJunction())
+				if(toLane!= null)
 				{
-					junctionID = link.getJunctionID();
-					connectionID = linkData.getConnectionID();
+					String toRoadID = toLane.getODRoad().getID();
+					int toLaneSectionIndex = toLane.getODLaneSection().getIndex();
+					int toLaneID = toLane.getID();
+					
+					String ascendingTokenTarget = "D";
+					if(linkData.getContactPoint() == EContactPoint.START)
+						ascendingTokenTarget = "A";
+					
+					String targetID = toRoadID + "/" + toLaneSectionIndex + "/" 
+							+ toLaneID + "/" + ascendingTokenTarget;
+					Node target = new Node(targetID);
+					
+					// junction
+					String junctionID = null;
+					String connectionID = null;
+					if(link.isJunction())
+					{
+						junctionID = link.getJunctionID();
+						connectionID = linkData.getConnectionID();
+					}
+					
+					// edge
+					String edgeID = sourceID + " --> " + targetID;
+					double distance = lane.getEndS()-lane.getStartS();
+					Edge edge = new Edge(edgeID, source, target, distance, junctionID, connectionID);
+					edgeList.add(edge);
 				}
-				
-				// edge
-				String edgeID = sourceID + " --> " + targetID;
-				double distance = lane.getEndS()-lane.getStartS();
-				Edge edge = new Edge(edgeID, source, target, distance, junctionID, connectionID);
-				edgeList.add(edge);
+				else
+				{
+					System.err.println("Exception while building the road graph (RoadGraph.java): " + sourceID 
+							+ " has a broken link");
+				}
 			}
 		}
 	}

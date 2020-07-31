@@ -1030,23 +1030,33 @@ public class ODRoad
 	
 	public double getElevation(double s)
 	{
-		List<TRoadElevationProfileElevation> elevationList = road.getElevationProfile().getElevation();
-		for (int i = elevationList.size() - 1; i >= 0; i--)
+		if(road == null)
+			System.err.println("ODRoad::getElevation(): road is null");
+		else
 		{
-			double sOffset = elevationList.get(i).getS();
-			if (s >= sOffset)
+			if(road.getElevationProfile() == null || road.getElevationProfile().getElevation() == null)
+				System.err.println("ODRoad::getElevation(): elevation profile is missing (road: " + road.getId() + ")");
+			else
 			{
-				double a = elevationList.get(i).getA();
-				double b = elevationList.get(i).getB();
-				double c = elevationList.get(i).getC();
-				double d = elevationList.get(i).getD();
+				List<TRoadElevationProfileElevation> elevationList = road.getElevationProfile().getElevation();
+				for (int i = elevationList.size() - 1; i >= 0; i--)
+				{
+					double sOffset = elevationList.get(i).getS();
+					if (s >= sOffset)
+					{
+						double a = elevationList.get(i).getA();
+						double b = elevationList.get(i).getB();
+						double c = elevationList.get(i).getC();
+						double d = elevationList.get(i).getD();
 
-				double ds = s - sOffset;
+						double ds = s - sOffset;
 
-				return a + b * ds + c * ds * ds + d * ds * ds * ds;
+						return a + b * ds + c * ds * ds + d * ds * ds * ds;
+					}
+				}
 			}
 		}
-		
+
 		return 0;
 	}
 	

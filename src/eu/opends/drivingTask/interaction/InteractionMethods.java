@@ -31,6 +31,7 @@ import eu.opends.hmi.PresentationModel;
 import eu.opends.hmi.RoadWorksInformationPresentationModel;
 import eu.opends.main.Simulator;
 import eu.opends.opendrive.processed.ODLane.Position;
+import eu.opends.settingsController.Event;
 import eu.opends.trigger.*;
 
 /**
@@ -2153,6 +2154,141 @@ public class InteractionMethods
 		}
 	}
 		
+	
+	@Action(
+			name = "addPlannerEvent", 
+			layer = Layer.SCENE, 
+			description = "Adds an event to be scheduled by the planner (sent by SettingsControllerServer)",
+			defaultDelay = 0,
+			defaultRepeat = 0,
+			param = {@Parameter(name="name", type="String", defaultValue="", 
+							description="Name of the event (optional)"),
+					 @Parameter(name="number", type="Integer", defaultValue="1", 
+							description="Unique number of the event (for identification)"),
+					 @Parameter(name="duration", type="Integer", defaultValue="3", 
+							description="Duration of the event in seconds"),
+					 @Parameter(name="minStartingTime", type="Integer", defaultValue="5", 
+							description="Minimum amount of seconds to elapse before the event will start"),
+					 @Parameter(name="maxEndingTime", type="Integer", defaultValue="10", 
+							description="Maximum amount of seconds to elapse before the event will end"),
+					 @Parameter(name="visualDemand", type="Integer", defaultValue="5", 
+							description="Expected visual demand of the event"),
+					 @Parameter(name="auditoryDemand", type="Integer", defaultValue="5", 
+							description="Expected auditory demand of the event"),
+					 @Parameter(name="hapticDemand", type="Integer", defaultValue="5", 
+							description="Expected haptic demand of the event")
+					}
+		)
+	public TriggerAction addPlannerEvent(SimulationBasics sim, float delay, int repeat, Properties parameterList)
+	{
+		String parameter = "";
+		
+		try {
+			
+			// set name of event (if available)
+			parameter = "name";
+			String name = parameterList.getProperty(parameter);
+			
+			// set (unique) number of event
+			parameter = "number";
+			Integer number = null;
+			String number_String = parameterList.getProperty(parameter);
+			if(number_String != null)
+			{
+				if(number_String.isEmpty())
+					number = 1;
+				else
+					number = Integer.parseInt(number_String);
+			}
+			
+			// set duration of event
+			parameter = "duration";
+			Integer duration = null;
+			String duration_String = parameterList.getProperty(parameter);
+			if(duration_String != null)
+			{
+				if(duration_String.isEmpty())
+					duration = 3;
+				else
+					duration = Integer.parseInt(duration_String);
+			}
+			
+			// set minimum starting time of event
+			parameter = "minStartingTime";
+			Integer minStartingTime = null;
+			String minStartingTime_String = parameterList.getProperty(parameter);
+			if(minStartingTime_String != null)
+			{
+				if(minStartingTime_String.isEmpty())
+					minStartingTime = 5;
+				else
+					minStartingTime = Integer.parseInt(minStartingTime_String);
+			}
+			
+			// set maximum ending time of event
+			parameter = "maxEndingTime";
+			Integer maxEndingTime = null;
+			String maxEndingTime_String = parameterList.getProperty(parameter);
+			if(maxEndingTime_String != null)
+			{
+				if(maxEndingTime_String.isEmpty())
+					maxEndingTime = 10;
+				else
+					maxEndingTime = Integer.parseInt(maxEndingTime_String);
+			}
+			
+			// set visual demand of event
+			parameter = "visualDemand";
+			Integer visualDemand = null;
+			String visualDemand_String = parameterList.getProperty(parameter);
+			if(visualDemand_String != null)
+			{
+				if(visualDemand_String.isEmpty())
+					visualDemand = 5;
+				else
+					visualDemand = Integer.parseInt(visualDemand_String);
+			}
+			
+			// set auditory demand of event
+			parameter = "auditoryDemand";
+			Integer auditoryDemand = null;
+			String auditoryDemand_String = parameterList.getProperty(parameter);
+			if(auditoryDemand_String != null)
+			{
+				if(auditoryDemand_String.isEmpty())
+					auditoryDemand = 5;
+				else
+					auditoryDemand = Integer.parseInt(auditoryDemand_String);
+			}
+			
+			// set haptic demand of event
+			parameter = "hapticDemand";
+			Integer hapticDemand = null;
+			String hapticDemand_String = parameterList.getProperty(parameter);
+			if(hapticDemand_String != null)
+			{
+				if(hapticDemand_String.isEmpty())
+					hapticDemand = 5;
+				else
+					hapticDemand = Integer.parseInt(hapticDemand_String);
+			}
+			
+			// create a new planner event
+			Event event = new Event(name, number, duration, minStartingTime, maxEndingTime, visualDemand, auditoryDemand, hapticDemand);
+			
+			//System.err.println(name + "; " + number + "; " + duration + "; " + minStartingTime + "; " + maxEndingTime + "; " + visualDemand 
+			// + "; " + auditoryDemand + "; " + hapticDemand);
+			
+			// create AddPlannerEventTriggerAction
+			return new AddPlannerEventTriggerAction(sim, delay, repeat, event);
+			
+		} catch (Exception e) {
+
+			reportError("addPlannerEvent", parameter);
+			return null;
+		}
+	}
+	
 	
 	/**
 	 * Writes an entry to the log if given traffic light is in the given state.

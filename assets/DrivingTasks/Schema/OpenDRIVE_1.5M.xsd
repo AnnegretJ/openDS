@@ -44,10 +44,11 @@
     </xs:simpleType> <!-- end t_yesNo -->
     
     <xs:simpleType name="t_header_Version">
-        <xs:restriction base="xs:float">
-            <xs:pattern value="\d\.\d{2}"/>
-        </xs:restriction>
-    </xs:simpleType> <!-- end t_header_Version -->
+    	<xs:restriction base="xs:float">
+    		<xs:pattern value="\d\.\d{2}" />
+    		<xs:pattern value="\d\.\d{1}"></xs:pattern>
+    	</xs:restriction>
+    </xs:simpleType><!-- end t_header_Version -->
     
     <xs:simpleType name="t_maxSpeed">
         <xs:union memberTypes="e_maxSpeedString t_grEqZero"/>
@@ -113,10 +114,12 @@
             <xs:selector xpath="road/objects/tunnel"/>
             <xs:field xpath="@id"/>
         </xs:key>
+        <!--
         <xs:key name="k_road_objects_bridge">
             <xs:selector xpath="road/objects/bridge"/>
             <xs:field xpath="@id"/>
         </xs:key>
+         -->
         <xs:key name="k_road_signals_signalId">
             <xs:selector xpath="road/signals/signal"/>
             <xs:field xpath="@id"/>

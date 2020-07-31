@@ -16,28 +16,28 @@
 *  along with OpenDS. If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 package eu.opends.trigger;
 
 import eu.opends.basics.SimulationBasics;
-import eu.opends.dashboard.OpenDSGaugeState;
 import eu.opends.main.Simulator;
-
+import eu.opends.settingsController.Event;
 
 /**
- * This class represents a SetOpenDSGauge trigger action. Whenever a collision
- * with a related trigger was detected, the given parameters (state) will be 
- * forwarded to the OpenDSGaugeCenter.
+ * This class represents an AddPannerEvent trigger action. Whenever a collision
+ * with a related trigger was detected, the given event parameters will be 
+ * forwarded to the event planner through the settings controller server.
  * 
  * @author Rafael Math
  */
-public class SetOpenDSGaugeTriggerAction extends TriggerAction 
+public class AddPlannerEventTriggerAction extends TriggerAction
 {
 	private SimulationBasics sim;
-	private OpenDSGaugeState state;
+	private Event event;
 
 	
 	/**
-	 * Creates a new SetOpenDSGauge trigger action instance, providing delay and maximum
+	 * Creates a new AddPannerEvent trigger action instance, providing delay and maximum
 	 * number of repetitions. 
 	 * 
 	 * @param sim
@@ -50,16 +50,16 @@ public class SetOpenDSGaugeTriggerAction extends TriggerAction
 	 * 			Maximum number how often the trigger can be hit (0 = infinite).
 	 * 
 	 * @param state
-	 * 			New parameters (state) to be forwarded to the OpenDSGaugeCenter
+	 * 			New event parameters to be forwarded to the event planner
 	 */
-	public SetOpenDSGaugeTriggerAction(SimulationBasics sim, float delay, int maxRepeat, OpenDSGaugeState state) 
+	public AddPlannerEventTriggerAction(SimulationBasics sim, float delay, int maxRepeat, Event event) 
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
-		this.state = state;
+		this.event = event;
 	}
-
-
+	
+	
 	/**
 	 * Forwarding given parameters. 
 	 */
@@ -68,11 +68,12 @@ public class SetOpenDSGaugeTriggerAction extends TriggerAction
 	{
 		if(!isExceeded() && sim instanceof Simulator)
 		{
-			((Simulator) sim).getOpenDSGaugeCenter().updateState(state);
+			if(((Simulator) sim).getSettingsControllerServer() != null)
+				((Simulator) sim).getSettingsControllerServer().getEventPlannerDataRecord().addEvent(event);
 
 			updateCounter();
 		}
-	}	
 
+	}
 
 }

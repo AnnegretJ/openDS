@@ -199,6 +199,7 @@ public class APIData
 	private String getValue(String var)
 	{
 		RoadData roadDataRecord = sim.getSettingsControllerServer().getRoadDataRecord();
+		EventPlannerData eventPlannerDataRecord = sim.getSettingsControllerServer().getEventPlannerDataRecord();
 		OpenDSGaugeCenter openDSGaugeCenter = sim.getOpenDSGaugeCenter();
 		ScenarioLoader scenarioLoader = Simulator.getDrivingTask().getScenarioLoader();
 		SettingsLoader settingsLoader = Simulator.getDrivingTask().getSettingsLoader();
@@ -732,6 +733,50 @@ public class APIData
 		{
 			value = roadDataRecord.trafficLightTimesToChange;
 		}
+		else if(var.equals(AdressTable.driver_maxVisualCapacity))
+		{
+			value = eventPlannerDataRecord.maxVisualCapacityOfDriver;
+		}
+		else if(var.equals(AdressTable.driver_maxAuditoryCapacity))
+		{
+			value = eventPlannerDataRecord.maxAuditoryCapacityOfDriver;
+		}
+		else if(var.equals(AdressTable.driver_maxHapticCapacity))
+		{
+			value = eventPlannerDataRecord.maxHapticCapacityOfDriver;
+		}
+		else if(var.equals(AdressTable.event_name))
+		{
+			value = eventPlannerDataRecord.getEventName();
+		}
+		else if(var.equals(AdressTable.event_number))
+		{
+			value = eventPlannerDataRecord.getEventNumber();
+		}
+		else if(var.equals(AdressTable.event_duration))
+		{
+			value = eventPlannerDataRecord.getEventDuration();
+		}
+		else if(var.equals(AdressTable.event_minStartingTime))
+		{
+			value = eventPlannerDataRecord.getEventMinStartingTime();
+		}
+		else if(var.equals(AdressTable.event_maxEndingTime))
+		{
+			value = eventPlannerDataRecord.getEventMaxEndingTime();
+		}
+		else if(var.equals(AdressTable.event_visualDemand))
+		{
+			value = eventPlannerDataRecord.getEventVisualDemand();
+		}
+		else if(var.equals(AdressTable.event_auditoryDemand))
+		{
+			value = eventPlannerDataRecord.getEventAuditoryDemand();
+		}
+		else if(var.equals(AdressTable.event_hapticDemand))
+		{
+			value = eventPlannerDataRecord.getEventHapticDemand();
+		}
 	
 		return value;
 	}
@@ -802,6 +847,9 @@ public class APIData
 			String output = writer.getBuffer().toString().replaceAll("\n|\r", "");
 
 			value = output;
+			
+			sim.getSettingsControllerServer().getEventPlannerDataRecord().removeFirstEvent();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -140,4 +140,15 @@ public class AdressTable
 	public static final String roadAttributes_regulations_trafficLightDist = "/root/thisVehicle/roadAttributes/regulations/trafficLightDist";
 	public static final String roadAttributes_regulations_trafficLightStates = "/root/thisVehicle/roadAttributes/regulations/trafficLightStates";
 	public static final String roadAttributes_regulations_trafficLightTimesToChange = "/root/thisVehicle/roadAttributes/regulations/trafficLightTimesToChange";
+	public static final String driver_maxVisualCapacity = "/root/thisVehicle/driver/maxVisualCapacity";
+	public static final String driver_maxAuditoryCapacity = "/root/thisVehicle/driver/maxAuditoryCapacity";
+	public static final String driver_maxHapticCapacity = "/root/thisVehicle/driver/maxHapticCapacity";
+	public static final String event_name = "/root/thisVehicle/event/name";
+	public static final String event_number = "/root/thisVehicle/event/number";
+	public static final String event_duration = "/root/thisVehicle/event/duration";
+	public static final String event_minStartingTime = "/root/thisVehicle/event/minStartingTime";
+	public static final String event_maxEndingTime = "/root/thisVehicle/event/maxEndingTime";
+	public static final String event_visualDemand = "/root/thisVehicle/event/visualDemand";
+	public static final String event_auditoryDemand = "/root/thisVehicle/event/auditoryDemand";
+	public static final String event_hapticDemand = "/root/thisVehicle/event/hapticDemand";
 }
