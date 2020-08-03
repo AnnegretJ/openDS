@@ -28,10 +28,11 @@ public class Event
 	private int visualDemand = 0;
 	private int auditoryDemand = 0;
 	private int hapticDemand = 0;
+	private int delayPenalty = 0;
 	
 	
 	public Event(String name, int number, int duration, int minStartingTime, int maxEndingTime,
-			int visualDemand, int auditoryDemand, int hapticDemand)
+			int visualDemand, int auditoryDemand, int hapticDemand, int delayPenalty)
 	{
 		this.name = name;
 		this.number = number;
@@ -41,6 +42,7 @@ public class Event
 		this.visualDemand = visualDemand;
 		this.auditoryDemand = auditoryDemand;
 		this.hapticDemand = hapticDemand;
+		this.delayPenalty = delayPenalty;
 	}
 
 
@@ -89,6 +91,12 @@ public class Event
 	public int getHapticDemand()
 	{
 		return hapticDemand;
+	}
+
+
+	public int getDelayPenalty()
+	{
+		return delayPenalty;
 	}
 	
 	

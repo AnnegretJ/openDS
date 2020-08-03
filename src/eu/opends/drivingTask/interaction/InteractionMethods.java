@@ -2176,7 +2176,9 @@ public class InteractionMethods
 					 @Parameter(name="auditoryDemand", type="Integer", defaultValue="5", 
 							description="Expected auditory demand of the event"),
 					 @Parameter(name="hapticDemand", type="Integer", defaultValue="5", 
-							description="Expected haptic demand of the event")
+							description="Expected haptic demand of the event"),
+					 @Parameter(name="delayPenalty", type="Integer", defaultValue="1", 
+						description="Penalty if event is getting delayed")
 					}
 		)
 	public TriggerAction addPlannerEvent(SimulationBasics sim, float delay, int repeat, Properties parameterList)
@@ -2273,11 +2275,25 @@ public class InteractionMethods
 					hapticDemand = Integer.parseInt(hapticDemand_String);
 			}
 			
-			// create a new planner event
-			Event event = new Event(name, number, duration, minStartingTime, maxEndingTime, visualDemand, auditoryDemand, hapticDemand);
+			// set delay penalty of event
+			parameter = "delayPenalty";
+			Integer delayPenalty = null;
+			String delayPenalty_String = parameterList.getProperty(parameter);
+			if(delayPenalty_String != null)
+			{
+				if(delayPenalty_String.isEmpty())
+					delayPenalty = 1;
+				else
+					delayPenalty = Integer.parseInt(delayPenalty_String);
+			}
 			
-			//System.err.println(name + "; " + number + "; " + duration + "; " + minStartingTime + "; " + maxEndingTime + "; " + visualDemand 
-			// + "; " + auditoryDemand + "; " + hapticDemand);
+			// create a new planner event
+			Event event = new Event(name, number, duration, minStartingTime, maxEndingTime, visualDemand, 
+					auditoryDemand, hapticDemand, delayPenalty);
+			
+			//System.err.println(name + "; " + number + "; " + duration + "; " + minStartingTime + "; "
+			// + maxEndingTime + "; " + visualDemand + "; " + auditoryDemand + "; " + hapticDemand
+			// + "; " + delayPenalty);
 			
 			// create AddPlannerEventTriggerAction
 			return new AddPlannerEventTriggerAction(sim, delay, repeat, event);

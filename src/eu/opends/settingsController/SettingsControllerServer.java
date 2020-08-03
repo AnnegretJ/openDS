@@ -54,7 +54,7 @@ public class SettingsControllerServer extends Thread
 		this.port = Simulator.getSettingsLoader().getSetting(Setting.SettingsControllerServer_port, 
 				SimulationDefaults.SettingsControllerServer_port);
 		roadDataRecord = new RoadData();
-		eventPlannerDataRecord = new EventPlannerData();
+		eventPlannerDataRecord = new EventPlannerData(sim);
 	}
 	
 	

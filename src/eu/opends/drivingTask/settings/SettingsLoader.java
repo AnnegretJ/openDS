@@ -228,7 +228,10 @@ public class SettingsLoader
 		OpenDrive_interpolationStepSize("settings:openDrive/settings:interpolationStepSize"),
 		OpenDrive_projectOntoTerrain("settings:openDrive/settings:projectOntoTerrain"),
 		OpenDrive_projectionOffset("settings:openDrive/settings:projectionOffset"),
-		OpenDrive_addToPhysicsEngine("settings:openDrive/settings:addToPhysicsEngine");
+		OpenDrive_addToPhysicsEngine("settings:openDrive/settings:addToPhysicsEngine"), 
+		EventPlanner_mode("settings:eventPlanner/settings:mode"),
+		EventPlanner_timeline_start("settings:eventPlanner/settings:timeline/settings:start"),
+		EventPlanner_timeline_end("settings:eventPlanner/settings:timeline/settings:end");
 		
 		
 		private String path;

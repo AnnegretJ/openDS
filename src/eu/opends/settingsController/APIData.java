@@ -733,49 +733,69 @@ public class APIData
 		{
 			value = roadDataRecord.trafficLightTimesToChange;
 		}
-		else if(var.equals(AdressTable.driver_maxVisualCapacity))
+		else if(var.equals(AdressTable.eventPlanner_mode))
+		{
+			value = eventPlannerDataRecord.getMode();
+		}
+		else if(var.equals(AdressTable.eventPlanner_driver_maxVisualCapacity))
 		{
 			value = eventPlannerDataRecord.maxVisualCapacityOfDriver;
 		}
-		else if(var.equals(AdressTable.driver_maxAuditoryCapacity))
+		else if(var.equals(AdressTable.eventPlanner_driver_maxAuditoryCapacity))
 		{
 			value = eventPlannerDataRecord.maxAuditoryCapacityOfDriver;
 		}
-		else if(var.equals(AdressTable.driver_maxHapticCapacity))
+		else if(var.equals(AdressTable.eventPlanner_driver_maxHapticCapacity))
 		{
 			value = eventPlannerDataRecord.maxHapticCapacityOfDriver;
 		}
-		else if(var.equals(AdressTable.event_name))
+		else if(var.equals(AdressTable.eventPlanner_event_name))
 		{
 			value = eventPlannerDataRecord.getEventName();
 		}
-		else if(var.equals(AdressTable.event_number))
+		else if(var.equals(AdressTable.eventPlanner_event_number))
 		{
 			value = eventPlannerDataRecord.getEventNumber();
 		}
-		else if(var.equals(AdressTable.event_duration))
+		else if(var.equals(AdressTable.eventPlanner_event_duration))
 		{
 			value = eventPlannerDataRecord.getEventDuration();
 		}
-		else if(var.equals(AdressTable.event_minStartingTime))
+		else if(var.equals(AdressTable.eventPlanner_event_minStartingTime))
 		{
 			value = eventPlannerDataRecord.getEventMinStartingTime();
 		}
-		else if(var.equals(AdressTable.event_maxEndingTime))
+		else if(var.equals(AdressTable.eventPlanner_event_maxEndingTime))
 		{
 			value = eventPlannerDataRecord.getEventMaxEndingTime();
 		}
-		else if(var.equals(AdressTable.event_visualDemand))
+		else if(var.equals(AdressTable.eventPlanner_event_visualDemand))
 		{
 			value = eventPlannerDataRecord.getEventVisualDemand();
 		}
-		else if(var.equals(AdressTable.event_auditoryDemand))
+		else if(var.equals(AdressTable.eventPlanner_event_auditoryDemand))
 		{
 			value = eventPlannerDataRecord.getEventAuditoryDemand();
 		}
-		else if(var.equals(AdressTable.event_hapticDemand))
+		else if(var.equals(AdressTable.eventPlanner_event_hapticDemand))
 		{
 			value = eventPlannerDataRecord.getEventHapticDemand();
+		}
+		else if(var.equals(AdressTable.eventPlanner_event_delayPenalty))
+		{
+			value = eventPlannerDataRecord.getDelayPenalty();
+		}
+		else if(var.equals(AdressTable.eventPlanner_timeline_start))
+		{
+			value = eventPlannerDataRecord.timelineStart();
+		}
+		else if(var.equals(AdressTable.eventPlanner_timeline_end))
+		{
+			value = eventPlannerDataRecord.timelineEnd();
+		}
+		else if(var.equals(AdressTable.eventPlanner_elapsedTime))
+		{
+			value = eventPlannerDataRecord.getElapsedTime();
 		}
 	
 		return value;

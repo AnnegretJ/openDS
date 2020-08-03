@@ -68,6 +68,9 @@ elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns
         	<xs:element name="openDrive" type="openDriveType"
         		maxOccurs="1" minOccurs="0">
         	</xs:element>
+        	<xs:element name="eventPlanner" type="eventPlannerType"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
         </xs:all>
 
     </xs:complexType>
@@ -715,5 +718,20 @@ elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns
         	<xs:element name="addToPhysicsEngine" type="xs:boolean" maxOccurs="1" minOccurs="0"></xs:element>
         </xs:all>
 
+    </xs:complexType>
+
+    <xs:complexType name="eventPlannerType">
+        <xs:all>
+    		<xs:element name="mode" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+    		<xs:element name="timeline" type="timelineType" maxOccurs="1" minOccurs="0">
+    		</xs:element>
+    	</xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="timelineType">
+        <xs:all>
+    		<xs:element name="start" type="xs:float" maxOccurs="1" minOccurs="0"></xs:element>
+    		<xs:element name="end" type="xs:float" maxOccurs="1" minOccurs="0"></xs:element>
+    	</xs:all>
     </xs:complexType>
 </xs:schema>
