@@ -90,6 +90,9 @@ public class SteeringCar extends Car implements TrafficObject
     // Simphynity Motion Seat
     private SimphynityController simphynityController;
     
+    private float distanceToFollowBox = 3;
+    private boolean visualizeODFollowBox = false;
+    
     // adaptive cruise control
 	private boolean useSpeedDependentForwardSafetyDistance = true;
 	private boolean isAdaptiveCruiseControl = false;
@@ -221,6 +224,10 @@ public class SteeringCar extends Car implements TrafficObject
         obstacleSensor = new ObstacleSensor(sim, invisibleCarNode);
         
         trajectoryVisualizer = new TrajectoryVisualizer(sim, carNode);
+        
+        // autopilot parameter (ODAutoPilot only)
+        distanceToFollowBox = scenarioLoader.getDistanceToFollowBox();
+        visualizeODFollowBox = scenarioLoader.isVisualizeFollowBox();
         
 		// play engine idle sounds (inside and outside) if engine is running initially
 		if(engineOn)
@@ -537,8 +544,11 @@ public class SteeringCar extends Car implements TrafficObject
 	{
 		if(!done)
 		{
-			visualizer = sim.getOpenDriveCenter().getVisualizer();
-			visualizer.createMarker("steeringCar_followBox", new Vector3f(0, 0, 0), initialPosition, visualizer.greenMaterial, 0.3f, false);
+			if(visualizeODFollowBox)
+			{
+				visualizer = sim.getOpenDriveCenter().getVisualizer();
+				visualizer.createMarker("steeringCar_followBox", new Vector3f(0, 0, 0), initialPosition, visualizer.greenMaterial, 0.3f, false);
+			}
 			done = true;
 		}
 
@@ -571,7 +581,6 @@ public class SteeringCar extends Car implements TrafficObject
 
 
 	private Vector3f targetPos = new Vector3f(0,0,0);
-	private float distanceFromPath = 3;
 	private void updateTargetPosition(ODLane lane)
 	{
 		if(lane != null)
@@ -585,7 +594,9 @@ public class SteeringCar extends Car implements TrafficObject
 			{
 				// visualize point (green)
 				targetPos = point.getPosition().toVector3f();
-				visualizer.setMarkerPosition("steeringCar_followBox", targetPos, getPosition(), visualizer.greenMaterial, false);
+				
+				if(visualizeODFollowBox)
+					visualizer.setMarkerPosition("steeringCar_followBox", targetPos, getPosition(), visualizer.greenMaterial, false);
 
 				// set expected lanes
 				expectedLanes.clear();
@@ -599,8 +610,11 @@ public class SteeringCar extends Car implements TrafficObject
 			currentS = 0;
 		}
 
-		// if no lane and/or point next to car --> hide marker
-		visualizer.hideMarker("steeringCar_followBox");
+		if(visualizeODFollowBox)
+		{
+			// if no lane and/or point next to car --> hide marker
+			visualizer.hideMarker("steeringCar_followBox");
+		}
 	}
 	
 	
@@ -650,14 +664,14 @@ public class SteeringCar extends Car implements TrafficObject
 			
 			
 			if(targetLane.isOppositeTo(lane))
-				point = targetLane.getLaneCenterPointAhead(!isWrongWay, s, distanceFromPath, preferredConnections, traversedLaneSet);
+				point = targetLane.getLaneCenterPointAhead(!isWrongWay, s, distanceToFollowBox, preferredConnections, traversedLaneSet);
 			else
-				point = targetLane.getLaneCenterPointAhead(isWrongWay, s, distanceFromPath, preferredConnections, traversedLaneSet);
+				point = targetLane.getLaneCenterPointAhead(isWrongWay, s, distanceToFollowBox, preferredConnections, traversedLaneSet);
 		}
 		else
 		{
 			// get point on center of current lane x meters ahead of the current position
-			point = lane.getLaneCenterPointAhead(false, s, distanceFromPath, preferredConnections, traversedLaneSet);
+			point = lane.getLaneCenterPointAhead(false, s, distanceToFollowBox, preferredConnections, traversedLaneSet);
 		}
 		
 		previousLane = lane;

@@ -94,6 +94,8 @@ public class ScenarioLoader
 	private String targetRoadID;	
 	private Integer targetLane;
 	private Double targetS;
+	private boolean visualizeFollowBox = false;
+	private float distanceToFollowBox = 3.0f;
 	private PreferredConnections preferredConnections = new PreferredConnections(); 
 	private Map<String, IdealTrackContainer> idealTrackMap = new HashMap<String, IdealTrackContainer>();
 	private HashMap<String, Float> frictionMap = new HashMap<String, Float>();
@@ -286,8 +288,17 @@ public class ScenarioLoader
 			
 			targetS = dtData.getValue(Layer.SCENARIO, 
 					"/scenario:scenario/scenario:driver/scenario:openDrive/scenario:targetS", Double.class);
-					
-					
+			
+			Boolean visualizeFollowBoxOrNull = dtData.getValue(Layer.SCENARIO, 
+					"/scenario:scenario/scenario:driver/scenario:openDrive/scenario:visualizeFollowBox", Boolean.class);
+			if(visualizeFollowBoxOrNull != null)
+				visualizeFollowBox = visualizeFollowBoxOrNull;
+			
+			Float distanceToFollowBoxOrNull = dtData.getValue(Layer.SCENARIO, 
+					"/scenario:scenario/scenario:driver/scenario:openDrive/scenario:distanceToFollowBox", Float.class);
+			if(distanceToFollowBoxOrNull != null)
+				distanceToFollowBox = distanceToFollowBoxOrNull;
+			
 			String path = "/scenario:scenario/scenario:driver/scenario:openDrive/scenario:preferredConnections/scenario:ODconnection";
 			
 			NodeList laneNodes = (NodeList) dtData.xPathQuery(Layer.SCENARIO, 
@@ -943,6 +954,7 @@ public class ScenarioLoader
 				String modelPath = null;
 				Boolean isSpeedLimitedToSteeringCar = null;
 				Float distanceFromPath = null;
+				Boolean visualizeFollowBox = null;
 				Float maxSpeed = null;
 				String startRoadID = null;
 				Integer startLane = null;
@@ -1012,6 +1024,13 @@ public class ScenarioLoader
 						distanceFromPath = Float.parseFloat(currentChild.getTextContent());
 					}
 					
+					//Boolean visualizeFollowBox = dtData.getValue(Layer.SCENARIO, 
+					//		"/scenario:scenario/scenario:traffic/scenario:ODvehicle["+k+"]/scenario:visualizeFollowBox", Boolean.class);
+					else if(currentChild.getNodeName().equals("visualizeFollowBox"))
+					{
+						visualizeFollowBox = Boolean.parseBoolean(currentChild.getTextContent());
+					}
+
 					//Float decelerationFreeWheel = dtData.getValue(Layer.SCENARIO, 
 					//		"/scenario:scenario/scenario:traffic/scenario:ODvehicle["+k+"]/scenario:maxSpeed", Float.class);
 					else if(currentChild.getNodeName().equals("maxSpeed"))
@@ -1101,6 +1120,9 @@ public class ScenarioLoader
 				if(distanceFromPath == null)
 					distanceFromPath = 5f;
 				
+				if(visualizeFollowBox == null)
+					visualizeFollowBox = false;
+				
 				if(maxSpeed == null)
 					maxSpeed = 200f;
 				
@@ -1126,8 +1148,9 @@ public class ScenarioLoader
 				
 				ODPosition targetPos = new ODPosition(targetRoadID, targetLane, targetS);
 				
-				OpenDRIVECarData openDRIVECarData = new OpenDRIVECarData(name, mass, acceleration, decelerationBrake, 
-						decelerationFreeWheel, engineOn, modelPath, isSpeedLimitedToSteeringCar, distanceFromPath,
+				OpenDRIVECarData openDRIVECarData = new OpenDRIVECarData(name, mass, acceleration, 
+						decelerationBrake, decelerationFreeWheel, engineOn, modelPath, 
+						isSpeedLimitedToSteeringCar, distanceFromPath, visualizeFollowBox,
 						maxSpeed, startPos, targetPos, preferredConnections);
 				PhysicalTraffic.getOpenDRIVECarDataList().add(openDRIVECarData);
 			}
@@ -1951,6 +1974,18 @@ public class ScenarioLoader
 		}
 		
 		return null;
+	}
+	
+	
+	public boolean isVisualizeFollowBox()
+	{
+		return visualizeFollowBox;
+	}
+	
+	
+	public float getDistanceToFollowBox()
+	{
+		return distanceToFollowBox;
 	}
 	
 	

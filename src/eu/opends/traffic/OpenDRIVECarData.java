@@ -39,6 +39,7 @@ public class OpenDRIVECarData
 	private String modelPath;
 	private boolean isSpeedLimitedToSteeringCar;
 	private float distanceFromPath;
+	private boolean visualizeFollowBox;
 	private float maxSpeed;
 	private ODPosition startPosition;
 	private ODPosition targetPosition;
@@ -48,8 +49,8 @@ public class OpenDRIVECarData
 	
 	public OpenDRIVECarData(String name, float mass, float acceleration, float decelerationBrake, 
 			float decelerationFreeWheel, boolean engineOn, String modelPath, boolean isSpeedLimitedToSteeringCar,
-			Float distanceFromPath, Float maxSpeed, ODPosition startPosition, ODPosition targetPosition, 
-			PreferredConnections preferredConnections) 
+			Float distanceFromPath, boolean visualizeFollowBox, Float maxSpeed, ODPosition startPosition, 
+			ODPosition targetPosition, PreferredConnections preferredConnections) 
 	{
 		this.name = name;
 		this.mass = mass;
@@ -60,6 +61,7 @@ public class OpenDRIVECarData
 		this.modelPath = modelPath;
 		this.isSpeedLimitedToSteeringCar = isSpeedLimitedToSteeringCar;
 		this.distanceFromPath = distanceFromPath;
+		this.visualizeFollowBox = visualizeFollowBox;
 		this.maxSpeed = maxSpeed;
 		this.startPosition = startPosition;
 		this.targetPosition = targetPosition;
@@ -113,6 +115,11 @@ public class OpenDRIVECarData
 	}
 
 	
+	public boolean isVisualizeFollowBox() {
+		return visualizeFollowBox;
+	}
+	
+	
 	public float getMaxSpeed() {
 		return maxSpeed;
 	}
@@ -149,6 +156,7 @@ public class OpenDRIVECarData
 			   "\t\t\t<maxSpeed>"+ maxSpeed + "</maxSpeed>\n" + 							  
 			   "\t\t\t<engineOn>"+ engineOn + "</engineOn>\n" + 
 			   "\t\t\t<distanceFromPath>"+ distanceFromPath + "</distanceFromPath>\n" + 
+			   "\t\t\t<visualizeFollowBox>"+ visualizeFollowBox + "</visualizeFollowBox>\n" + 
 			   "\t\t\t<neverFasterThanSteeringCar>"+ isSpeedLimitedToSteeringCar + "</neverFasterThanSteeringCar>\n" + 
 			   "\t\t\t<startRoadID>"+ startPosition.getRoadID() + "</startRoadID>\n" + 
 			   "\t\t\t<startLane>"+ startPosition.getLane() + "</startLane>\n" + 

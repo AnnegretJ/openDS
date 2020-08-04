@@ -2195,97 +2195,73 @@ public class InteractionMethods
 			parameter = "number";
 			Integer number = null;
 			String number_String = parameterList.getProperty(parameter);
-			if(number_String != null)
-			{
-				if(number_String.isEmpty())
-					number = 1;
-				else
-					number = Integer.parseInt(number_String);
-			}
-			
+			if(number_String != null && !number_String.isEmpty())
+				number = Integer.parseInt(number_String);
+			else
+				number = 1;
+
 			// set duration of event
 			parameter = "duration";
 			Integer duration = null;
 			String duration_String = parameterList.getProperty(parameter);
-			if(duration_String != null)
-			{
-				if(duration_String.isEmpty())
-					duration = 3;
-				else
-					duration = Integer.parseInt(duration_String);
-			}
-			
+			if(duration_String != null && !duration_String.isEmpty())
+				duration = Integer.parseInt(duration_String);
+			else
+				duration = 3;
+
 			// set minimum starting time of event
 			parameter = "minStartingTime";
 			Integer minStartingTime = null;
 			String minStartingTime_String = parameterList.getProperty(parameter);
-			if(minStartingTime_String != null)
-			{
-				if(minStartingTime_String.isEmpty())
-					minStartingTime = 5;
-				else
-					minStartingTime = Integer.parseInt(minStartingTime_String);
-			}
+			if(minStartingTime_String != null && !minStartingTime_String.isEmpty())
+				minStartingTime = Integer.parseInt(minStartingTime_String);
+			else
+				minStartingTime = 5;
 			
 			// set maximum ending time of event
 			parameter = "maxEndingTime";
 			Integer maxEndingTime = null;
 			String maxEndingTime_String = parameterList.getProperty(parameter);
-			if(maxEndingTime_String != null)
-			{
-				if(maxEndingTime_String.isEmpty())
-					maxEndingTime = 10;
-				else
-					maxEndingTime = Integer.parseInt(maxEndingTime_String);
-			}
-			
+			if(maxEndingTime_String != null && !maxEndingTime_String.isEmpty())
+				maxEndingTime = Integer.parseInt(maxEndingTime_String);
+			else
+				maxEndingTime = 10;
+
 			// set visual demand of event
 			parameter = "visualDemand";
 			Integer visualDemand = null;
 			String visualDemand_String = parameterList.getProperty(parameter);
-			if(visualDemand_String != null)
-			{
-				if(visualDemand_String.isEmpty())
-					visualDemand = 5;
-				else
-					visualDemand = Integer.parseInt(visualDemand_String);
-			}
+			if(visualDemand_String != null && !visualDemand_String.isEmpty())
+				visualDemand = Integer.parseInt(visualDemand_String);
+			else
+				visualDemand = 5;
 			
 			// set auditory demand of event
 			parameter = "auditoryDemand";
 			Integer auditoryDemand = null;
 			String auditoryDemand_String = parameterList.getProperty(parameter);
-			if(auditoryDemand_String != null)
-			{
-				if(auditoryDemand_String.isEmpty())
-					auditoryDemand = 5;
-				else
-					auditoryDemand = Integer.parseInt(auditoryDemand_String);
-			}
+			if(auditoryDemand_String != null && !auditoryDemand_String.isEmpty())
+				auditoryDemand = Integer.parseInt(auditoryDemand_String);
+			else
+				auditoryDemand = 5;
 			
 			// set haptic demand of event
 			parameter = "hapticDemand";
 			Integer hapticDemand = null;
 			String hapticDemand_String = parameterList.getProperty(parameter);
-			if(hapticDemand_String != null)
-			{
-				if(hapticDemand_String.isEmpty())
-					hapticDemand = 5;
-				else
-					hapticDemand = Integer.parseInt(hapticDemand_String);
-			}
-			
+			if(hapticDemand_String != null && !hapticDemand_String.isEmpty())
+				hapticDemand = Integer.parseInt(hapticDemand_String);
+			else
+				hapticDemand = 5;
+
 			// set delay penalty of event
 			parameter = "delayPenalty";
 			Integer delayPenalty = null;
 			String delayPenalty_String = parameterList.getProperty(parameter);
-			if(delayPenalty_String != null)
-			{
-				if(delayPenalty_String.isEmpty())
-					delayPenalty = 1;
-				else
-					delayPenalty = Integer.parseInt(delayPenalty_String);
-			}
+			if(delayPenalty_String != null && !delayPenalty_String.isEmpty())
+				delayPenalty = Integer.parseInt(delayPenalty_String);
+			else
+				delayPenalty = 1;
 			
 			// create a new planner event
 			Event event = new Event(name, number, duration, minStartingTime, maxEndingTime, visualDemand, 

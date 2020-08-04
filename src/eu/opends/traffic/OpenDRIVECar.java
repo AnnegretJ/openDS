@@ -66,6 +66,7 @@ public class OpenDRIVECar extends Car implements TrafficObject
 	private boolean isSpeedLimitedToSteeringCar;
 	private String name;
 	private ODVisualizer visualizer;
+	private boolean visualizeFollowBox = true;
 	private ODLane currentLane = null;
 	private double currentS = 0;
 	private Integer targetLaneID = null;
@@ -132,6 +133,8 @@ public class OpenDRIVECar extends Car implements TrafficObject
 		
 		distanceFromPath = trafficCarData.getDistanceFromPath();
 		
+		visualizeFollowBox = trafficCarData.isVisualizeFollowBox();
+		
 		minSpeed = 0;
 		maxSpeed = trafficCarData.getMaxSpeed();
 		
@@ -173,8 +176,11 @@ public class OpenDRIVECar extends Car implements TrafficObject
 	{
 		if(!done)
 		{
-			visualizer = sim.getOpenDriveCenter().getVisualizer();
-			visualizer.createMarker(name + "_followBox", new Vector3f(0, 0, 0), initialPosition, visualizer.greenMaterial, 0.3f, false);
+			if(visualizeFollowBox)
+			{
+				visualizer = sim.getOpenDriveCenter().getVisualizer();
+				visualizer.createMarker(name + "_followBox", new Vector3f(0, 0, 0), initialPosition, visualizer.greenMaterial, 0.3f, false);
+			}
 			done = true;
 		}
 		
@@ -228,7 +234,9 @@ public class OpenDRIVECar extends Car implements TrafficObject
 			{
 				// visualize point (green)
 				targetPos = point.getPosition().toVector3f();
-				visualizer.setMarkerPosition(name + "_followBox", targetPos, getPosition(), visualizer.greenMaterial, false);
+				
+				if(visualizeFollowBox)
+					visualizer.setMarkerPosition(name + "_followBox", targetPos, getPosition(), visualizer.greenMaterial, false);
 				
 				// set expected lanes
 				expectedLanes.clear();
@@ -242,8 +250,11 @@ public class OpenDRIVECar extends Car implements TrafficObject
 			currentS = 0;
 		}
 
-		// if no lane and/or point next to car --> hide marker
-		visualizer.hideMarker(name + "_followBox");
+		if(visualizeFollowBox)
+		{
+			// if no lane and/or point next to car --> hide marker
+			visualizer.hideMarker(name + "_followBox");
+		}
 	}
 
 

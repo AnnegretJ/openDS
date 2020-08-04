@@ -795,7 +795,13 @@ elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns
         	<xs:element name="targetLane" type="xs:int" maxOccurs="1"
         		minOccurs="0">
         	</xs:element>
-        	<xs:element name="targetS" type="xs:double" maxOccurs="1" minOccurs="0"></xs:element>
+        	<xs:element name="targetS" type="xs:double" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="visualizeFollowBox" type="xs:boolean"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="distanceToFollowBox" type="xs:float" maxOccurs="1" minOccurs="0"></xs:element>
         </xs:all>
 
 
@@ -824,6 +830,7 @@ elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns
         	<xs:element name="distanceFromPath" type="xs:float"
         		maxOccurs="1" minOccurs="0">
         	</xs:element>
+        	<xs:element name="visualizeFollowBox" type="xs:boolean" maxOccurs="1" minOccurs="0"></xs:element>
         	<xs:element name="maxSpeed" type="xs:float" maxOccurs="1"
         		minOccurs="0">
         	</xs:element>
@@ -839,9 +846,15 @@ elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns
         	<xs:element name="startS" type="xs:double" maxOccurs="1"
         		minOccurs="0">
         	</xs:element>
-        	<xs:element name="targetRoadID" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-        	<xs:element name="targetLane" type="xs:int" maxOccurs="1" minOccurs="0"></xs:element>
-        	<xs:element name="targetS" type="xs:double" maxOccurs="1" minOccurs="0"></xs:element>
+        	<xs:element name="targetRoadID" type="xs:string"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="targetLane" type="xs:int" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="targetS" type="xs:double" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
         	<xs:element name="preferredConnections"
         		type="preferredConnectionsType" maxOccurs="1" minOccurs="0">
         	</xs:element>
