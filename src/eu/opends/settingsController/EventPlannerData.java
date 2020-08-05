@@ -50,7 +50,7 @@ public class EventPlannerData
 	
 	
 	// remove the head of the queue
-	public void removeFirstEvent()
+	private void removeFirstEvent()
 	{
 		eventQueue.poll();
 	}
@@ -58,88 +58,149 @@ public class EventPlannerData
 	
 	public String getEventName()
 	{
-		if(eventQueue.peek() != null)
-			return eventQueue.peek().getName();
-		else
-			return "";
+		String eventName = "";
+		
+		Event event = eventQueue.peek();
+		if(event != null)
+		{
+			eventName = event.getName();
+			if(event.requestedAllParameters())
+				removeFirstEvent();
+		}
+		
+		return eventName;
 	}
 
 
 	public String getEventNumber()
 	{
-		if(eventQueue.peek() != null)
-			return String.valueOf(eventQueue.peek().getNumber());
-		else
-			return "";
+		String eventNumber = "";
+		
+		Event event = eventQueue.peek();
+		if(event != null)
+		{
+			eventNumber = String.valueOf(eventQueue.peek().getNumber());
+			if(event.requestedAllParameters())
+				removeFirstEvent();
+		}
+		
+		return eventNumber;
 	}
 
 
 	public String getEventDuration()
 	{
-		if(eventQueue.peek() != null)
-			return String.valueOf(eventQueue.peek().getDuration());
-		else
-			return "";
+		String eventDuration = "";
+		
+		Event event = eventQueue.peek();
+		if(event != null)
+		{
+			eventDuration = String.valueOf(eventQueue.peek().getDuration());
+			if(event.requestedAllParameters())
+				removeFirstEvent();
+		}
+		
+		return eventDuration;
 	}
 
 
 	public String getEventMinStartingTime()
 	{
-		if(eventQueue.peek() != null)
+		String eventMinStartingTime = "";
+		
+		Event event = eventQueue.peek();
+		if(event != null)
 		{
 			float secondsSinceStart = sim.getBulletAppState().getElapsedSecondsSinceStart();
-			return String.valueOf(eventQueue.peek().getMinStartingTime() + secondsSinceStart);
+			eventMinStartingTime = String.valueOf(eventQueue.peek().getMinStartingTime() + secondsSinceStart);
+			
+			if(event.requestedAllParameters())
+				removeFirstEvent();
 		}
-		else
-			return "";
+		
+		return eventMinStartingTime;
 	}
 
 
 	public String getEventMaxEndingTime()
 	{
-		if(eventQueue.peek() != null)
+		String eventMaxEndingTime = "";
+		
+		Event event = eventQueue.peek();
+		if(event != null)
 		{
 			float secondsSinceStart = sim.getBulletAppState().getElapsedSecondsSinceStart();
-			return String.valueOf(eventQueue.peek().getMaxEndingTime() + secondsSinceStart);
+			eventMaxEndingTime = String.valueOf(eventQueue.peek().getMaxEndingTime() + secondsSinceStart);
+			
+			if(event.requestedAllParameters())
+				removeFirstEvent();
 		}
-		else
-			return "";
+		
+		return eventMaxEndingTime;
 	}
 
 
 	public String getEventVisualDemand()
 	{
-		if(eventQueue.peek() != null)
-			return String.valueOf(eventQueue.peek().getVisualDemand());
-		else
-			return "";
+		String eventVisualDemand = "";
+		
+		Event event = eventQueue.peek();
+		if(event != null)
+		{
+			eventVisualDemand = String.valueOf(eventQueue.peek().getVisualDemand());
+			if(event.requestedAllParameters())
+				removeFirstEvent();
+		}
+		
+		return eventVisualDemand;
 	}
 
 
 	public String getEventAuditoryDemand()
 	{
-		if(eventQueue.peek() != null)
-			return String.valueOf(eventQueue.peek().getAuditoryDemand());
-		else
-			return "";
+		String eventAuditoryDemand = "";
+		
+		Event event = eventQueue.peek();
+		if(event != null)
+		{
+			eventAuditoryDemand = String.valueOf(eventQueue.peek().getAuditoryDemand());
+			if(event.requestedAllParameters())
+				removeFirstEvent();
+		}
+		
+		return eventAuditoryDemand;
 	}
 
 
 	public String getEventHapticDemand()
 	{
-		if(eventQueue.peek() != null)
-			return String.valueOf(eventQueue.peek().getHapticDemand());
-		else
-			return "";
+		String eventHapticDemand = "";
+		
+		Event event = eventQueue.peek();
+		if(event != null)
+		{
+			eventHapticDemand = String.valueOf(eventQueue.peek().getHapticDemand());
+			if(event.requestedAllParameters())
+				removeFirstEvent();
+		}
+		
+		return eventHapticDemand;
 	}
 	
 	
 	public String getDelayPenalty()
 	{
-		if(eventQueue.peek() != null)
-			return String.valueOf(eventQueue.peek().getDelayPenalty());
-		else
-			return "";
+		String eventDelayPenalty = "";
+		
+		Event event = eventQueue.peek();
+		if(event != null)
+		{
+			eventDelayPenalty = String.valueOf(eventQueue.peek().getDelayPenalty());
+			if(event.requestedAllParameters())
+				removeFirstEvent();
+		}
+		
+		return eventDelayPenalty;
 	}
 
 	

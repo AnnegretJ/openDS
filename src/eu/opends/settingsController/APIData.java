@@ -868,8 +868,6 @@ public class APIData
 
 			value = output;
 			
-			sim.getSettingsControllerServer().getEventPlannerDataRecord().removeFirstEvent();
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

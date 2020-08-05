@@ -20,6 +20,17 @@ package eu.opends.settingsController;
 
 public class Event 
 {
+	private boolean requestedName = false;
+	private boolean requestedNumber = false;
+	private boolean requestedDuration = false;
+	private boolean requestedMinStartingTime = false;
+	private boolean requestedMaxEndingTime = false;
+	private boolean requestedVisualDemand = false;
+	private boolean requestedAuditoryDemand = false;
+	private boolean requestedHapticDemand = false;
+	private boolean requestedDelayPenalty = false;
+	
+	
 	private String name = "";
 	private int number = 0;
 	private int duration = 0;
@@ -48,57 +59,71 @@ public class Event
 
 	public String getName()
 	{
+		requestedName = true;
 		return name;
 	}
 
 
 	public int getNumber()
 	{
+		requestedNumber = true;
 		return number;
 	}
 
 
 	public int getDuration()
 	{
+		requestedDuration = true;
 		return duration;
 	}
 
 
 	public int getMinStartingTime()
 	{
+		requestedMinStartingTime = true;
 		return minStartingTime;
 	}
 
 
 	public int getMaxEndingTime()
 	{
+		requestedMaxEndingTime = true;
 		return maxEndingTime;
 	}
 
 
 	public int getVisualDemand()
 	{
+		requestedVisualDemand = true;
 		return visualDemand;
 	}
 
 
 	public int getAuditoryDemand()
 	{
+		requestedAuditoryDemand = true;
 		return auditoryDemand;
 	}
 
 
 	public int getHapticDemand()
 	{
+		requestedHapticDemand = true;
 		return hapticDemand;
 	}
 
 
 	public int getDelayPenalty()
 	{
+		requestedDelayPenalty = true;
 		return delayPenalty;
 	}
 	
 	
-	
+	public boolean requestedAllParameters()
+	{
+		return requestedName && requestedNumber && requestedDuration && requestedMinStartingTime 
+			&& requestedMaxEndingTime && requestedVisualDemand && requestedAuditoryDemand 
+			&& requestedHapticDemand && requestedDelayPenalty;
+	}
 }
