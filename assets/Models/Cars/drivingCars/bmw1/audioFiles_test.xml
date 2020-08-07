@@ -1,0 +1,13 @@
+<audioFiles>
+	<insideVehicle>
+		<engineStart volume="2">bmw/start_inside.wav</engineStart>
+    	<engineIdle volume="2" loop="true">bmw/idle_inside.wav</engineIdle>
+    	<engineStop volume="2">bmw/stop_inside.wav</engineStop>
+	</insideVehicle>
+	<outsideVehicle>
+		<engineStart>test2/start_outside.wav</engineStart>
+    	<engineIdle loop="true">test2/idle_outside.wav</engineIdle>
+    	<engineStop>test2/stop_outside.wav</engineStop>
+		<horn loop="true">horn2.wav</horn>
+	</outsideVehicle>
+</audioFiles>
