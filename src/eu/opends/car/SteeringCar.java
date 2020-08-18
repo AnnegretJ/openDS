@@ -625,6 +625,11 @@ public class SteeringCar extends Car implements TrafficObject
 		// traversedLaneSet will be filled with all lanes between current lane (including)
 		// and the lane of target point (including) in order of increasing distance
 		
+		float speedFactor = 0.05f * Math.max(20, Math.min(100, getCurrentSpeedKmh())); // [1.0 .. 5.0]
+		float speedDependentDistToFollowBox = distanceToFollowBox * speedFactor;
+		
+		//System.err.println(getCurrentSpeedKmh() + "; " + speedFactor + "; " + speedDependentDistToFollowBox);
+		
 		double s = lane.getCurrentInnerBorderPoint().getS();
 		
 		currentLane = lane;
@@ -664,14 +669,14 @@ public class SteeringCar extends Car implements TrafficObject
 			
 			
 			if(targetLane.isOppositeTo(lane))
-				point = targetLane.getLaneCenterPointAhead(!isWrongWay, s, distanceToFollowBox, preferredConnections, traversedLaneSet);
+				point = targetLane.getLaneCenterPointAhead(!isWrongWay, s, speedDependentDistToFollowBox, preferredConnections, traversedLaneSet);
 			else
-				point = targetLane.getLaneCenterPointAhead(isWrongWay, s, distanceToFollowBox, preferredConnections, traversedLaneSet);
+				point = targetLane.getLaneCenterPointAhead(isWrongWay, s, speedDependentDistToFollowBox, preferredConnections, traversedLaneSet);
 		}
 		else
 		{
 			// get point on center of current lane x meters ahead of the current position
-			point = lane.getLaneCenterPointAhead(false, s, distanceToFollowBox, preferredConnections, traversedLaneSet);
+			point = lane.getLaneCenterPointAhead(false, s, speedDependentDistToFollowBox, preferredConnections, traversedLaneSet);
 		}
 		
 		previousLane = lane;

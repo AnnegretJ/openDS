@@ -98,7 +98,7 @@ public class OpenDRIVECar extends Car implements TrafficObject
         	}
         	else
         		System.err.println("No route from " + startPos + " to " + targetPos 
-        				+ " could be found for OpenDRIVECar '\" + name + \"'! (OpenDRIVECar.java)");
+        				+ " could be found for OpenDRIVECar '" + name + "'! (OpenDRIVECar.java)");
         }
 
         
@@ -265,6 +265,11 @@ public class OpenDRIVECar extends Car implements TrafficObject
 		// traversedLaneSet will be filled with all lanes between current lane (including)
 		// and the lane of target point (including) in order of increasing distance
 		
+		float speedFactor = 0.1f * Math.max(20, Math.min(100, getCurrentSpeedKmh()));
+		float speedDependentDistFromPath = distanceFromPath * speedFactor;
+		
+		//System.err.println(getCurrentSpeedKmh() + "; " + speedFactor + "; " + speedDependentDistFromPath);
+
 		ODPoint point = null;
 		
 		if(previousLane != null && 	targetLaneID != null)
@@ -299,14 +304,14 @@ public class OpenDRIVECar extends Car implements TrafficObject
 			
 			
 			if(targetLane.isOppositeTo(currentLane))
-				point = targetLane.getLaneCenterPointAhead(!isWrongWay, currentS, distanceFromPath, preferredConnections, traversedLaneSet);
+				point = targetLane.getLaneCenterPointAhead(!isWrongWay, currentS, speedDependentDistFromPath, preferredConnections, traversedLaneSet);
 			else
-				point = targetLane.getLaneCenterPointAhead(isWrongWay, currentS, distanceFromPath, preferredConnections, traversedLaneSet);
+				point = targetLane.getLaneCenterPointAhead(isWrongWay, currentS, speedDependentDistFromPath, preferredConnections, traversedLaneSet);
 		}
 		else
 		{
 			// get point on center of current lane x meters ahead of the current position
-			point = currentLane.getLaneCenterPointAhead(false, currentS, distanceFromPath, preferredConnections, traversedLaneSet);
+			point = currentLane.getLaneCenterPointAhead(false, currentS, speedDependentDistFromPath, preferredConnections, traversedLaneSet);
 		}
 		
 		previousLane = currentLane;
@@ -735,5 +740,71 @@ public class OpenDRIVECar extends Car implements TrafficObject
 		}
 		else
 			targetLaneID = null;
+	}
+
+
+	public void setToODPosition(ODPosition startPosition, ODPosition targetNavPosition)
+	{
+		ODPosition startNavPosition = null;
+		
+    	if(startPosition != null)
+    		startNavPosition = startPosition;
+    	else if(currentLane != null)
+    		startNavPosition = new ODPosition(currentLane.getODRoad().getID(), currentLane.getID(), currentS);
+
+		
+		// fill preferred connections with shortest route from start to target navigation position
+        if(startNavPosition != null && targetNavPosition != null)
+        {
+        	RoadGraph roadGraph = sim.getOpenDriveCenter().getRoadGraph();
+        	PreferredConnections pc = roadGraph.getShortestPath(startNavPosition, targetNavPosition);
+        	if(pc != null)
+        	{
+        		preferredConnections = pc;
+        		//System.err.println("PreferredConnections of OpenDRIVECar '" + name + "': \n" + preferredConnections);
+        	}
+        	else
+        		System.err.println("No route from " + startNavPosition + " to " + targetNavPosition 
+        				+ " could be found for OpenDRIVECar '" + name + "'! (OpenDRIVECar.java)");
+        }
+        
+        if(startPosition != null)
+        {
+    		ODRoad road = sim.getOpenDriveCenter().getRoadMap().get(startPosition.getRoadID());
+    		if(road != null)
+    		{
+    			double s = startPosition.getS();
+    			
+    			for(ODLaneSection laneSection : road.getLaneSectionList())
+    			{
+    				if(laneSection.getS() <= s && s <= laneSection.getEndS())
+    				{
+    					ODLane lane = laneSection.getLaneMap().get(startPosition.getLane());
+    					
+    					if(lane!=null)
+    					{
+    						ODPoint point = lane.getLaneCenterPointAhead(false, s, 0, preferredConnections, null);
+    						ODPoint towardsPoint = lane.getLaneCenterPointAhead(false, s, 1, preferredConnections, null);
+    					
+    						Vector3f position = point.getPosition().toVector3f();
+    						Vector3f towardsPosition = towardsPoint.getPosition().toVector3f();
+    					
+    						Vector3f posDiff = towardsPosition.subtract(position);
+    						float rotation = FastMath.atan2(posDiff.x,-posDiff.z);
+
+    						Quaternion orientation = new Quaternion().fromAngles(0, rotation, 0);
+    						setPositionRotation(position, orientation);
+    					}
+    					else
+    						System.err.println("OpenDRIVECar::setToODPosition(): " + startPosition.getLane() + " is not a valid laneID");
+    					
+    					return;
+    				}
+    			}
+    			System.err.println("OpenDRIVECar::setToODPosition(): " + s + " is not a valid s");
+    		}
+    		else
+    			System.err.println("OpenDRIVECar::setToODPosition(): " + startPosition.getRoadID() + " is not a valid roadID");
+        }
 	}
 }

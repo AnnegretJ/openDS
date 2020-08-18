@@ -64,6 +64,7 @@ import eu.opends.drivingTask.DrivingTask;
 import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.effects.EffectCenter;
 import eu.opends.environment.TrafficLightCenter;
+import eu.opends.events.EventCenter;
 import eu.opends.eyetracker.EyetrackerCenter;
 import eu.opends.hmi.HMICenter;
 import eu.opends.infrastructure.RoadNetwork;
@@ -318,6 +319,12 @@ public class Simulator extends SimulationBasics
 	}
 	
 	
+	private EventCenter eventCenter;
+	public EventCenter getEventCenter() 
+	{
+		return eventCenter;
+	}
+	
 	
     @Override
     public void simpleInitApp()
@@ -554,6 +561,8 @@ public class Simulator extends SimulationBasics
 		ffbController = new ForceFeedbackController(this);
 		
 		openDSGaugeCenter = new OpenDSGaugeCenter();
+		
+		eventCenter = new EventCenter(this);
 
 		initializationFinished = true;
     }
@@ -682,6 +691,8 @@ public class Simulator extends SimulationBasics
     		onScreenVisualizer.update();
     		
     		ffbController.update();
+    		
+    		eventCenter.update();
     	}
     }
 

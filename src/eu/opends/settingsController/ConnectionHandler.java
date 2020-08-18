@@ -27,6 +27,8 @@ import java.io.StringReader;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -35,11 +37,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.jme3.math.FastMath;
 
+import eu.opends.events.Event;
+import eu.opends.events.EventPlannerData;
 import eu.opends.main.Simulator;
 import eu.opends.traffic.Pedestrian;
 import eu.opends.traffic.TrafficCar;
@@ -313,8 +318,33 @@ public class ConnectionHandler extends Thread
 					setPedestrianControl(val);
 					response += "<Event Name=\"UpdatePedestrianControl\">\n" + val + "\n</Event>";
 				}
+				else if(eventName.equals("Schedule"))
+				{
+					NodeList childNodes = nodes.item(i).getChildNodes();
+					for(int j=0; j<childNodes.getLength(); j++)
+					{
+						Node currentChild = childNodes.item(j);
+						
+						if(currentChild.getNodeName().equals("PresentationTask"))
+						{
+							String name = currentChild.getAttributes().getNamedItem("Name").getNodeValue();
+							
+							if(name != null && !name.isEmpty())
+							{
+								String startTimeString = currentChild.getAttributes().getNamedItem("StartTime").getNodeValue();
+								int startTime = Integer.parseInt(startTimeString);
+								String endTimeString = currentChild.getAttributes().getNamedItem("EndTime").getNodeValue();
+								int endTime = Integer.parseInt(endTimeString);
+
+								setupPresentationTask(name, startTime, endTime);
+							}
+						}
+					}					
+
+					return;
+				}
 				else{
-					System.err.println("Unknow event received!");
+					System.err.println("Unknown event received!");
 					return;
 				}			
 				
@@ -333,6 +363,36 @@ public class ConnectionHandler extends Thread
 			e.printStackTrace();
 		}		
 	}
+	
+
+	private void setupPresentationTask(String name, int startTime, int endTime)
+	{
+		// look up event in list of previous sent events
+		EventPlannerData record = sim.getSettingsControllerServer().getEventPlannerDataRecord();
+		ArrayList<Event> sentEvents = record.getSentEvents();
+
+		for(Iterator<Event> iterator = sentEvents.iterator(); iterator.hasNext();)
+		{
+			Event event = iterator.next();
+			if(event.getName().equals(name))
+			{
+				// if event found, add exact start and end times
+				event.setExactTimings(startTime, endTime);
+				
+				// initiate presentation by adding event to upcoming event list
+				sim.getEventCenter().addUpcomingEvent(event);
+				
+				// remove event from sent event list
+				iterator.remove();
+				
+				// System.err.println("Task received: " + name + " (start: " + startTime + ", end: " + 
+				//		endTime + ")");
+				
+				return;
+			}
+		}
+	}
+	
 	
 	public synchronized void sendResponse(String response){		
 		try {

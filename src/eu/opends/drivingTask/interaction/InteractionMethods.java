@@ -26,12 +26,15 @@ import com.jme3.math.Vector3f;
 import eu.opends.basics.SimulationBasics;
 import eu.opends.dashboard.OpenDSGaugeState;
 import eu.opends.drivingTask.DrivingTaskDataQuery.Layer;
+import eu.opends.events.Event;
 import eu.opends.hmi.LocalDangerWarningPresentationModel;
 import eu.opends.hmi.PresentationModel;
 import eu.opends.hmi.RoadWorksInformationPresentationModel;
 import eu.opends.main.Simulator;
+import eu.opends.opendrive.processed.ODLaneSection;
+import eu.opends.opendrive.processed.ODRoad;
 import eu.opends.opendrive.processed.ODLane.Position;
-import eu.opends.settingsController.Event;
+import eu.opends.opendrive.util.ODPosition;
 import eu.opends.trigger.*;
 
 /**
@@ -588,8 +591,51 @@ public class InteractionMethods
 			else
 				enabled = Boolean.parseBoolean(enabledString);
 			
-			// create ResetCarToResetPointAction
-			return new MoveTrafficTriggerAction(sim, delay, repeat, trafficObjectID, wayPointID, engineOn, enabled);
+			// read OpenDRIVE start position status
+			parameter = "startRoadID";
+			String startRoadID = parameterList.getProperty(parameter);
+
+			parameter = "startLaneID";
+			String startLaneIDString = parameterList.getProperty(parameter);
+			Integer startLaneID = null;
+			if(startLaneIDString != null && !startLaneIDString.isEmpty())
+				startLaneID = Integer.parseInt(startLaneIDString);
+						
+			parameter = "startS";
+			String startSString = parameterList.getProperty(parameter);
+			double startS = 0d;
+			if(startSString != null && !startSString.isEmpty())
+				startS = Double.parseDouble(startSString);
+				
+			ODPosition startPosition = null;
+			if(startRoadID != null && startLaneID != null)
+				startPosition = new ODPosition(startRoadID, startLaneID, startS);
+			
+			
+			// read OpenDRIVE target position status
+			parameter = "targetRoadID";
+			String targetRoadID = parameterList.getProperty(parameter);
+
+			parameter = "targetLaneID";
+			String targetLaneIDString = parameterList.getProperty(parameter);
+			Integer targetLaneID = null;
+			if(targetLaneIDString != null && !targetLaneIDString.isEmpty())
+				targetLaneID = Integer.parseInt(targetLaneIDString);
+						
+			parameter = "targetS";
+			String targetSString = parameterList.getProperty(parameter);
+			double targetS = 0d;
+			if(targetSString != null && !targetSString.isEmpty())
+				targetS = Double.parseDouble(targetSString);
+				
+			ODPosition targetPosition = null;
+			if(targetRoadID != null && targetLaneID != null)
+				targetPosition = new ODPosition(targetRoadID, targetLaneID, targetS);
+			
+			
+			// create MoveTrafficTriggerAction
+			return new MoveTrafficTriggerAction(sim, delay, repeat, trafficObjectID, wayPointID, 
+					engineOn, enabled, startPosition, targetPosition);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2157,7 +2203,7 @@ public class InteractionMethods
 	
 	@Action(
 			name = "addPlannerEvent", 
-			layer = Layer.SCENE, 
+			layer = Layer.INTERACTION, 
 			description = "Adds an event to be scheduled by the planner (sent by SettingsControllerServer)",
 			defaultDelay = 0,
 			defaultRepeat = 0,

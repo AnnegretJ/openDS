@@ -16,7 +16,7 @@
 *  along with OpenDS. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package eu.opends.settingsController;
+package eu.opends.events;
 
 public class Event 
 {
@@ -40,6 +40,11 @@ public class Event
 	private int auditoryDemand = 0;
 	private int hapticDemand = 0;
 	private int delayPenalty = 0;
+	
+	
+	private float initializationTimeStamp = 0;
+	private float exactStartTime = 0;
+	private float exactEndTime = 0;
 	
 	
 	public Event(String name, int number, int duration, int minStartingTime, int maxEndingTime,
@@ -120,10 +125,56 @@ public class Event
 	}
 	
 	
-	public boolean requestedAllParameters()
+	public boolean requestedAllPreSendParameters()
 	{
 		return requestedName && requestedNumber && requestedDuration && requestedMinStartingTime 
 			&& requestedMaxEndingTime && requestedVisualDemand && requestedAuditoryDemand 
 			&& requestedHapticDemand && requestedDelayPenalty;
+	}
+
+
+	public void setInitializationTimeStamp(float initializationTimeStamp)
+	{
+		// set time stamp when the event was triggered
+		this.initializationTimeStamp = initializationTimeStamp;
+	}
+	
+	
+	public float getInitializationTimeStamp()
+	{
+		return initializationTimeStamp;
+	}
+	
+	
+	public void setExactTimings(int exactStartTime, int exactEndTime)
+	{
+		this.exactStartTime = initializationTimeStamp + exactStartTime;
+		this.exactEndTime = initializationTimeStamp + exactEndTime;
+	}
+	
+	
+	public float getExactStartTime()
+	{
+		return exactStartTime;
+	}
+	
+	
+	public float getExactEndTime()
+	{
+		return exactEndTime;
+	}
+
+
+	public void display() 
+	{
+		// TODO
+		System.err.println("DISPLAY: " + name);		
+	}
+	
+	
+	public void hide() 
+	{
+		// TODO
+		System.err.println("HIDE: " + name);		
 	}
 }

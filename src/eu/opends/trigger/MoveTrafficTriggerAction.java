@@ -20,6 +20,7 @@ package eu.opends.trigger;
 
 import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
+import eu.opends.opendrive.util.ODPosition;
 import eu.opends.traffic.OpenDRIVECar;
 import eu.opends.traffic.Pedestrian;
 import eu.opends.traffic.PhysicalTraffic;
@@ -41,6 +42,8 @@ public class MoveTrafficTriggerAction extends TriggerAction
 	private String wayPointID;
 	private Boolean engineOn;
 	private Boolean pedestrianEnabled;
+	private ODPosition startPosition;
+	private ODPosition targetPosition;
 	
 	
 	/**
@@ -69,7 +72,7 @@ public class MoveTrafficTriggerAction extends TriggerAction
 	 * 			Set pedestrian enabled/disabled.
 	 */
 	public MoveTrafficTriggerAction(SimulationBasics sim, float delay, int maxRepeat, String trafficObjectName, String wayPointID,
-			Boolean engineOn, Boolean pedestrianEnabled) 
+			Boolean engineOn, Boolean pedestrianEnabled, ODPosition startPosition, ODPosition targetPosition) 
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
@@ -77,6 +80,8 @@ public class MoveTrafficTriggerAction extends TriggerAction
 		this.wayPointID = wayPointID;
 		this.engineOn = engineOn;
 		this.pedestrianEnabled = pedestrianEnabled;
+		this.startPosition = startPosition;
+		this.targetPosition = targetPosition;
 	}
 
 	
@@ -101,8 +106,14 @@ public class MoveTrafficTriggerAction extends TriggerAction
 					if(trafficObject instanceof TrafficCar && engineOn != null)
 						((TrafficCar)trafficObject).setEngineOn(engineOn);
 					
-					if(trafficObject instanceof OpenDRIVECar && engineOn != null)
-						((OpenDRIVECar)trafficObject).setEngineOn(engineOn);
+					if(trafficObject instanceof OpenDRIVECar)
+					{
+						if(engineOn != null)
+							((OpenDRIVECar)trafficObject).setEngineOn(engineOn);
+						
+						if(startPosition != null || targetPosition != null)
+							((OpenDRIVECar)trafficObject).setToODPosition(startPosition, targetPosition);
+					}
 					
 					if(trafficObject instanceof Pedestrian && pedestrianEnabled != null)
 						((Pedestrian)trafficObject).setEnabled(pedestrianEnabled);

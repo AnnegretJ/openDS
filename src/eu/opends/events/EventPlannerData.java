@@ -16,8 +16,9 @@
 *  along with OpenDS. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package eu.opends.settingsController;
+package eu.opends.events;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -29,10 +30,13 @@ public class EventPlannerData
 {
 	private Simulator sim;
 	private SettingsLoader settingsLoader;
+	private Queue<Event> triggeredEvents = new LinkedList<Event>();
+	private ArrayList<Event> sentEvents = new ArrayList<Event>();
+	
+	
 	public String maxVisualCapacityOfDriver = "10";
 	public String maxAuditoryCapacityOfDriver = "10";
 	public String maxHapticCapacityOfDriver = "10";
-	public Queue<Event> eventQueue = new LinkedList<Event>();
 
 	
 	public EventPlannerData(Simulator sim)
@@ -42,17 +46,28 @@ public class EventPlannerData
 	}
 	
 	
-	// add event to the tail of the queue
-	public void addEvent(Event event)
+	// add event to the tail of the triggered events queue
+	public void addTriggeredEvent(Event event)
 	{
-		eventQueue.add(event);
+		float secondsSinceStart = sim.getBulletAppState().getElapsedSecondsSinceStart();
+		event.setInitializationTimeStamp(secondsSinceStart);
+		triggeredEvents.add(event);
 	}
 	
 	
-	// remove the head of the queue
-	private void removeFirstEvent()
+	// remove the head of the triggered events queue and add it to the list of sent events
+	private void removeFirstTriggeredEvent()
 	{
-		eventQueue.poll();
+		Event firstEvent = triggeredEvents.poll();
+
+		if(firstEvent != null)
+			sentEvents.add(firstEvent);
+	}
+	
+	
+	public ArrayList<Event> getSentEvents()
+	{
+		return sentEvents;
 	}
 	
 	
@@ -60,12 +75,12 @@ public class EventPlannerData
 	{
 		String eventName = "";
 		
-		Event event = eventQueue.peek();
+		Event event = triggeredEvents.peek();
 		if(event != null)
 		{
 			eventName = event.getName();
-			if(event.requestedAllParameters())
-				removeFirstEvent();
+			if(event.requestedAllPreSendParameters())
+				removeFirstTriggeredEvent();
 		}
 		
 		return eventName;
@@ -76,12 +91,12 @@ public class EventPlannerData
 	{
 		String eventNumber = "";
 		
-		Event event = eventQueue.peek();
+		Event event = triggeredEvents.peek();
 		if(event != null)
 		{
-			eventNumber = String.valueOf(eventQueue.peek().getNumber());
-			if(event.requestedAllParameters())
-				removeFirstEvent();
+			eventNumber = String.valueOf(triggeredEvents.peek().getNumber());
+			if(event.requestedAllPreSendParameters())
+				removeFirstTriggeredEvent();
 		}
 		
 		return eventNumber;
@@ -92,12 +107,12 @@ public class EventPlannerData
 	{
 		String eventDuration = "";
 		
-		Event event = eventQueue.peek();
+		Event event = triggeredEvents.peek();
 		if(event != null)
 		{
-			eventDuration = String.valueOf(eventQueue.peek().getDuration());
-			if(event.requestedAllParameters())
-				removeFirstEvent();
+			eventDuration = String.valueOf(triggeredEvents.peek().getDuration());
+			if(event.requestedAllPreSendParameters())
+				removeFirstTriggeredEvent();
 		}
 		
 		return eventDuration;
@@ -108,14 +123,14 @@ public class EventPlannerData
 	{
 		String eventMinStartingTime = "";
 		
-		Event event = eventQueue.peek();
+		Event event = triggeredEvents.peek();
 		if(event != null)
 		{
-			float secondsSinceStart = sim.getBulletAppState().getElapsedSecondsSinceStart();
-			eventMinStartingTime = String.valueOf(eventQueue.peek().getMinStartingTime() + secondsSinceStart);
+			float secondsSinceStart = event.getInitializationTimeStamp();
+			eventMinStartingTime = String.valueOf(triggeredEvents.peek().getMinStartingTime() + secondsSinceStart);
 			
-			if(event.requestedAllParameters())
-				removeFirstEvent();
+			if(event.requestedAllPreSendParameters())
+				removeFirstTriggeredEvent();
 		}
 		
 		return eventMinStartingTime;
@@ -126,14 +141,14 @@ public class EventPlannerData
 	{
 		String eventMaxEndingTime = "";
 		
-		Event event = eventQueue.peek();
+		Event event = triggeredEvents.peek();
 		if(event != null)
 		{
-			float secondsSinceStart = sim.getBulletAppState().getElapsedSecondsSinceStart();
-			eventMaxEndingTime = String.valueOf(eventQueue.peek().getMaxEndingTime() + secondsSinceStart);
+			float secondsSinceStart = event.getInitializationTimeStamp();
+			eventMaxEndingTime = String.valueOf(triggeredEvents.peek().getMaxEndingTime() + secondsSinceStart);
 			
-			if(event.requestedAllParameters())
-				removeFirstEvent();
+			if(event.requestedAllPreSendParameters())
+				removeFirstTriggeredEvent();
 		}
 		
 		return eventMaxEndingTime;
@@ -144,12 +159,12 @@ public class EventPlannerData
 	{
 		String eventVisualDemand = "";
 		
-		Event event = eventQueue.peek();
+		Event event = triggeredEvents.peek();
 		if(event != null)
 		{
-			eventVisualDemand = String.valueOf(eventQueue.peek().getVisualDemand());
-			if(event.requestedAllParameters())
-				removeFirstEvent();
+			eventVisualDemand = String.valueOf(triggeredEvents.peek().getVisualDemand());
+			if(event.requestedAllPreSendParameters())
+				removeFirstTriggeredEvent();
 		}
 		
 		return eventVisualDemand;
@@ -160,12 +175,12 @@ public class EventPlannerData
 	{
 		String eventAuditoryDemand = "";
 		
-		Event event = eventQueue.peek();
+		Event event = triggeredEvents.peek();
 		if(event != null)
 		{
-			eventAuditoryDemand = String.valueOf(eventQueue.peek().getAuditoryDemand());
-			if(event.requestedAllParameters())
-				removeFirstEvent();
+			eventAuditoryDemand = String.valueOf(triggeredEvents.peek().getAuditoryDemand());
+			if(event.requestedAllPreSendParameters())
+				removeFirstTriggeredEvent();
 		}
 		
 		return eventAuditoryDemand;
@@ -176,12 +191,12 @@ public class EventPlannerData
 	{
 		String eventHapticDemand = "";
 		
-		Event event = eventQueue.peek();
+		Event event = triggeredEvents.peek();
 		if(event != null)
 		{
-			eventHapticDemand = String.valueOf(eventQueue.peek().getHapticDemand());
-			if(event.requestedAllParameters())
-				removeFirstEvent();
+			eventHapticDemand = String.valueOf(triggeredEvents.peek().getHapticDemand());
+			if(event.requestedAllPreSendParameters())
+				removeFirstTriggeredEvent();
 		}
 		
 		return eventHapticDemand;
@@ -192,12 +207,12 @@ public class EventPlannerData
 	{
 		String eventDelayPenalty = "";
 		
-		Event event = eventQueue.peek();
+		Event event = triggeredEvents.peek();
 		if(event != null)
 		{
-			eventDelayPenalty = String.valueOf(eventQueue.peek().getDelayPenalty());
-			if(event.requestedAllParameters())
-				removeFirstEvent();
+			eventDelayPenalty = String.valueOf(triggeredEvents.peek().getDelayPenalty());
+			if(event.requestedAllPreSendParameters())
+				removeFirstTriggeredEvent();
 		}
 		
 		return eventDelayPenalty;

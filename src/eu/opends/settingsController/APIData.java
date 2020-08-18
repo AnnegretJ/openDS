@@ -43,6 +43,7 @@ import eu.opends.drivingTask.scenario.ScenarioLoader;
 import eu.opends.drivingTask.scenario.ScenarioLoader.CarProperty;
 import eu.opends.drivingTask.settings.SettingsLoader;
 import eu.opends.drivingTask.settings.SettingsLoader.Setting;
+import eu.opends.events.EventPlannerData;
 import eu.opends.main.SimulationDefaults;
 import eu.opends.main.Simulator;
 

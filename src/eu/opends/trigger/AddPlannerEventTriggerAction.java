@@ -20,8 +20,8 @@
 package eu.opends.trigger;
 
 import eu.opends.basics.SimulationBasics;
+import eu.opends.events.Event;
 import eu.opends.main.Simulator;
-import eu.opends.settingsController.Event;
 
 /**
  * This class represents an AddPannerEvent trigger action. Whenever a collision
@@ -69,7 +69,7 @@ public class AddPlannerEventTriggerAction extends TriggerAction
 		if(!isExceeded() && sim instanceof Simulator)
 		{
 			if(((Simulator) sim).getSettingsControllerServer() != null)
-				((Simulator) sim).getSettingsControllerServer().getEventPlannerDataRecord().addEvent(event);
+				((Simulator) sim).getSettingsControllerServer().getEventPlannerDataRecord().addTriggeredEvent(event);
 
 			updateCounter();
 		}
