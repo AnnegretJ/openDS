@@ -506,7 +506,7 @@ public class SimulatorActionListener implements ActionListener
 		else if (binding.equals(KeyMapping.RESET_FUEL_CONSUMPTION.getID())) 
 		{
 			if (value)
-				car.getCarControl().resetTotalFuelConsumption();
+				car.getCarControl().setTotalFuelConsumption(0.0f);
 		}
 		
 		else if (binding.equals(KeyMapping.TOGGLE_STATS.getID()))

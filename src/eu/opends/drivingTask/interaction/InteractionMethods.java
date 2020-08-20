@@ -2224,7 +2224,11 @@ public class InteractionMethods
 					 @Parameter(name="hapticDemand", type="Integer", defaultValue="5", 
 							description="Expected haptic demand of the event"),
 					 @Parameter(name="delayPenalty", type="Integer", defaultValue="1", 
-						description="Penalty if event is getting delayed")
+						description="Penalty if event is getting delayed"),
+					 @Parameter(name="type", type="String", defaultValue="", 
+						description="Type of the event (optional)"),
+					 @Parameter(name="value", type="String", defaultValue="", 
+						description="Value of the event (optional)")
 					}
 		)
 	public TriggerAction addPlannerEvent(SimulationBasics sim, float delay, int repeat, Properties parameterList)
@@ -2309,13 +2313,25 @@ public class InteractionMethods
 			else
 				delayPenalty = 1;
 			
+			// set type of event (if available)
+			parameter = "type";
+			String type = parameterList.getProperty(parameter);
+			if(type == null)
+				type = "";
+			
+			// set value of event (if available)
+			parameter = "value";
+			String value = parameterList.getProperty(parameter);
+			if(value == null)
+				value = "";
+			
 			// create a new planner event
-			Event event = new Event(name, number, duration, minStartingTime, maxEndingTime, visualDemand, 
-					auditoryDemand, hapticDemand, delayPenalty);
+			Event event = new Event(sim, name, number, duration, minStartingTime, maxEndingTime, visualDemand, 
+					auditoryDemand, hapticDemand, delayPenalty, type, value);
 			
 			//System.err.println(name + "; " + number + "; " + duration + "; " + minStartingTime + "; "
 			// + maxEndingTime + "; " + visualDemand + "; " + auditoryDemand + "; " + hapticDemand
-			// + "; " + delayPenalty);
+			// + "; " + delayPenalty + "; " + type + "; " + value);
 			
 			// create AddPlannerEventTriggerAction
 			return new AddPlannerEventTriggerAction(sim, delay, repeat, event);
@@ -2513,6 +2529,57 @@ public class InteractionMethods
 		}
 	}
 		
+	
+	/**
+	 * Sets the amount of burned fuel to the user-controlled car.
+	 * 
+	 * @param sim
+	 * 			Simulator.
+	 * 
+	 * @param delay
+	 * 			Amount of seconds (float) to wait before the TriggerAction will be executed.
+	 * 
+	 * @param repeat
+	 * 			Number of maximum repetitions (0 = infinite).
+	 * 
+	 * @param parameterList
+	 * 			List of additional parameters.
+	 * 
+	 * @return
+	 * 			SetFuelConsumption trigger action.
+	 */
+	@Action(
+			name = "setFuelConsumption", 
+			layer = Layer.INTERACTION, 
+			description = "Sets the amount of burned fuel to the user-controlled car.",
+			defaultDelay = 0,
+			defaultRepeat = 0,
+			param = {@Parameter(name="burnedFuel", type="Float", defaultValue="0", 
+							 	description="Amount of fuel burned")
+					}
+		)
+	public TriggerAction setFuelConsumption(SimulationBasics sim, float delay, int repeat, Properties parameterList)
+	{
+		String parameter = "burnedFuel";
+		
+		try {
+			
+			// extract burnedFuel
+			float burnedFuel = 0;
+			String burnedFuelString = parameterList.getProperty(parameter);
+			if(burnedFuelString != null && !burnedFuelString.isEmpty())
+				burnedFuel = Float.parseFloat(burnedFuelString);
+						
+			// create SetFuelConsumptionTriggerAction
+			return new SetFuelConsumptionTriggerAction(delay, repeat, (Simulator) sim, burnedFuel);
+			
+		} catch (Exception e) {
+	
+			reportError("setFuelConsumption", parameter);
+			return null;
+		}
+	}
+	
 	
 	/**
 	 * Applies weather settings.

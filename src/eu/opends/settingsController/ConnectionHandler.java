@@ -333,10 +333,11 @@ public class ConnectionHandler extends Thread
 							{
 								String startTimeString = currentChild.getAttributes().getNamedItem("StartTime").getNodeValue();
 								int startTime = Integer.parseInt(startTimeString);
-								String endTimeString = currentChild.getAttributes().getNamedItem("EndTime").getNodeValue();
-								int endTime = Integer.parseInt(endTimeString);
-
-								setupPresentationTask(name, startTime, endTime);
+								String hasStartedString = currentChild.getAttributes().getNamedItem("HasStarted").getNodeValue();
+								boolean hasStarted = Boolean.parseBoolean(hasStartedString);
+								//String hasFinishedString = currentChild.getAttributes().getNamedItem("HasFinished").getNodeValue();
+								//boolean hasFinished = Boolean.parseBoolean(hasFinishedString);
+								setupPresentationTask(name, startTime, hasStarted/*, hasFinished*/);
 							}
 						}
 					}					
@@ -365,7 +366,7 @@ public class ConnectionHandler extends Thread
 	}
 	
 
-	private void setupPresentationTask(String name, int startTime, int endTime)
+	private void setupPresentationTask(String name, int startTime, boolean hasStarted/*, boolean hasFinished*/)
 	{
 		// look up event in list of previous sent events
 		EventPlannerData record = sim.getSettingsControllerServer().getEventPlannerDataRecord();
@@ -374,21 +375,17 @@ public class ConnectionHandler extends Thread
 		for(Iterator<Event> iterator = sentEvents.iterator(); iterator.hasNext();)
 		{
 			Event event = iterator.next();
-			if(event.getName().equals(name))
-			{
-				// if event found, add exact start and end times
-				event.setExactTimings(startTime, endTime);
-				
-				// initiate presentation by adding event to upcoming event list
-				sim.getEventCenter().addUpcomingEvent(event);
+			if(event.getName().equals(name) && hasStarted)
+			{				
+				// initiate presentation by adding event to active event list
+				sim.getEventCenter().addActiveEvent(event);
 				
 				// remove event from sent event list
 				iterator.remove();
 				
-				// System.err.println("Task received: " + name + " (start: " + startTime + ", end: " + 
-				//		endTime + ")");
+				// System.err.println("Task activated: " + name);
 				
-				return;
+				break;
 			}
 		}
 	}

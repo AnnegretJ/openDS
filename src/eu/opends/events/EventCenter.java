@@ -24,40 +24,31 @@ import java.util.Iterator;
 
 import eu.opends.main.Simulator;
 
+
 public class EventCenter
 {
 	private Simulator sim;
-	private ArrayList<Event> upcomingEventList = new ArrayList<Event>();
 	private ArrayList<Event> activeEventList = new ArrayList<Event>();
-	
 
+	
 	public EventCenter(Simulator sim)
 	{
 		this.sim = sim;
 	}
 
 	
+	public void addActiveEvent(Event event)
+	{
+		float now = sim.getBulletAppState().getElapsedSecondsSinceStart();
+		event.setExactTimings(now);
+		activeEventList.add(event);
+		event.display(now);
+	}
+	
+	
 	public void update()
 	{
 		float secondsSinceStart = sim.getBulletAppState().getElapsedSecondsSinceStart();
-		
-		// process upcoming events
-		for(Iterator<Event> iterator = upcomingEventList.iterator(); iterator.hasNext();)
-		{
-			Event event = iterator.next();
-			if(event.getExactStartTime() <= secondsSinceStart)
-			{
-				// display event
-				event.display();
-				
-				// add event to the active event list
-				activeEventList.add(event);
-				
-				// remove event from upcoming event list
-				iterator.remove();
-			}
-		}
-		
 		
 		// process active events
 		for(Iterator<Event> iterator = activeEventList.iterator(); iterator.hasNext();)
@@ -66,18 +57,12 @@ public class EventCenter
 			if(event.getExactEndTime() <= secondsSinceStart)
 			{
 				// hide event 
-				event.hide();
+				event.hide(secondsSinceStart);
 				
 				// remove event from active event list
 				iterator.remove();
 			}
 		}
-	}
-
-	
-	public void addUpcomingEvent(Event event)
-	{
-		upcomingEventList.add(event);		
 	}
 
 }

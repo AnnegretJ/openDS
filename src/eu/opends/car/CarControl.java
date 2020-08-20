@@ -356,10 +356,10 @@ public class CarControl
 	}
 
 
-	public void resetTotalFuelConsumption()
+	public void setTotalFuelConsumption(float burnedFuelAmount)
 	{
 		if(type == PhysicsType.BULLET)
-			powerTrain.resetTotalFuelConsumption();
+			powerTrain.setTotalFuelConsumption(burnedFuelAmount);
 		else
 			System.err.println("Cannot reset total fuel consumption in Chrono vehicles");
 	}

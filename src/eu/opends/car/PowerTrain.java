@@ -148,9 +148,9 @@ public class PowerTrain
 	}
 	
 	
-	public void resetTotalFuelConsumption()
+	public void setTotalFuelConsumption(float burnedFuelAmount)
 	{
-		totalFuelConsumption = 0;
+		totalFuelConsumption = burnedFuelAmount;
 	}
 	
 	
