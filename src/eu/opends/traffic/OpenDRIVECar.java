@@ -90,15 +90,20 @@ public class OpenDRIVECar extends Car implements TrafficObject
         if(preferredConnections.isEmpty() && startPos != null && targetPos != null)
         {
         	RoadGraph roadGraph = sim.getOpenDriveCenter().getRoadGraph();
-        	PreferredConnections pc = roadGraph.getShortestPath(startPos, targetPos);
-        	if(pc != null)
+        	if(roadGraph != null)
         	{
-        		preferredConnections = pc;
-        		//System.err.println("PreferredConnections of OpenDRIVECar '" + name + "': \n" + preferredConnections);
+        		PreferredConnections pc = roadGraph.getShortestPath(startPos, targetPos);
+        		if(pc != null)
+        		{
+        			preferredConnections = pc;
+        			//System.err.println("PreferredConnections of OpenDRIVECar '" + name + "': \n" + preferredConnections);
+        		}
+        		else
+        			System.err.println("No route from " + startPos + " to " + targetPos 
+        				+ " could be found for OpenDRIVECar '" + name + "'! (OpenDRIVECar.java)");
         	}
         	else
-        		System.err.println("No route from " + startPos + " to " + targetPos 
-        				+ " could be found for OpenDRIVECar '" + name + "'! (OpenDRIVECar.java)");
+        		System.err.println("Road graph not available"); 
         }
 
         
@@ -757,15 +762,20 @@ public class OpenDRIVECar extends Car implements TrafficObject
         if(startNavPosition != null && targetNavPosition != null)
         {
         	RoadGraph roadGraph = sim.getOpenDriveCenter().getRoadGraph();
-        	PreferredConnections pc = roadGraph.getShortestPath(startNavPosition, targetNavPosition);
-        	if(pc != null)
+        	if(roadGraph != null)
         	{
-        		preferredConnections = pc;
-        		//System.err.println("PreferredConnections of OpenDRIVECar '" + name + "': \n" + preferredConnections);
+        		PreferredConnections pc = roadGraph.getShortestPath(startNavPosition, targetNavPosition);
+        		if(pc != null)
+        		{
+        			preferredConnections = pc;
+        			//System.err.println("PreferredConnections of OpenDRIVECar '" + name + "': \n" + preferredConnections);
+        		}
+        		else
+        			System.err.println("No route from " + startNavPosition + " to " + targetNavPosition 
+        				+ " could be found for OpenDRIVECar '" + name + "'! (OpenDRIVECar.java)");
         	}
         	else
-        		System.err.println("No route from " + startNavPosition + " to " + targetNavPosition 
-        				+ " could be found for OpenDRIVECar '" + name + "'! (OpenDRIVECar.java)");
+        		System.err.println("Road graph not available"); 
         }
         
         if(startPosition != null)

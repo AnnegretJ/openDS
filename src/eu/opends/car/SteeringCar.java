@@ -318,15 +318,20 @@ public class SteeringCar extends Car implements TrafficObject
 	        if(preferredConnections.isEmpty() && startPos != null && targetPos != null)
 	        {
 	        	RoadGraph roadGraph = sim.getOpenDriveCenter().getRoadGraph();
-	        	PreferredConnections pc = roadGraph.getShortestPath(startPos, targetPos);
-	        	if(pc != null)
+	        	if(roadGraph != null)
 	        	{
-	        		preferredConnections = pc;
-	        		//System.err.println("PreferredConnections of steering car: \n" + preferredConnections);
+	        		PreferredConnections pc = roadGraph.getShortestPath(startPos, targetPos);
+	        		if(pc != null)
+	        		{
+	        			preferredConnections = pc;
+	        			//System.err.println("PreferredConnections of steering car: \n" + preferredConnections);
+	        		}
+	        		else
+	        			System.err.println("No route from " + startPos + " to " + targetPos 
+	        				+ " could be found for steering car! (SteeringCar.java)");
 	        	}
 	        	else
-	        		System.err.println("No route from " + startPos + " to " + targetPos 
-	        				+ " could be found for steering car! (SteeringCar.java)");
+	        		System.err.println("Road graph not available"); 
 	        }
 			
 			openDrivePositionSet = true;
