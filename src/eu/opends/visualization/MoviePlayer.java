@@ -31,11 +31,11 @@ import com.jme3x.jfx.media.TextureMovie;
 import com.jme3x.jfx.media.TextureMovie.LetterboxMode;
 
 import eu.opends.main.Simulator;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaException;
-import javafx.scene.media.MediaPlayer;
+//import javafx.beans.value.ChangeListener;
+//import javafx.beans.value.ObservableValue;
+//import javafx.scene.media.Media;
+//import javafx.scene.media.MediaException;
+//import javafx.scene.media.MediaPlayer;
 
 
 public class MoviePlayer 
@@ -45,7 +45,7 @@ public class MoviePlayer
 	private String play = null;
 	private String playedLast = null;
 	private boolean stop = false;
-	private MediaPlayer	mediaPlayer = null;
+	//private MediaPlayer	mediaPlayer = null;
 	private TextureMovie textureMovie;
 	private Geometry screen;
 	
@@ -98,6 +98,7 @@ public class MoviePlayer
 	
 	private void playSynchronized(String id)
 	{
+		/*
 		try {
 			
 			MovieData movie = moviesMap.get(id);
@@ -151,6 +152,7 @@ public class MoviePlayer
 		} catch (MediaException e) {
 			e.printStackTrace();
 		}
+		*/
 	}
 
 	
@@ -163,6 +165,7 @@ public class MoviePlayer
 	
 	private void stopSynchronized()
 	{
+		/*
 		if(mediaPlayer != null)
 		{
 			mediaPlayer.stop();
@@ -172,5 +175,6 @@ public class MoviePlayer
 			String time = new SimpleDateFormat("HH:mm:ss.SSS").format(System.currentTimeMillis());
 			Simulator.getDrivingTaskLogger().reportText(time + " --> Stop movie" + newLine);
 		}
+		*/
 	}
 }

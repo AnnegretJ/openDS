@@ -40,7 +40,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.Spatial.CullHint;
 import com.jme3.system.JmeContext.Type;
-import com.sun.javafx.application.PlatformImpl;
+//import com.sun.javafx.application.PlatformImpl;
 
 import de.lessvoid.nifty.Nifty;
 import eu.opends.analyzer.DrivingTaskLogger;
@@ -801,7 +801,7 @@ public class Simulator extends SimulationBasics
 		super.destroy();
 		logger.info("finished destroy()");
 		
-		PlatformImpl.exit();
+		//PlatformImpl.exit();
 		//System.exit(0);
     }
 	
@@ -847,7 +847,7 @@ public class Simulator extends SimulationBasics
     		// only show severe jme3-logs
     		java.util.logging.Logger.getLogger("").setLevel(java.util.logging.Level.SEVERE);
     		
-    		PlatformImpl.startup(() -> {});
+    		//PlatformImpl.startup(() -> {});
     		
 	    	Simulator sim = new Simulator();
     		
