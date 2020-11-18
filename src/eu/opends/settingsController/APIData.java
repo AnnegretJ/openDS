@@ -526,7 +526,7 @@ public class APIData
 		}
 		else if(var.equals(AdressTable.physicalAttributes_orientation))
 		{
-			float orientation = car.getHeadingDegree();  // 0..360 degree
+			float orientation = car.getThreadSafeHeadingDegree();  // 0..360 degree
 			value = String.valueOf(orientation);
 		}
 		else if(var.equals(AdressTable.physicalAttributes_speed))
