@@ -103,6 +103,8 @@ public class SteeringCar extends Car implements TrafficObject
 	
 	private boolean openDrivePositionSet = false;
 	
+	private float threadSafeHeadingValue = 0;
+	
 	// crosswind (will influence steering angle)
 	private Crosswind crosswind = new Crosswind("left", 0, 0);
 	
@@ -299,6 +301,8 @@ public class SteeringCar extends Car implements TrafficObject
 	@Override
 	public void update(float tpf, ArrayList<TrafficObject> vehicleList)
 	{
+		threadSafeHeadingValue = getHeading();
+		
 		acceleratorPedalIntensity = acceleratorPedalIntensityByUser;
 		brakePedalIntensity = brakePedalIntensityByUser;
 		
@@ -473,7 +477,19 @@ public class SteeringCar extends Car implements TrafficObject
 		}
 	}
 
+	
+	public float getThreadSafeHeading()
+	{
+		return threadSafeHeadingValue;
+	}
 
+	
+	public float getThreadSafeHeadingDegree()
+	{
+		return threadSafeHeadingValue * FastMath.RAD_TO_DEG;
+	}
+	
+	
 	private float getMinVolume(AudioNode engineIdleNode)
 	{
 		Object minVolume = engineIdleNode.getUserData("minVolume");
