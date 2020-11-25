@@ -283,7 +283,7 @@ public class KeyMappingGUIController implements ScreenController
      */
     private Element getElementByID(String elementID)
     {
-    	return nifty.getCurrentScreen().findElementByName(elementID);
+    	return nifty.getCurrentScreen().findElementById(elementID);
     }
 	
 	

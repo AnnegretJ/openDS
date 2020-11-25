@@ -1,0 +1,107 @@
+LIST OF MODIFICATIONS
+=====================
+
+The sources of the following binaries have been modified for the use with OpenDS. 
+The corresponding binaries have been re-built and can be found in this folder.
+
+  * jme3-core.jar                --> belongs to jMonkeyEngine (version 3.3.2) 
+  * jme3-niftygui.jar            --> belongs to jMonkeyEngine (version 3.3.2) 
+  * nifty-default-controls.jar   --> belongs to NiftyGUI (version 1.4.4) 
+
+
+The modifications to the aforementioned binaries are as follows:
+
+  * jme3-core.jar
+    -------------
+    source: https://github.com/jMonkeyEngine/jmonkeyengine/releases/tag/v3.3.2-stable
+	
+     - jme3-core/src/main/java/com/jme3/material/RenderState.java
+         Changed line 452 as follows:
+         Orig:     FaceCullMode cullMode = FaceCullMode.Back;
+         New:      FaceCullMode cullMode = FaceCullMode.Off; 
+
+     - jme3-core/src/main/java/com/jme3/input/FlyByCamera.java
+         commented (removed) lines 212-247
+         Original Code:
+			// both mouse and button - rotation of cam
+	        inputManager.addMapping(CameraInput.FLYCAM_LEFT, new MouseAxisTrigger(MouseInput.AXIS_X, true),
+                                               new KeyTrigger(KeyInput.KEY_LEFT));
+
+	        inputManager.addMapping(CameraInput.FLYCAM_RIGHT, new MouseAxisTrigger(MouseInput.AXIS_X, false),
+                                                new KeyTrigger(KeyInput.KEY_RIGHT));
+
+	        inputManager.addMapping(CameraInput.FLYCAM_UP, new MouseAxisTrigger(MouseInput.AXIS_Y, false),
+                                             new KeyTrigger(KeyInput.KEY_UP));
+
+	        inputManager.addMapping(CameraInput.FLYCAM_DOWN, new MouseAxisTrigger(MouseInput.AXIS_Y, true),
+                                               new KeyTrigger(KeyInput.KEY_DOWN));
+
+	        // mouse only - zoom in/out with wheel, and rotate drag
+        	inputManager.addMapping(CameraInput.FLYCAM_ZOOMIN, new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
+        	inputManager.addMapping(CameraInput.FLYCAM_ZOOMOUT, new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
+        	inputManager.addMapping(CameraInput.FLYCAM_ROTATEDRAG, new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+
+        	// keyboard only WASD for movement and WZ for rise/lower height
+        	inputManager.addMapping(CameraInput.FLYCAM_STRAFELEFT, new KeyTrigger(KeyInput.KEY_A));
+        	inputManager.addMapping(CameraInput.FLYCAM_STRAFERIGHT, new KeyTrigger(KeyInput.KEY_D));
+        	inputManager.addMapping(CameraInput.FLYCAM_FORWARD, new KeyTrigger(KeyInput.KEY_W));
+        	inputManager.addMapping(CameraInput.FLYCAM_BACKWARD, new KeyTrigger(KeyInput.KEY_S));
+        	inputManager.addMapping(CameraInput.FLYCAM_RISE, new KeyTrigger(KeyInput.KEY_Q));
+        	inputManager.addMapping(CameraInput.FLYCAM_LOWER, new KeyTrigger(KeyInput.KEY_Z));
+
+        	inputManager.addListener(this, mappings);
+        	inputManager.setCursorVisible(dragToRotate || !isEnabled());
+
+        	Joystick[] joysticks = inputManager.getJoysticks();
+        	if (joysticks != null && joysticks.length > 0){
+            		for (Joystick j : joysticks) {
+                		mapJoystick(j);
+            		}
+        	}
+
+			
+
+  * jme3-niftygui.jar
+    -----------------
+    source: https://github.com/jMonkeyEngine/jmonkeyengine/releases/tag/v3.3.2-stable
+    related issue: https://github.com/nifty-gui/nifty-gui/issues/382
+	
+     - jme3-niftygui/src/main/java/com/jme3/niftygui/InputSystemJme.java
+         Changed "|" to "||" in line 123/124:
+         Orig:  boolean consumed = nic.processMouseEvent(x, y, 0, button, true) 
+					| nifty.getCurrentScreen().isMouseOverElement();
+         New:   boolean consumed = nic.processMouseEvent(x, y, 0, button, true) 
+					|| nifty.getCurrentScreen().isMouseOverElement();
+		 
+		 
+		 
+  * nifty-default-controls.jar
+    --------------------------
+    source: https://github.com/nifty-gui/nifty-gui/tree/1.4
+	
+	 - nifty-controls/src/main/java/de/lessvoid/nifty/controls/listbox/ListBoxControl.java
+	     Added the following line after line 413 and 453 (two modifications):
+		 nifty.executeEndOfFrameElementActions();
+		 
+		 Original Code (412-414): 
+			ensureWidthConstraints();
+			updateBottomRightElement();
+			}
+			
+         New Code (412-415): 
+			ensureWidthConstraints();
+			updateBottomRightElement();
+			nifty.executeEndOfFrameElementActions();
+			}
+	 
+	 
+         Original Code (452-454):
+			verticalScrollbar = null;
+			verticalScrollbarState = false;
+			}
+			
+         New Code (452-455): 
+			verticalScrollbar = null;
+			verticalScrollbarState = false;
+			nifty.executeEndOfFrameElementActions();
+			}

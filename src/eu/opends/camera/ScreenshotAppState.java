@@ -39,6 +39,7 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.post.SceneProcessor;
+import com.jme3.profile.AppProfiler;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.Renderer;
@@ -526,5 +527,9 @@ public class ScreenshotAppState extends AbstractAppState implements ActionListen
 		int startIdx = trimHeight*origWidth*4;
 		int endIdx = (origHeight-trimHeight)*origWidth*4;
 		return Arrays.copyOfRange(origByteArray, startIdx, endIdx);
+	}
+
+	@Override
+	public void setProfiler(AppProfiler arg0) {
 	}
 }

@@ -34,6 +34,7 @@ package eu.opends.profiler;
 
 import com.jme3.profile.AppProfiler;
 import com.jme3.profile.AppStep;
+import com.jme3.profile.SpStep;
 import com.jme3.profile.VpStep;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
@@ -198,9 +199,18 @@ public class BasicProfiler implements AppProfiler {
         }
     }
     
+	
+	@Override
+	public void appSubStep(String... additionalInfo) {
+    }
+    
     @Override
     public void vpStep( VpStep step, ViewPort vp, Bucket bucket ) {
-    }    
+    }
+
+    @Override
+    public void spStep(SpStep step, String... additionalInfo) {
+    }
 }
 
 

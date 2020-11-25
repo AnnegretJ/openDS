@@ -388,7 +388,7 @@ public class SimulationBasics extends SimpleApplication
 		int axisSamples = 5;		
 		int radialSamples = 20;		
 		float radius = 2;
-		float radius2 = 0;
+		float radius2 = 0.1f;
 		float height = 5;
 		Boolean closed = true;
 				

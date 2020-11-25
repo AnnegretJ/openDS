@@ -149,7 +149,7 @@ public class InstructionScreenGUI
 			if(layer.getId().equals(layerID))
 			{
 				layer.show();
-				for(Element elem : layer.getElements())
+				for(Element elem : layer.getChildren())
 					elem.disableFocus();
 			}
 			else

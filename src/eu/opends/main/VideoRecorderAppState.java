@@ -35,6 +35,7 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.post.SceneProcessor;
+import com.jme3.profile.AppProfiler;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.Renderer;
@@ -300,6 +301,10 @@ public class VideoRecorderAppState extends AbstractAppState {
             }
             writer = null;
         }
+
+		@Override
+		public void setProfiler(AppProfiler arg0) {
+		}
     }
 
     public static final class IsoTimer extends com.jme3.system.Timer {

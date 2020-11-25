@@ -58,8 +58,8 @@ public abstract class CameraFactory
 	protected MirrorMode mirrorMode = MirrorMode.OFF;
 	protected ChaseCamera chaseCam;
 	protected CameraNode topViewCamNode;
-	protected CameraNode mainCameraNode = new CameraNode();
-	protected CameraNode frontCameraNode = new CameraNode();
+	protected Node mainCameraNode = new Node();
+	protected Node frontCameraNode = new Node();
 	protected CameraNode digitalMapViewCamNode;
 	protected ScreenshotAppState screenshotAppState = new ScreenshotAppState("", "screenshot", 0);
 	
@@ -139,7 +139,7 @@ public abstract class CameraFactory
 	 * @return
 	 * 		Node containing all scene cameras.
 	 */
-	public CameraNode getMainCameraNode()
+	public Node getMainCameraNode()
 	{
 		return mainCameraNode;
 	}

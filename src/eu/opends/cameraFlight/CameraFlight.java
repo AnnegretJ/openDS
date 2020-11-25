@@ -54,7 +54,7 @@ public class CameraFlight
 	private ViewPort viewPort;
 	private AssetManager assetManager;
 	private MotionEvent cameraMotionTrack;
-	private CameraNode mainCamNode;
+	private Node mainCamNode;
 	private float speedKmPerHour = 50f;
 	private boolean isTerminated = true;
 	private CameraFlightSettings settings;

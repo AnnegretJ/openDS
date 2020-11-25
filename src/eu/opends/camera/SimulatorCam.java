@@ -74,11 +74,12 @@ public class SimulatorCam extends CameraFactory
 	{
 		// Top View marker
 		Cylinder cone = new Cylinder(10, 10, 3f, 0.1f, 9f, true, false);
-		cone.setLineWidth(4f);
 		topViewMarker = new Geometry("TopViewMarker", cone);
 		
 	    Material coneMaterial = new Material(sim.getAssetManager(),"Common/MatDefs/Misc/Unshaded.j3md");
 	    coneMaterial.setColor("Color", ColorRGBA.Red);
+	    coneMaterial.getAdditionalRenderState().setLineWidth(4f);
+	    
 		topViewMarker.setMaterial(coneMaterial);
 		
 		topViewMarker.setCullHint(CullHint.Always);
@@ -90,11 +91,12 @@ public class SimulatorCam extends CameraFactory
 		{
 			// Digital Map marker
 			Cylinder cone2 = new Cylinder(10, 10, 1f, 0.01f, 3f, true, false);
-			cone2.setLineWidth(4f);
 			digitalMapMarker = new Geometry("DigitalMapMarker", cone2);
 			
 		    Material digitalMapMarkerMaterial = new Material(sim.getAssetManager(),"Common/MatDefs/Misc/Unshaded.j3md");
 		    digitalMapMarkerMaterial.setColor("Color", ColorRGBA.Blue);
+		    digitalMapMarkerMaterial.getAdditionalRenderState().setLineWidth(4f);
+		    
 		    digitalMapMarker.setMaterial(digitalMapMarkerMaterial);
 			
 		    digitalMapMarker.setCullHint(CullHint.Dynamic);

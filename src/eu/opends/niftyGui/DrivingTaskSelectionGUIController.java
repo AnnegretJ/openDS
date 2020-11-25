@@ -35,7 +35,7 @@ import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.controls.TextFieldChangedEvent;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
-import de.lessvoid.nifty.input.NiftyInputEvent;
+import de.lessvoid.nifty.input.NiftyStandardInputEvent;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import de.lessvoid.nifty.tools.Color;
@@ -73,10 +73,14 @@ public class DrivingTaskSelectionGUIController implements ScreenController
 		if(sim.getSettings().getWidth() >= 2400)
 		{
 			SizeValue sv = new SizeValue("20%");
-			nifty.getCurrentScreen().findElementByName("menuPanel").setConstraintWidth(sv);
+			nifty.getCurrentScreen().findElementById("menuPanel").setConstraintWidth(sv);
 		}
 
 		updateListBox();
+
+		// disable start button initially
+		Button startButton = nifty.getCurrentScreen().findNiftyControl("startButton", Button.class);
+		startButton.setEnabled(false);
 	}
 
 	
@@ -136,7 +140,7 @@ public class DrivingTaskSelectionGUIController implements ScreenController
     
     public Element getElementByName(String element)
     {
-    	return nifty.getCurrentScreen().findElementByName(element);
+    	return nifty.getCurrentScreen().findElementById(element);
     }
     
     
@@ -218,6 +222,18 @@ public class DrivingTaskSelectionGUIController implements ScreenController
 	}
 
 	
+	private void updateStartButton(String text)
+	{
+		Button startButton = nifty.getCurrentScreen().findNiftyControl("startButton", Button.class);
+
+		File file = new File(text);
+		if(file.isFile())
+			startButton.setEnabled(true);
+		else
+			startButton.setEnabled(false);
+	}
+	
+	
 	/**
 	 * When the selection of the ListBox changes this method is called.
 	 * 
@@ -237,6 +253,8 @@ public class DrivingTaskSelectionGUIController implements ScreenController
 			currentPath = selectedItem.getPath();
 			updateListBox();
 		}
+		
+		updateStartButton(currentPath);
 	}
     
 	
@@ -252,21 +270,15 @@ public class DrivingTaskSelectionGUIController implements ScreenController
 	@NiftyEventSubscriber(id = "drivingTaskTextfield")
 	public void ondrivingTaskTextfieldChanged(final String id, final TextFieldChangedEvent event)
 	{
-		Button startButton = nifty.getCurrentScreen().findNiftyControl("startButton", Button.class);
-
-		File file = new File(event.getText());
-		if(file.isFile())
-			startButton.setEnabled(true);
-		else
-			startButton.setEnabled(false);
+		updateStartButton(event.getText());
 	}
 
 	
 	@NiftyEventSubscriber(id="drivingTaskTextfield")
-	public void ondrivingTaskTextfieldInputEvent(final String id, final NiftyInputEvent event) 
+	public void ondrivingTaskTextfieldInputEvent(final String id, final NiftyStandardInputEvent event) 
 	{
 		// update folder view, when return key was hit and focus is on driving task text field
-		if (NiftyInputEvent.SubmitText.equals(event)) 
+		if (NiftyStandardInputEvent.SubmitText.equals(event)) 
 		{
 			currentPath = getTextFromTextfield("drivingTaskTextfield");
 			updateListBox();

@@ -1,0 +1,15 @@
+The default physics simulation is based on jBullet; however, can be switched to native Bullet.
+
+ * to use native Bullet add the following .jar files to the build path:
+   - jme3-bullet.jar
+   - jme3-bullet-native.jar
+
+ * to use jBullet add the following .jar files to the build path (default):
+   - jme3-jbullet.jar
+   - jbullet.jar
+
+Make sure to remove the .jar files of the physics simulation not in use from the build path!
+
+
+Be aware: The Force Feedback Controller (class eu.opends.logitechsdk.ForceFeedbackController)
+          will currently not work with native Bullet!
