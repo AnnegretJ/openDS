@@ -46,6 +46,7 @@ import com.jme3.math.FastMath;
 import eu.opends.events.Event;
 import eu.opends.events.EventPlannerData;
 import eu.opends.main.Simulator;
+import eu.opends.settingsController.liveDataRequest.RequestParser;
 import eu.opends.traffic.Pedestrian;
 import eu.opends.traffic.TrafficCar;
 import eu.opends.traffic.TrafficObject;
@@ -60,6 +61,7 @@ public class ConnectionHandler extends Thread
 	private OutputStream out;
 	private DataInputStream in;
 	private UpdateSender updateSender;	
+	private RequestParser requestParser;
 	private APIData data;
 	
 	private int updateInterval = 1000; //in ms
@@ -101,6 +103,7 @@ public class ConnectionHandler extends Thread
 		
 		data = new APIData(sim.getCar());		
 		updateSender = new UpdateSender(sim, data, this);
+		requestParser = new RequestParser(sim);
 	}
 	
 	public void run(){		
@@ -291,6 +294,10 @@ public class ConnectionHandler extends Thread
 				else if(eventName.equals("GetValue")){				
 					String[] val = new String[]{nodes.item(i).getTextContent()};
 					response += "<Event Name=\""+val[0]+"\">\n" + data.getValues(val, false) + "\n</Event>";
+				}
+				else if(eventName.equals("GetXMLRequest")){
+					String result = requestParser.processRequest(nodes.item(i));
+					response += "<Event Name=\"XMLRequest\"><liveDataRequest>\n" + result + "\n</liveDataRequest></Event>";
 				}
 				else if(eventName.equals("GetUpdateInterval")){
 					response += "<Event Name=\"UpdateInterval\">\n" + String.valueOf(getUpdateInterval()) + "\n</Event>";

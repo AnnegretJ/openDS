@@ -83,6 +83,12 @@ public class AudioCenter
 	}
 	
 	
+	@Deprecated
+	public static void playSound(String s)
+	{
+	}
+	
+	
 	public static void playSound(Collection<AudioNode> audioNodes)
 	{
 		for(AudioNode audioNode : audioNodes)

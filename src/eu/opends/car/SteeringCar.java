@@ -1450,5 +1450,11 @@ public class SteeringCar extends Car implements TrafficObject
 	}
 
 
+	public boolean isWrongWay()
+	{
+		return isWrongWay;
+	}
+
+
 	// AutoPilot *****************************************************************
 }
