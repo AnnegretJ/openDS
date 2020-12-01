@@ -12,13 +12,13 @@
     </xs:complexType>
 
     <xs:complexType name="location">
-    	<xs:sequence>
+        <xs:all>
     		<xs:element name="id" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
     		<xs:element name="type" maxOccurs="1" minOccurs="0" type="typeEnum"></xs:element>
-    		<xs:element name="lon" maxOccurs="1" minOccurs="1" type="posInt"></xs:element>
+    		<xs:element name="lon" maxOccurs="1" minOccurs="1" type="posFloat"></xs:element>
     		<xs:element name="lat" type="xs:float" maxOccurs="1" minOccurs="0"></xs:element>
     		<xs:element name="elev" type="xs:float" maxOccurs="1" minOccurs="0"></xs:element>
-    	</xs:sequence>
+    	</xs:all>
     </xs:complexType>
     
     <xs:simpleType name="typeEnum">
@@ -29,7 +29,7 @@
         </xs:restriction>
     </xs:simpleType>
     
-    <xs:simpleType name="posInt">
+    <xs:simpleType name="posFloat">
     	<xs:restriction base="xs:float">
     		<xs:minInclusive value="0"></xs:minInclusive>
     	</xs:restriction>

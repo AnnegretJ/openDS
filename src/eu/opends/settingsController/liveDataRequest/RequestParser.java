@@ -161,7 +161,7 @@ public class RequestParser
 				Vector3f targetPosition = pointInLane.getPosition().toVector3f();
 				float ortho = (float) pointInLane.getOrtho();
 			
-				// add lateral offset (- left; + right) to target position - if available
+				// add lateral offset (- right; + left) to target position - if available
 				Float lateralOffset = location.getLat();
 				if(lateralOffset != null && lateralOffset != 0)
 				{
