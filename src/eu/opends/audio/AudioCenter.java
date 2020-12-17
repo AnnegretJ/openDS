@@ -60,8 +60,10 @@ public class AudioCenter
 		
 		listener = sim.getListener();
 
+		AmazonPollyTTS amazonPollyTTS = new AmazonPollyTTS();
+		
 		// add user sounds to global audio node list
-		audioNodeList = Simulator.getDrivingTask().getSceneLoader().getAudioNodes();
+		audioNodeList = Simulator.getDrivingTask().getSceneLoader().getAudioNodes(amazonPollyTTS);
 		
 		// set environment TODO
 		Environment cityStreets = new Environment( new float[]{ 26, 3f, 0.780f, -1000, -300, 

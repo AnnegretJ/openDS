@@ -231,7 +231,12 @@ public class SettingsLoader
 		OpenDrive_addToPhysicsEngine("settings:openDrive/settings:addToPhysicsEngine"), 
 		EventPlanner_mode("settings:eventPlanner/settings:mode"),
 		EventPlanner_timeline_start("settings:eventPlanner/settings:timeline/settings:start"),
-		EventPlanner_timeline_end("settings:eventPlanner/settings:timeline/settings:end");
+		EventPlanner_timeline_end("settings:eventPlanner/settings:timeline/settings:end"), 
+		AmazonPolly_enableConnection("settings:amazonPolly/settings:enableConnection"), 
+		AmazonPolly_accessKey("settings:amazonPolly/settings:accessKey"), 
+		AmazonPolly_secretKey("settings:amazonPolly/settings:secretKey"), 
+		AmazonPolly_region("settings:amazonPolly/settings:region"), 
+		AmazonPolly_voice("settings:amazonPolly/settings:voice");
 		
 		
 		private String path;

@@ -71,6 +71,9 @@ elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns
         	<xs:element name="eventPlanner" type="eventPlannerType"
         		maxOccurs="1" minOccurs="0">
         	</xs:element>
+        	<xs:element name="amazonPolly" type="amazonPollyType"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
         </xs:all>
 
     </xs:complexType>
@@ -733,5 +736,16 @@ elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns
     		<xs:element name="start" type="xs:float" maxOccurs="1" minOccurs="0"></xs:element>
     		<xs:element name="end" type="xs:float" maxOccurs="1" minOccurs="0"></xs:element>
     	</xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="amazonPollyType">
+        <xs:all>
+        	<xs:element name="enableConnection" type="xs:boolean" maxOccurs="1" minOccurs="0"></xs:element>
+        	<xs:element name="accessKey" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+        	<xs:element name="secretKey" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+        	<xs:element name="region" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+        	<xs:element name="voice" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+        </xs:all>
+
     </xs:complexType>
 </xs:schema>

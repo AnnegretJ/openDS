@@ -30,6 +30,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.amazonaws.services.polly.model.OutputFormat;
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.TextureKey;
 import com.jme3.asset.plugins.FileLocator;
@@ -59,6 +60,7 @@ import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Image;
 import com.jme3.ui.Picture;
 
+import eu.opends.audio.AmazonPollyTTS;
 import eu.opends.basics.MapObject;
 import eu.opends.basics.MapObjectOD;
 import eu.opends.basics.SimulationBasics;
@@ -102,7 +104,7 @@ public class SceneLoader
 	}
 	
 	
-	public Map<String,AudioNode> getAudioNodes()
+	public Map<String,AudioNode> getAudioNodes(AmazonPollyTTS pollyTTS)
 	{
 		Map<String,AudioNode> audioNodeList = new HashMap<String,AudioNode>();
 		
@@ -127,8 +129,32 @@ public class SceneLoader
 			
 				if((audioNodeURL != null) && (!audioNodeURL.equals("")))
 				{
-					AudioNode audioNode = new AudioNode(assetManager, audioNodeURL);
+					// If the element <fromAmazonPolly> exists and the given <text> is not empty,
+					// create a new ogg sound file using Amazon Polly TTS.
+					// The resulting sound file will be saved under the location specified in
+					// "key" and will be loaded afterwards if the speech synthesis was successful.
+					String text = dtData.getValue(Layer.SCENE,
+							"/scene:scene/scene:sounds/scene:sound["+k+"]/scene:fromAmazonPolly/scene:text", String.class);
+					if(text != null && !text.isEmpty())
+					{
+						boolean success = pollyTTS.synthesize(text, OutputFormat.Ogg_vorbis, audioNodeURL);
+		        
+						if(!success)
+						{
+							// error message
+							System.err.println("SceneLoader: unable to generate audio file '" + audioNodeURL 
+									+ "' from text (found in soundID '" + audioNodeID + "').");
+							
+							// show warning message if <amazonPolly> has been disabled in settings.xml
+							if(!pollyTTS.isEnabled())
+								System.err.println("Amazon Polly must be enabled in settings.xml");
+								
+							// go to next audio node
+							continue;
+						}
+					}
 					
+					AudioNode audioNode = new AudioNode(assetManager, audioNodeURL);
 					
 					// set positional
 					Boolean isPositional = dtData.getValue(Layer.SCENE,

@@ -238,12 +238,25 @@ public class Util
 	 */
 	public static void makeDirectory(String directory) 
 	{
-		File dir = new File(directory);
+		directory = directory.replace("\\", "/");
+		String[] array = directory.split("/");
 		
-		if (!dir.exists())
-			dir.mkdir();
-		else if (!dir.isDirectory())
-			System.err.println("'" + directory + "' exists but is not a directory");		
+		String currentLevel = "";
+		
+		for(int i=0; i<array.length; i++)
+		{
+			if(i==0)
+				currentLevel = array[i];
+			else
+				currentLevel += "/" + array[i];
+			
+			File dir = new File(currentLevel);
+		
+			if (!dir.exists())
+				dir.mkdir();
+			else if (!dir.isDirectory())
+				System.err.println("'" + currentLevel + "' exists but is not a directory");
+		}
 	}
 	
 	
