@@ -24,6 +24,7 @@ import java.nio.FloatBuffer;
 
 import com.jme3.material.MatParamTexture;
 import com.jme3.material.RenderState.BlendMode;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
@@ -54,10 +55,12 @@ public class GeometryVisitor implements SceneGraphVisitor
 				
 				if (hasTransparentPixel(texture))
 				{
-					// activate blend mode "alpha" and discard (semi-)transparent pixels 
-					// below 20% threshold (= pixels with alpha value below 51)
+					// Activate blend mode "alpha" and discard (semi-)transparent pixels 
+					// below 20% threshold (= pixels with alpha value below 51).
+					// Furthermore, add object to the "Transparent" render queue bucket
 					geometry.getMaterial().setFloat("AlphaDiscardThreshold", 0.2f);
 					geometry.getMaterial().getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+					geometry.setQueueBucket(Bucket.Transparent);
 					//System.err.println("Activated: " + geometry.getName());
 				}
 				

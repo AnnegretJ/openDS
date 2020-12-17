@@ -39,7 +39,10 @@ public class ODLink
 	{
 		this.sim = sim;
 		
-		linkDataList.add(new LinkData(linkedLane, contactPoint, null));
+		if(linkedLane != null)
+		{
+			linkDataList.add(new LinkData(linkedLane, contactPoint, null));
+		}
 	}
 
 	

@@ -212,7 +212,8 @@ public class ODRoad
 					{
 						// successor is on same road in next lane section
 						ODLane successorLane = ODLaneSectionList.get(i+1).getLane(laneSuccessorID);
-						lane.setSuccessor(new ODLink(sim, successorLane, EContactPoint.START));
+						if(successorLane != null)
+							lane.setSuccessor(new ODLink(sim, successorLane, EContactPoint.START));
 					}
 					else
 					{

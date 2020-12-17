@@ -35,6 +35,9 @@ public class LinkData
 		this.lane = lane;
 		this.contactPoint = contactPoint;
 		this.connectionID = connectionID;
+		
+		if(lane==null)
+			System.err.println("NULL");
 	}
 	
 	

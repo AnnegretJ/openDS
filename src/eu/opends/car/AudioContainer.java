@@ -340,7 +340,7 @@ public class AudioContainer
 				insideEngineStartAudioNode.setVolume(0.25f);
 				insideEngineStartAudioNode.setPitch(1f);
 				insideEngineStartAudioNode.setPositional(true);
-				insideEngineStartAudioNode.setRefDistance(5f);
+				insideEngineStartAudioNode.setRefDistance(10f);
 				insideEngineStartAudioNode.setMaxDistance(2000f);
 				insideEngineStartAudioNode.setReverbEnabled(false);
 				return insideEngineStartAudioNode;
@@ -355,7 +355,7 @@ public class AudioContainer
 				insideEngineIdleAudioNode.setUserData("minVolume", 0.25f);
 				insideEngineIdleAudioNode.setPitch(1f);
 				insideEngineIdleAudioNode.setPositional(true);
-				insideEngineIdleAudioNode.setRefDistance(5f);
+				insideEngineIdleAudioNode.setRefDistance(10f);
 				insideEngineIdleAudioNode.setMaxDistance(2000f);
 				insideEngineIdleAudioNode.setReverbEnabled(false);
 				return insideEngineIdleAudioNode;	
@@ -369,7 +369,7 @@ public class AudioContainer
 				insideEngineStopAudioNode.setVolume(0.25f);
 				insideEngineStopAudioNode.setPitch(1f);
 				insideEngineStopAudioNode.setPositional(true);
-				insideEngineStopAudioNode.setRefDistance(5f);
+				insideEngineStopAudioNode.setRefDistance(10f);
 				insideEngineStopAudioNode.setMaxDistance(2000f);
 				insideEngineStopAudioNode.setReverbEnabled(false);
 				return insideEngineStopAudioNode;
@@ -397,7 +397,7 @@ public class AudioContainer
 				insideHornAudioNode.setVolume(0.5f);
 				insideHornAudioNode.setPitch(1f);
 				insideHornAudioNode.setPositional(true);
-				insideHornAudioNode.setRefDistance(5f);
+				insideHornAudioNode.setRefDistance(10f);
 				insideHornAudioNode.setMaxDistance(2000f);
 				insideHornAudioNode.setReverbEnabled(false);
 				return insideHornAudioNode;

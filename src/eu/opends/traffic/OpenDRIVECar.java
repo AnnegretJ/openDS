@@ -270,7 +270,7 @@ public class OpenDRIVECar extends Car implements TrafficObject
 		// traversedLaneSet will be filled with all lanes between current lane (including)
 		// and the lane of target point (including) in order of increasing distance
 		
-		float speedFactor = 0.1f * Math.max(20, Math.min(100, getCurrentSpeedKmh()));
+		float speedFactor = 0.05f * Math.max(20, Math.min(100, getCurrentSpeedKmh())); // [1.0 .. 5.0]
 		float speedDependentDistFromPath = distanceFromPath * speedFactor;
 		
 		//System.err.println(getCurrentSpeedKmh() + "; " + speedFactor + "; " + speedDependentDistFromPath);
@@ -482,7 +482,7 @@ public class OpenDRIVECar extends Car implements TrafficObject
 			for (int i = 100; i >= 1; i--)
 			{
 				// inspect curvature and speed limit in 200, 198, 196, ... meters				
-				ODPoint point = currentLane.getReferencePointAhead(isWrongWay, currentS, i*2, preferredConnections);
+				ODPoint point = currentLane.getLaneCenterPointAhead(isWrongWay, currentS, i*2, preferredConnections, null);
 				if (point != null)
 				{
 					float maxSpeedDueToCurveKmh = 200;

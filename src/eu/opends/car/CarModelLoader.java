@@ -133,7 +133,7 @@ public class CarModelLoader
 			
 		// chassis properties
 		Vector3f chassisScale = new Vector3f(getVector3f(properties, "chassisScale", 1));
-		Vector3f chassisPosition = new Vector3f(getVector3f(properties, "chassisPosition", 0));
+		Vector3f chassisPosition = new Vector3f(getVector3f(properties, "chassisPosition", 0)).mult(chassisScale);
 		
 		// ego camera properties
 		egoCamPos = new Vector3f(getVector3f(properties, "egoCamPos", 0)).mult(chassisScale);
@@ -244,9 +244,9 @@ public class CarModelLoader
 	        // apply chassis's translation and rotation to collision shape
 	        CompoundCollisionShape compoundShape = new CompoundCollisionShape();
 	        Vector3f location = chassis.getWorldTranslation();
-	        Matrix3f rotation = (new Matrix3f()).set(chassis.getWorldRotation());
+	        //Matrix3f rotation = (new Matrix3f()).set(chassis.getWorldRotation());
 	        Vector3f offset = getCollisionShapeOffset(properties).mult(chassisScale);
-	        compoundShape.addChildShape(carHull, location.add(offset) , rotation);
+	        compoundShape.addChildShape(carHull, location.add(offset) /*, rotation*/);
 	        
 	        
 	        // create a vehicle control
