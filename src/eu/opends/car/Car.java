@@ -519,15 +519,9 @@ public abstract class Car
 	public void steer(final float direction) 
 	{
 		carControl.steer(direction + steeringInfluenceByCrosswind);
-		setSteeringWheelState(direction);
+		steeringWheelState = direction;
 	}
-
 	
-	public void setSteeringWheelState(float steeringWheelState) 
-	{
-		this.steeringWheelState = steeringWheelState;
-	}
-
 	
 	public float getSteeringWheelState() 
 	{
@@ -547,7 +541,7 @@ public abstract class Car
 	public void unsteer() 
 	{
 		carControl.steer(steeringInfluenceByCrosswind);
-		setSteeringWheelState(0);
+		steeringWheelState = 0;
 	}
 
 	

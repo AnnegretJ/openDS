@@ -376,6 +376,12 @@ public class ODRoad
 		return null;
 	}
 	
+	
+	public List<TRoadPlanViewGeometry> getGeometryList()
+	{
+		return geometryList;
+	}
+	
 /*
 	public TRoadPlanViewGeometry getGeometryAtS(double s)
 	{
@@ -1084,7 +1090,7 @@ public class ODRoad
 					String maxSpeedString = speedEntry.getMax();
 				
 					if(maxSpeedString.equals("no limit") || maxSpeedString.equals("unlimited"))
-						return Double.MAX_VALUE;
+						return -1;
 					
 					try {
 						

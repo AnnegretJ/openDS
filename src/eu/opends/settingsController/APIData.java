@@ -235,8 +235,8 @@ public class APIData
 		}
 		else if(var.equals(AdressTable.interior_cockpit_dashboard_speedLimit))
 		{
-			if(!roadDataRecord.currentSpeedLimit.equals("-1"))
-				value = roadDataRecord.currentSpeedLimit;
+			if(0 < roadDataRecord.currentSpeedLimit && roadDataRecord.currentSpeedLimit < 1000)
+				value = String.valueOf(roadDataRecord.currentSpeedLimit);
 			else
 				value = openDSGaugeCenter.getSpeedLimitIndicator();
 		}
@@ -700,7 +700,7 @@ public class APIData
 		}
 		else if(var.equals(AdressTable.roadAttributes_regulations_currentSpeedLimit))
 		{
-			value = roadDataRecord.currentSpeedLimit;
+			value = String.valueOf(roadDataRecord.currentSpeedLimit);
 		}
 		else if(var.equals(AdressTable.roadAttributes_regulations_numUpcomingSpeedLimits))
 		{

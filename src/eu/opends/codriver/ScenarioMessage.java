@@ -56,6 +56,7 @@ import eu.opends.opendrive.util.ODVisualizer;
 import eu.opends.settingsController.RoadData;
 import eu.opends.tools.PanelCenter;
 import eu.opends.tools.Vector3d;
+import eu.opends.tools.intersectionForecast.IntersectionForecast;
 
 public class ScenarioMessage 
 {
@@ -88,6 +89,7 @@ public class ScenarioMessage
 	private ODVisualizer visualizer;
 	private SettingsLoader settingsloader;
 	private ObjectWatch objectWatch;
+	private IntersectionForecast intersectionForecast;
 	
 	
 	public ScenarioMessage(Simulator sim, ODVisualizer visualizer, HashMap<String,ODRoad> roadMap)
@@ -185,6 +187,7 @@ public class ScenarioMessage
 		*/	
 		
 		objectWatch = new ObjectWatch(sim);
+		intersectionForecast = new IntersectionForecast(sim);
 	}
 
 	public int RLMetrics(ODLane lane, double[] reward){
@@ -574,10 +577,11 @@ public class ScenarioMessage
 					//System.err.println("nr: " + i + " --> pos: " + item.getDist() + " --> curv: " + item.getValue());
 				}
 
+				/*
 				if(reducedCurvatureDistList.size()>maxAdasisCurvatureNr)
 					System.err.println("Too many curvature distance points: " + reducedCurvatureDistList.size() +
 							". Entries beyond " + maxAdasisCurvatureNr + " will be discarded");
-
+				*/
 
 
 				// add first 10 entries of speedLimitList to the arrays
@@ -605,9 +609,12 @@ public class ScenarioMessage
 
 				// removed in update 11.13 --> 12.04
 				ArrayList<Intersection> intersectionList = refLane.getIntersectionListAhead(refLaneIsWrongWay, s, rangeOfIntersectionForecast, preferredConnections);
-				double IntersectionDistance = -1;
+				double intersectionDistance = -1;
 				if(intersectionList.size()>0)
-					IntersectionDistance = intersectionList.get(0).getDistance();
+					intersectionDistance = intersectionList.get(0).getDistance();
+				
+				intersectionForecast.update(intersectionList, refLane, refLaneIsWrongWay, s, preferredConnections);
+
 
 				//refLane.getODRoad().getElevation(s));
 
@@ -842,11 +849,11 @@ public class ScenarioMessage
 					roadDataRecord.blindSpotObstacleRight = (BlindSpotObstacleRight==1)?true:false;
 					roadDataRecord.nrLanesDrivingDirection = NrLanesDrivingDirection;
 					roadDataRecord.nrLanesOppositeDirection = NrLanesOppositeDirection;
-					roadDataRecord.currentSpeedLimit = String.valueOf((float)refLane.getSpeedLimit(s));
+					roadDataRecord.currentSpeedLimit = (int) Math.round(refLane.getSpeedLimit(s));
 					roadDataRecord.nrSpeedLimits = AdasisSpeedLimitNrP1;
 					roadDataRecord.speedLimitDist = arrayToString(AdasisSpeedLimitDist, AdasisSpeedLimitNrP1, 1);
 					roadDataRecord.speedLimitValues = arrayToString(AdasisSpeedLimitValues, AdasisSpeedLimitNrP1);
-					roadDataRecord.intersectionDistance = (float) IntersectionDistance;
+					roadDataRecord.intersectionDistance = (float) intersectionDistance;
 					roadDataRecord.targetDistance = (float) distToTarget;
 					roadDataRecord.trafficLightAhead = (NrTrfLights==1)?true:false;
 					roadDataRecord.trafficLightDist = (float) TrfLightDist;

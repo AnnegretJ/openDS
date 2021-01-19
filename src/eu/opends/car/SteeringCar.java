@@ -128,7 +128,7 @@ public class SteeringCar extends Car implements TrafficObject
 		return obstacleSensor;
 	}
 	
-	private TrajectoryVisualizer trajectoryVisualizer;
+	//private TrajectoryVisualizer trajectoryVisualizer;
     
 	private boolean adjustSpeedToCurvature = true;
 	
@@ -225,7 +225,7 @@ public class SteeringCar extends Car implements TrafficObject
         
         obstacleSensor = new ObstacleSensor(sim, invisibleCarNode);
         
-        trajectoryVisualizer = new TrajectoryVisualizer(sim, carNode);
+        //trajectoryVisualizer = new TrajectoryVisualizer(sim, carNode);
         
         // autopilot parameter (ODAutoPilot only)
         distanceToFollowBox = scenarioLoader.getDistanceToFollowBox();
@@ -345,7 +345,7 @@ public class SteeringCar extends Car implements TrafficObject
 		if(manoeuvreMsg != null && manoeuvreMsg.TimeStamp > 1)
 		{
 			computeAcceleration(manoeuvreMsg);
-			trajectoryVisualizer.update();
+			//trajectoryVisualizer.update();
 		}
 		else
 		{		

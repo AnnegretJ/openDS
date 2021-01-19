@@ -28,6 +28,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.audio.AudioData.DataType;
 import com.jme3.audio.AudioNode;
 import com.jme3.audio.AudioSource.Status;
 
@@ -256,7 +257,7 @@ public class AudioContainer
 			if ((audioNodePath != null) && (!audioNodePath.isEmpty()))
 			{
 				try {
-					AudioNode audioNode = new AudioNode(assetManager, parentFolder + "/" + audioNodePath);
+					AudioNode audioNode = new AudioNode(assetManager, parentFolder + "/" + audioNodePath, DataType.Buffer);
 					audioNode.setName(parentFolder + "/" + audioNodePath);
 					
 					// set parameters from attributes
@@ -334,7 +335,7 @@ public class AudioContainer
 			if(audioType == AudioType.engineStart)
 			{
 				String path = "Sounds/Effects/start_inside.wav";
-				AudioNode insideEngineStartAudioNode = new AudioNode(assetManager, path);
+				AudioNode insideEngineStartAudioNode = new AudioNode(assetManager, path, DataType.Buffer);
 				insideEngineStartAudioNode.setName(path);
 				insideEngineStartAudioNode.setLooping(false);
 				insideEngineStartAudioNode.setVolume(0.25f);
@@ -348,7 +349,7 @@ public class AudioContainer
 			else if(audioType == AudioType.engineIdle)
 			{
 				String path = "Sounds/Effects/idle_inside.wav";				
-				AudioNode insideEngineIdleAudioNode = new AudioNode(assetManager, path);
+				AudioNode insideEngineIdleAudioNode = new AudioNode(assetManager, path, DataType.Buffer);
 				insideEngineIdleAudioNode.setName(path);
 				insideEngineIdleAudioNode.setLooping(true);
 				insideEngineIdleAudioNode.setVolume(0.25f);
@@ -363,7 +364,7 @@ public class AudioContainer
 			else if(audioType == AudioType.engineStop)
 			{
 				String path = "Sounds/Effects/stop_inside.wav";
-				AudioNode insideEngineStopAudioNode = new AudioNode(assetManager, path);
+				AudioNode insideEngineStopAudioNode = new AudioNode(assetManager, path, DataType.Buffer);
 				insideEngineStopAudioNode.setName(path);
 				insideEngineStopAudioNode.setLooping(false);
 				insideEngineStopAudioNode.setVolume(0.25f);
@@ -377,7 +378,7 @@ public class AudioContainer
 			else if(audioType == AudioType.turnSignal)
 			{
 				String path = "Sounds/Effects/turnSignal_inside.wav";
-				AudioNode insideTurnSignalAudioNode = new AudioNode(assetManager, path);
+				AudioNode insideTurnSignalAudioNode = new AudioNode(assetManager, path, DataType.Buffer);
 				insideTurnSignalAudioNode.setName(path);
 				insideTurnSignalAudioNode.setLooping(false);
 				insideTurnSignalAudioNode.setVolume(0.25f);
@@ -391,7 +392,7 @@ public class AudioContainer
 			else if(audioType == AudioType.horn)
 			{
 				String path = "Sounds/Effects/horn_inside.wav";
-				AudioNode insideHornAudioNode = new AudioNode(assetManager, path);
+				AudioNode insideHornAudioNode = new AudioNode(assetManager, path, DataType.Buffer);
 				insideHornAudioNode.setName(path);
 				insideHornAudioNode.setLooping(true);
 				insideHornAudioNode.setVolume(0.5f);
@@ -408,7 +409,7 @@ public class AudioContainer
 			if(audioType == AudioType.engineStart)
 			{
 				String path = "Sounds/Effects/start_outside.wav";
-				AudioNode outsideEngineStartAudioNode = new AudioNode(assetManager, path);
+				AudioNode outsideEngineStartAudioNode = new AudioNode(assetManager, path, DataType.Buffer);
 				outsideEngineStartAudioNode.setName(path);
 				outsideEngineStartAudioNode.setLooping(false);
 				outsideEngineStartAudioNode.setVolume(0.25f);
@@ -422,7 +423,7 @@ public class AudioContainer
 			else if(audioType == AudioType.engineIdle)
 			{
 				String path = "Sounds/Effects/idle_outside.wav";				
-				AudioNode outsideEngineIdleAudioNode = new AudioNode(assetManager, path);
+				AudioNode outsideEngineIdleAudioNode = new AudioNode(assetManager, path, DataType.Buffer);
 				outsideEngineIdleAudioNode.setName(path);
 				outsideEngineIdleAudioNode.setLooping(true);
 				outsideEngineIdleAudioNode.setVolume(0.25f);
@@ -437,7 +438,7 @@ public class AudioContainer
 			else if(audioType == AudioType.engineStop)
 			{
 				String path = "Sounds/Effects/stop_outside.wav";
-				AudioNode outsideEngineStopAudioNode = new AudioNode(assetManager, path);
+				AudioNode outsideEngineStopAudioNode = new AudioNode(assetManager, path, DataType.Buffer);
 				outsideEngineStopAudioNode.setName(path);
 				outsideEngineStopAudioNode.setLooping(false);
 				outsideEngineStopAudioNode.setVolume(0.25f);
@@ -451,7 +452,7 @@ public class AudioContainer
 			else if(audioType == AudioType.turnSignal)
 			{
 				String path = "Sounds/Effects/turnSignal_outside.wav";
-				AudioNode outsideTurnSignalAudioNode = new AudioNode(assetManager, path);
+				AudioNode outsideTurnSignalAudioNode = new AudioNode(assetManager, path, DataType.Buffer);
 				outsideTurnSignalAudioNode.setName(path);
 				outsideTurnSignalAudioNode.setLooping(false);
 				outsideTurnSignalAudioNode.setVolume(0.25f);
@@ -465,7 +466,7 @@ public class AudioContainer
 			else if(audioType == AudioType.horn)
 			{
 				String path = "Sounds/Effects/horn_outside.wav";
-				AudioNode outsideHornAudioNode = new AudioNode(assetManager, path);
+				AudioNode outsideHornAudioNode = new AudioNode(assetManager, path, DataType.Buffer);
 				outsideHornAudioNode.setName(path);
 				outsideHornAudioNode.setLooping(true);
 				outsideHornAudioNode.setVolume(0.5f);

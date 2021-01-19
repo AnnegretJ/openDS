@@ -122,7 +122,7 @@ public class RoadData
 	public int nrLanesDrivingDirection = -1; /* Considered at vehicle position */
 	public int nrLanesOppositeDirection = -1; /* Considered at vehicle position */	
 	
-	public String currentSpeedLimit = "-1";
+	public int currentSpeedLimit = -1;
 	public int nrSpeedLimits = 0;
 	public String speedLimitDist = "[]";
 	public String speedLimitValues = "[]";
