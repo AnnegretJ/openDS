@@ -38,6 +38,7 @@ import eu.opends.environment.TrafficLight;
 import eu.opends.environment.TrafficLight.TrafficLightState;
 import eu.opends.infrastructure.Segment;
 import eu.opends.main.Simulator;
+import eu.opends.opendrive.data.TRoadPlanViewGeometry;
 import eu.opends.opendrive.processed.ODLane;
 import eu.opends.opendrive.processed.ODLane.Position;
 import eu.opends.opendrive.processed.ODLaneSection;
@@ -49,6 +50,7 @@ import eu.opends.opendrive.roadGraph.RoadGraph;
 import eu.opends.opendrive.util.ODPosition;
 import eu.opends.opendrive.util.ODVisualizer;
 import eu.opends.tools.Util;
+import eu.opends.tools.Vector3d;
 import eu.opends.trigger.Trigger;
 import eu.opends.trigger.TriggerCenter;
 
@@ -62,6 +64,14 @@ public class OpenDRIVECar extends Car implements TrafficObject
 	private float minForwardSafetyDistance = 8;
 	private float minLateralSafetyDistance = 2;
 	private boolean useSpeedDependentForwardSafetyDistance = true;
+	
+	// lateral speed (in m/s) applied when changing lanes by the autopilot
+	private float lateralSpeed = 1.5f;
+	
+	private boolean carIsWrongWay = false;
+	
+	private boolean waitForPreviousLaneChange = true;
+	
 	private float distanceFromPath;
 	private boolean isSpeedLimitedToSteeringCar;
 	private String name;
@@ -195,6 +205,7 @@ public class OpenDRIVECar extends Car implements TrafficObject
 			float elapsedBulletTime = sim.getBulletAppState().getElapsedSecondsSinceStart();
 			float bulletTimeDiff = elapsedBulletTime - elapsedBulletTimeAtLastUpdate; // in seconds
 			
+			// restricting the update rate of a vehicle enhances the overall performance of the simulation
 			if(bulletTimeDiff >= 0.049f)
 			{
 				elapsedBulletTimeAtLastUpdate = elapsedBulletTime;
@@ -206,7 +217,7 @@ public class OpenDRIVECar extends Car implements TrafficObject
 				ODLane lane = sim.getOpenDriveCenter().getMostProbableLane(position, expectedLanes);
 
 				// update steering
-				updateTargetPosition(lane);
+				updateTargetPosition(bulletTimeDiff, lane);
 				steerTowardsPosition(targetPos);
 			
 				// update speed
@@ -221,20 +232,21 @@ public class OpenDRIVECar extends Car implements TrafficObject
 
 
 	private Vector3f targetPos = new Vector3f(0,0,0);
-	private void updateTargetPosition(ODLane lane)
+	private void updateTargetPosition(float tslu, ODLane lane)
 	{
 		if(lane != null)
-		{	
-			double s = lane.getCurrentInnerBorderPoint().getS();
-			
+		{
 			currentLane = lane;
-			currentS = s;
+			currentS = currentLane.getCurrentInnerBorderPoint().getS();
+			
+			float hdgDiff = currentLane.getHeadingDiff(this.getHeadingDegree());
+			carIsWrongWay = (FastMath.abs(hdgDiff) > 90);
 			
 			HashSet<ODLane> traversedLaneSet = new HashSet<ODLane>();
 			
 			// filling traversedLaneSet with all lanes between current lane (including)
 			// and the lane of target point (including) in order of increasing distance
-			ODPoint point = getTargetPoint(traversedLaneSet);			
+			ODPoint point = getFollowPoint(tslu, traversedLaneSet);			
 			if(point != null)
 			{
 				// visualize point (green)
@@ -253,6 +265,7 @@ public class OpenDRIVECar extends Car implements TrafficObject
 		{
 			currentLane = null;
 			currentS = 0;
+			carIsWrongWay = false;
 		}
 
 		if(visualizeFollowBox)
@@ -263,67 +276,132 @@ public class OpenDRIVECar extends Car implements TrafficObject
 	}
 
 
-	private ODLane previousLane = null;
-	private boolean isWrongWay = false; //assumption: vehicle is placed initially on road in driving direction
-	public ODPoint getTargetPoint(HashSet<ODLane> traversedLaneSet)
+	private ODLane startLane = null;
+	private ODLane targetLane = null;
+	public ODPoint getFollowPoint(float tslu, HashSet<ODLane> traversedLaneSet)
 	{
 		// traversedLaneSet will be filled with all lanes between current lane (including)
 		// and the lane of target point (including) in order of increasing distance
 		
 		float speedFactor = 0.05f * Math.max(20, Math.min(100, getCurrentSpeedKmh())); // [1.0 .. 5.0]
-		float speedDependentDistFromPath = distanceFromPath * speedFactor;
+		float speedDependentDistToFollowBox = distanceFromPath * speedFactor;
 		
-		//System.err.println(getCurrentSpeedKmh() + "; " + speedFactor + "; " + speedDependentDistFromPath);
-
-		ODPoint point = null;
+		//System.err.println(getCurrentSpeedKmh() + "; " + speedFactor + "; " + speedDependentDistToFollowBox);
 		
-		if(previousLane != null && 	targetLaneID != null)
+		if(changeToLane != null)
 		{
-			if(previousLane.isOppositeTo(currentLane))
-				isWrongWay = !isWrongWay;
-			
-			float hdgDiff = currentLane.getHeadingDiff(this.getHeadingDegree());
-			boolean carIsWrongWay = (FastMath.abs(hdgDiff) > 90);
-			boolean smallerLaneIdsToTheRight = (currentLane.getID() > 0 && carIsWrongWay) || (currentLane.getID() < 0 && !carIsWrongWay);
-			
-			
-			ODLane targetLane = null;			
-			
-			if(targetLaneID > currentLane.getID())
-			{
-				// get neighbor with greater lane ID
-				targetLane = currentLane.getNeighbor(smallerLaneIdsToTheRight?Position.Left:Position.Right, currentS, isWrongWay);
-			}
-			else if(targetLaneID < currentLane.getID())
-			{
-				// get neighbor with smaller lane ID
-				targetLane = currentLane.getNeighbor(smallerLaneIdsToTheRight?Position.Right:Position.Left, currentS, isWrongWay);
-			}
-					
-			
-			if(targetLane == null)
-			{
-				// stay in current lane (target lane reached or unreachable)
-				targetLane = currentLane;
-			}
-			
-			
-			if(targetLane.isOppositeTo(currentLane))
-				point = targetLane.getLaneCenterPointAhead(!isWrongWay, currentS, speedDependentDistFromPath, preferredConnections, traversedLaneSet);
+			travelPercentage = 0;
+			startLane = currentLane;
+			targetLane = changeToLane;
+			changeToLane = null;
+		}
+
+		if(startLane != null && targetLane != null)
+		{
+			// check whether lane change exceeds length of start or target lane
+			// and extend lane (by lane ahead) if necessary
+			startLane = extendLane(startLane);
+			targetLane = extendLane(targetLane);
+		}
+		
+		ODPoint followPoint = null;
+		if(startLane != null && targetLane != null)
+		{
+			// get point on center of start lane x meters ahead of the current position
+			ODPoint startPoint;
+			if(startLane.isOppositeTo(currentLane))
+				startPoint = startLane.getLaneCenterPointAhead(!carIsWrongWay, currentS, speedDependentDistToFollowBox, preferredConnections, null);
 			else
-				point = targetLane.getLaneCenterPointAhead(isWrongWay, currentS, speedDependentDistFromPath, preferredConnections, traversedLaneSet);
+				startPoint = startLane.getLaneCenterPointAhead(carIsWrongWay, currentS, speedDependentDistToFollowBox, preferredConnections, null);
+			
+			// get point on center of target lane x meters ahead of the current position
+			ODPoint targetPoint;
+			if(targetLane.isOppositeTo(currentLane))
+				targetPoint = targetLane.getLaneCenterPointAhead(!carIsWrongWay, currentS, speedDependentDistToFollowBox, preferredConnections, null);
+			else
+				targetPoint = targetLane.getLaneCenterPointAhead(carIsWrongWay, currentS, speedDependentDistToFollowBox, preferredConnections, null);
+			
+			followPoint = interpolatePoint(tslu, startPoint, targetPoint);
+			
+			/*
+			System.err.println("currentLane: " + currentLane.getID() + " (road: " + currentLane.getODRoad().getID() + 
+					"); targetLane: " + targetLane.getID() + " (road: " + targetLane.getODRoad().getID() + ")");
+			*/
+			
+			// target lane reached --> stop lane change process
+			if(travelPercentage >= 1.0 && currentLane.equals(targetLane))
+			{
+				startLane = null;
+				targetLane = null;
+			}
 		}
 		else
 		{
 			// get point on center of current lane x meters ahead of the current position
-			point = currentLane.getLaneCenterPointAhead(false, currentS, speedDependentDistFromPath, preferredConnections, traversedLaneSet);
+			followPoint = currentLane.getLaneCenterPointAhead(carIsWrongWay, currentS, speedDependentDistToFollowBox, preferredConnections, traversedLaneSet);
+			
+			//System.err.println("currentLane: " + currentLane.getID() + " (road: " + currentLane.getODRoad().getID() + ")");
 		}
-		
-		previousLane = currentLane;
-		
-		return point;
+
+		return followPoint;
 	}
 
+
+	private ODLane extendLane(ODLane lane)
+	{
+		int counter = 0;
+		while(lane != null && !lane.getODLaneSection().equals(currentLane.getODLaneSection()))
+		{
+			if(lane.isOppositeTo(currentLane))
+				lane = lane.getLaneAhead(!carIsWrongWay, preferredConnections);
+			else
+				lane = lane.getLaneAhead(carIsWrongWay, preferredConnections);
+			
+			counter++;
+			
+			if(counter>100)
+			{
+				lane = null;
+				break;
+			}
+		}
+		
+		if(lane == null)
+			System.err.println("Error during lane change (OpenDRIVECar.java; Car: '" + getName() + "')");
+		
+		return lane;
+	}
+	
+	
+	private double travelPercentage = 0;
+	public ODPoint interpolatePoint(float tslu, ODPoint startPoint, ODPoint targetPoint)
+	{
+		if(startPoint != null && targetPoint != null)
+		{
+			String ID = targetPoint.getID() + "_offset";
+			double s = targetPoint.getS();
+			
+			Vector3d startPosition = startPoint.getPosition();
+			Vector3d targetPosition = targetPoint.getPosition();
+			
+			if(travelPercentage < 1.0)
+			{
+				double distance = startPosition.distance(targetPosition);
+				double stepSize = tslu * (lateralSpeed/distance);
+				travelPercentage = Math.min(travelPercentage + stepSize, 1.0);
+			}
+			
+			Vector3d resultPos = startPosition.interpolateLocal(targetPosition, travelPercentage);
+			
+			double ortho = targetPoint.getOrtho();
+			TRoadPlanViewGeometry geometry = targetPoint.getGeometry();
+			
+			return new ODPoint(ID, s, resultPos, ortho, geometry, currentLane);
+		}
+		else
+			return null;
+	}
+	
 
 	private void steerTowardsPosition(Vector3f wayPoint) 
 	{
@@ -482,7 +560,7 @@ public class OpenDRIVECar extends Car implements TrafficObject
 			for (int i = 100; i >= 1; i--)
 			{
 				// inspect curvature and speed limit in 200, 198, 196, ... meters				
-				ODPoint point = currentLane.getLaneCenterPointAhead(isWrongWay, currentS, i*2, preferredConnections, null);
+				ODPoint point = currentLane.getLaneCenterPointAhead(carIsWrongWay, currentS, i*2, preferredConnections, null);
 				if (point != null)
 				{
 					float maxSpeedDueToCurveKmh = 200;
@@ -718,33 +796,33 @@ public class OpenDRIVECar extends Car implements TrafficObject
 	}
 	
 	
+	private ODLane changeToLane = null;
 	public void setTargetLane(Integer laneID)
 	{
-		targetLaneID = laneID;
-	}
-	
-	
-	public Integer getTargetLane()
-	{
-		return targetLaneID;
+		// if ready (goAhead()), vehicle in the lane, and target lane different from current
+		if(goAhead() && currentLane != null && currentLane.getID() != laneID)
+			changeToLane = currentLane.getODLaneSection().getLane(laneID);
 	}
 
-
+	
 	public void changeLane(Position position)
 	{
-		if(currentLane != null)
-		{	
-			float hdgDiff = currentLane.getHeadingDiff(this.getHeadingDegree());
-			boolean carIsWrongWay = (FastMath.abs(hdgDiff) > 90);
-			
-			ODLane neighborLane = currentLane.getNeighbor(position, currentS, carIsWrongWay);
-			if(neighborLane != null)
-				targetLaneID = neighborLane.getID();
-			else
-				targetLaneID = currentLane.getID();
-		}
-		else
-			targetLaneID = null;
+		// if ready (goAhead()) and vehicle in the lane
+		if(goAhead() &&  currentLane != null)
+			changeToLane = currentLane.getNeighbor(position, currentS, carIsWrongWay);
+	}
+	
+	
+	private boolean goAhead()
+	{
+		// if waitForPreviousLaneChange == true
+		// --> wait until previous lane change has finished
+		boolean goAhead = true;
+		
+		if(waitForPreviousLaneChange)
+			goAhead = (startLane == null && targetLane == null);
+		
+		return goAhead;
 	}
 
 

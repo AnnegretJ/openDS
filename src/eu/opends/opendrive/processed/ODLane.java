@@ -1717,4 +1717,37 @@ public class ODLane
 		return getID() * otherLane.getID() < 0;
 	}
 
+
+	public ODLane getLaneAhead(boolean increasingS, PreferredConnections pc)
+	{
+		if(laneID == 0)
+			return null;
+		
+		if(laneID < 0)
+			increasingS = !increasingS;
+		
+		if(increasingS)
+			return getLaneAhead(successorLink, "successor", pc);  // get successor
+		else
+			return getLaneAhead(predecessorLink, "predecessor", pc);  // get predecessor		
+	}
+
+
+	private ODLane getLaneAhead(ODLink link, String debugName, PreferredConnections pc)
+	{
+		if(link != null)
+		{
+			LinkData linkDataAhead = link.getLinkData(pc);
+			
+			if(linkDataAhead != null)
+				return linkDataAhead.getLane();
+		}
+		
+		if(printDebugMsg)
+			System.err.println("no " + debugName + " available (lane: " + laneID + "; road: " + road.getID() + "; getLaneAhead)");
+		
+		return null;
+	}
+
+
 }
