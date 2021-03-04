@@ -5432,7 +5432,7 @@
         <submesh name="female:tshirt02:tshirt02Material" index="0">
         </submesh>
     </submeshnames>
-    <skeletonlink name="tshirt02.skeleton"/>
+    <skeletonlink name="female.skeleton"/>
     <boneassignments>
         <vertexboneassignment weight="0.8673999905586243" boneindex="0" vertexindex="0"/>
         <vertexboneassignment weight="0.13259999454021454" boneindex="9" vertexindex="0"/>

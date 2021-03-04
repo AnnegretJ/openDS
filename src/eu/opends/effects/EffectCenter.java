@@ -180,7 +180,7 @@ public class EffectCenter
 	{
 		if(isSnowing)
 		{
-			snowParticleEmitter.setLocalTranslation(sim.getCar().getPosition());
+			snowParticleEmitter.setLocalTranslation(sim.getCar().getFrontGeometry().getWorldTranslation());
 			
 			if(snowingPercentageHasChanged)
 			{

@@ -234,7 +234,7 @@ public abstract class Car
 		// add node representing position of front box
 		Box frontBox = new Box(0.01f, 0.01f, 0.01f);
 		frontGeometry = new Geometry("frontBox", frontBox);
-        frontGeometry.setLocalTranslation(0, 0, -1);
+        frontGeometry.setLocalTranslation(0, 0, -15);
 		Material frontMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		frontMaterial.setColor("Color", ColorRGBA.Red);
 		frontGeometry.setMaterial(frontMaterial);

@@ -1,0 +1,12 @@
+;Rainy3
+;SUNLIGHT DIRECTION POSITION VECTOR (based on 25000x25000 being center of world)
+SunDirection	= 30000,10000,50000
+;SUNLIGHT STRENGH MULTIPLIER (DEFAULT 100)
+SunStrength     = 100
+;SUN COLOR (RGB)
+SunColor        = 255,235,220
+;SUN ROTATION
+SunRotation	= 80
+;SKYSCROLL SPEED
+SkyScrollX      = 10
+SkyScrollZ      = 10

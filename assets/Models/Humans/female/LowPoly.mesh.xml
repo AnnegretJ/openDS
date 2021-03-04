@@ -666,7 +666,7 @@
         <submesh name="female:Low-Poly:Eye_brown" index="0">
         </submesh>
     </submeshnames>
-    <skeletonlink name="LowPoly.skeleton"/>
+    <skeletonlink name="female.skeleton"/>
     <boneassignments>
         <vertexboneassignment weight="1.0" boneindex="69" vertexindex="0"/>
         <vertexboneassignment weight="1.0" boneindex="69" vertexindex="1"/>

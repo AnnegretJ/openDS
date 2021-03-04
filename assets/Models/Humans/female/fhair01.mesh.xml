@@ -20017,7 +20017,7 @@
         <submesh name="female:fhair01:female01Material" index="0">
         </submesh>
     </submeshnames>
-    <skeletonlink name="fhair01.skeleton"/>
+    <skeletonlink name="female.skeleton"/>
     <boneassignments>
         <vertexboneassignment weight="0.5485000014305115" boneindex="11" vertexindex="0"/>
         <vertexboneassignment weight="0.3991999924182892" boneindex="12" vertexindex="0"/>

@@ -21,9 +21,9 @@ The modifications to the aforementioned binaries are as follows:
          New:      FaceCullMode cullMode = FaceCullMode.Off; 
 
      - jme3-core/src/main/java/com/jme3/input/FlyByCamera.java
-         commented (removed) lines 212-247
+         commented (removed) lines 257-291
          Original Code:
-			// both mouse and button - rotation of cam
+		// both mouse and button - rotation of cam
 	        inputManager.addMapping(CameraInput.FLYCAM_LEFT, new MouseAxisTrigger(MouseInput.AXIS_X, true),
                                                new KeyTrigger(KeyInput.KEY_LEFT));
 

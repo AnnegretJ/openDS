@@ -71,6 +71,8 @@ public class Event
 		this.auditoryDemand = auditoryDemand;
 		this.hapticDemand = hapticDemand;
 		this.delayPenalty = delayPenalty;
+		this.type = type;
+		this.value = value;
 	}
 
 
@@ -191,6 +193,14 @@ public class Event
 		
 		if(type.equals("navigationImageId") && !value.isEmpty())
 		{
+			String soundID = "Bell";
+			AudioNode audioNode = AudioCenter.getAudioNode(soundID);
+			
+			if(audioNode != null)
+				AudioCenter.playSound(audioNode);
+			else
+				System.err.println("Event: audio node '" + soundID + "' does not exist");
+			
 			OpenDSGaugeState openDSGaugeState = new OpenDSGaugeState(null, null, value, null, 
 					null, null, null, null, null, null, null, null);
 			sim.getOpenDSGaugeCenter().updateState(openDSGaugeState);
@@ -219,7 +229,7 @@ public class Event
 			if(audioNode != null)
 				AudioCenter.playSound(audioNode);
 			else
-				System.err.println("PlaySoundTriggerAction: audio node '" + soundID + "' does not exist");
+				System.err.println("Event: audio node '" + soundID + "' does not exist");
 			
 
 			String iconID = "ToC";

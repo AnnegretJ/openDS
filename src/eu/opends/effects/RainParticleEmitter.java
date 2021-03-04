@@ -60,7 +60,7 @@ public class RainParticleEmitter extends ParticleEmitter
 		this.setGravity(0,1,0);
 		this.setLowLife(1f);
 		this.setHighLife(2f);
-		this.getParticleInfluencer().setInitialVelocity(new Vector3f(0, -6, 0));
+		this.getParticleInfluencer().setInitialVelocity(new Vector3f(0, -30, 0));
 		this.getParticleInfluencer().setVelocityVariation(0f);
 		this.setShape(new EmitterBoxShape(new Vector3f(-20f,3.0f,-20f),new Vector3f(20f,4.5f,20f)));
 	}

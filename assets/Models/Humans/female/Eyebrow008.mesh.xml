@@ -826,7 +826,7 @@
         <submesh name="female:Eyebrow008:eyebrow011" index="0">
         </submesh>
     </submeshnames>
-    <skeletonlink name="Eyebrow008.skeleton"/>
+    <skeletonlink name="female.skeleton"/>
     <boneassignments>
         <vertexboneassignment weight="1.0" boneindex="62" vertexindex="0"/>
         <vertexboneassignment weight="1.0" boneindex="62" vertexindex="1"/>

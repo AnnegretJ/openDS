@@ -19,7 +19,8 @@
 
 package eu.opends.traffic;
 
-import com.jme3.animation.*;
+import com.jme3.anim.AnimComposer;
+import com.jme3.anim.tween.action.Action;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.SceneGraphVisitorAdapter;
@@ -37,11 +38,14 @@ public class AnimationController
     /**
      * Character animation controllers.
      */
-    final Map<String, AnimControl> animControls = new HashMap<>();
+    //final Map<String, AnimControl> animControls = new HashMap<>();
+    
+    final Map<String, AnimComposer> animComposers = new HashMap<>();
+    
     /**
      * Character animation channels.
      */
-    final Map<String, AnimChannel> animChannels = new HashMap<>();
+    //final Map<String, AnimChannel> animChannels = new HashMap<>();
     /**
      * The character animator listener.
      */
@@ -53,19 +57,19 @@ public class AnimationController
     /**
      * The animation speed multiplier.
      */
-    private float speedMultiplier = 0f;
+    //private float speedMultiplier = 0f;
     /**
      * The loop count.
      */
-    private int loopCount = 0;
+    //private int loopCount = 0;
     /**
      * The animation max time.
      */
-    private float animationMaxTime = 0f;
+    //private float animationMaxTime = 0f;
     /**
      * The animation time.
      */
-    private float animationTime = 0f;
+    //private float animationTime = 0f;
 
     
     /**
@@ -98,6 +102,13 @@ public class AnimationController
              */
             private void checkForAnimControl(final Spatial spatial) 
             {
+            	AnimComposer animComposer = spatial.getControl(AnimComposer.class);
+            	if (animComposer == null)
+                    return;
+            	
+            	animComposers.put(spatial.getName(), animComposer);
+            	
+            	/*
                 AnimControl animControl = spatial.getControl(AnimControl.class);
                 if (animControl == null)
                     return;
@@ -105,6 +116,7 @@ public class AnimationController
                 final AnimChannel animChannel = animControl.createChannel();
                 animControls.put(spatial.getName(), animControl);
                 animChannels.put(spatial.getName(), animChannel);
+                */
             }
         };
         character.depthFirstTraversal(visitor);
@@ -121,6 +133,22 @@ public class AnimationController
      */
     public void animate(final String animationName, final float speedMultiplier, final float blendTime, final int loopCount) 
     {
+    	this.animationName = animationName;
+
+    	for (final Map.Entry<String, AnimComposer> item : animComposers.entrySet())
+    	{
+    		AnimComposer animComposer = item.getValue();
+    		
+    		if(animComposer.hasAnimClip(animationName))
+    		{
+    			Action action = animComposer.setCurrentAction(animationName);
+    			action.setSpeed(speedMultiplier);
+    		}
+    		else
+    			System.err.println("Spatial '" + item.getKey() + "' has no animation named '" + animationName + "'");
+    	}
+
+    	/*
         this.loopCount = loopCount - 1;
         this.animationName = animationName;
         this.speedMultiplier = speedMultiplier;
@@ -143,6 +171,7 @@ public class AnimationController
                 this. animationMaxTime = animChannel.getAnimMaxTime();
             }
         }
+        */
     }
 
     
@@ -152,7 +181,8 @@ public class AnimationController
      */
     public Collection<String> getSpatialNamesWithAnimations()
     {
-        return animControls.keySet();
+        return animComposers.keySet();
+        //return animControls.keySet();
     }
 
     
@@ -161,9 +191,10 @@ public class AnimationController
      * @param spatialName the spatial name
      * @return the animation control or null
      */
-    public AnimControl getAnimControl(final String spatialName)
+    public AnimComposer getAnimControl(final String spatialName)
     {
-        return animControls.get(spatialName);
+    	return animComposers.get(spatialName);
+    	//return animControls.get(spatialName);
     }
     
 
@@ -181,8 +212,10 @@ public class AnimationController
      * Updates animation manually.
      * @param tpf time per frame
      */
+    // TODO
     public void update(final float tpf)
     {
+    	/*
         if (animationTime > 0f && animationTime > animationMaxTime)
         {
             if (loopCount == 0)
@@ -203,6 +236,7 @@ public class AnimationController
             channel.setSpeed(0f);
             channel.setTime(animationTime);
         }
+        */
     }
 
     

@@ -29604,7 +29604,7 @@
         <submesh name="female:Teeth_Base:teethMaterial" index="0">
         </submesh>
     </submeshnames>
-    <skeletonlink name="Teeth_Base.skeleton"/>
+    <skeletonlink name="female.skeleton"/>
     <boneassignments>
         <vertexboneassignment weight="1.0" boneindex="63" vertexindex="0"/>
         <vertexboneassignment weight="1.0" boneindex="63" vertexindex="1"/>
