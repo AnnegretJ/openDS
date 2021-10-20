@@ -58,7 +58,6 @@ public class DriveAnalyzerAnalogListener implements AnalogListener
 			{
 				float topCamDistance = Math.max(10f, camFactory.getTopCamDistance() - 1);
 				camFactory.setTopCamDistance(topCamDistance);
-				camFactory.updateCamera();
 			}
 		} 
 		
@@ -69,7 +68,6 @@ public class DriveAnalyzerAnalogListener implements AnalogListener
 			{
 				float topCamDistance = camFactory.getTopCamDistance() + 1;
 				camFactory.setTopCamDistance(topCamDistance);
-				camFactory.updateCamera();
 			}
 		} 
 	}

@@ -1,9 +1,7 @@
 <audioFiles>
-<!-- 
 	<insideVehicle>
 		<engineStart>start_inside.wav</engineStart>
-    	<engineIdle loop="true">idle_inside.wav</engineIdle>
+    	<engineIdle loop="true" volume="1.0">idle_inside.wav</engineIdle>
     	<engineStop>stop_inside.wav</engineStop>
 	</insideVehicle>
--->
 </audioFiles>

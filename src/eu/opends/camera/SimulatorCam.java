@@ -206,7 +206,7 @@ public class SimulatorCam extends CameraFactory
 	}
 	
 	
-	public void updateCamera()
+	public void updateCamera(float tpf)
 	{
 		if(camMode == CameraMode.EGO)
 		{

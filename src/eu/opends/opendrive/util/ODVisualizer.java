@@ -256,7 +256,7 @@ public class ODVisualizer
 		
 		if(vizArrows)
 		{
-			Cylinder cyl = new Cylinder(5, 20, 0.5f, 0, 1.5f, true, false);
+			Cylinder cyl = new Cylinder(5, 20, 0.5f, 0.01f, 1.5f, true, false);
 			com.jme3.scene.Geometry cylinder = new com.jme3.scene.Geometry(ID + "_cylinder", cyl);
 			cylinder.scale(0.5f);
 			cylinder.setLocalTranslation(cylinderPos);

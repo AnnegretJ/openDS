@@ -67,6 +67,7 @@ import eu.opends.basics.SimulationBasics;
 import eu.opends.car.ResetPosition;
 import eu.opends.drivingTask.DrivingTaskDataQuery;
 import eu.opends.drivingTask.DrivingTaskDataQuery.Layer;
+import eu.opends.gesture.ReferenceObjectParams;
 import eu.opends.main.Simulator;
 import eu.opends.tools.Util;
 import eu.opends.traffic.OpenDRIVECar;
@@ -655,6 +656,7 @@ public class SceneLoader
 				Float lateralOffset = null;
 				Float verticalOffset = null;
 				String collisionSound = null;
+				ReferenceObjectParams referenceObjectParams = null;
 				
 				for (int j = 1; j <= childnodes.getLength(); j++) 
 				{
@@ -773,6 +775,11 @@ public class SceneLoader
 						collisionSound = currentChild.getAttributes().getNamedItem("ref").getNodeValue();
 					}
 					
+					else if(currentChild.getNodeName().equals("referenceObject"))
+					{
+						referenceObjectParams = extractReferenceObjectParams(currentChild, spatial);
+					}
+					
 					else if(currentChild.getNodeName().equals("ambientLight"))
 					{
 						// add ambient light to current spatial
@@ -821,7 +828,8 @@ public class SceneLoader
 						(collisionShape != null))
 				{
 					MapObject mapObject = new MapObject(name, spatial, translation, rotation, scale,
-							visible, addToMapNode, collisionShape, mass, spatialURL, collisionSound);
+							visible, addToMapNode, collisionShape, mass, spatialURL, collisionSound, 
+							referenceObjectParams);
 					mapObjectsList.add(mapObject);
 				}
 				else if((name != null) && (spatial != null) && (roadID != null) && (s != null) && 
@@ -829,7 +837,7 @@ public class SceneLoader
 				{
 					MapObjectOD mapObjectOD = new MapObjectOD(name, spatial, roadID, s, lateralOffset, 
 							verticalOffset, rotation, scale, visible, addToMapNode, collisionShape, mass, 
-							spatialURL, collisionSound);
+							spatialURL, collisionSound, referenceObjectParams);
 					dependentMapObjectsList.add(mapObjectOD);
 				}
 			}
@@ -837,6 +845,121 @@ public class SceneLoader
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+
+	private ReferenceObjectParams extractReferenceObjectParams(Node refObjNode, Spatial spatial)
+	{
+		// set defaults
+		boolean isAlignSpatial = false;
+		boolean isFrontLogoEnabled = false;
+		boolean isBackLogoEnabled = false;
+		boolean isLeftLogoEnabled = false;
+		boolean isRightLogoEnabled = false;
+		float logoXPos = -2.5f;
+		float logoYPos = -0.5f;
+		float logoWidth = 5;
+		float logoHeight = -1;
+		String logoTexturePath = "Textures/Logo/DFKI.jpg";
+		HashMap<String, String> textureMap = new HashMap<String, String>();
+		
+		// fill variables with actual values (if given)
+		NodeList childnodes = refObjNode.getChildNodes();
+		for (int i = 0; i < childnodes.getLength(); i++) 
+		{
+			Node childNode = childnodes.item(i);
+			if(childNode.getNodeName().equals("alignToGrid"))
+			{
+				// alignToGrid
+				isAlignSpatial = Boolean.parseBoolean(childNode.getTextContent());
+			}
+			else if(childNode.getNodeName().equals("logo"))
+			{
+				// logo
+				NodeList logoNodes = childNode.getChildNodes();
+				for (int j = 0; j < logoNodes.getLength(); j++) 
+				{
+					Node logoNode = logoNodes.item(j);
+					if(logoNode.getNodeName().equals("enableLogoSigns"))
+					{
+						// enableLogoSigns
+						NodeList logoSignNodes = logoNode.getChildNodes();
+						for (int k = 0; k < logoSignNodes.getLength(); k++) 
+						{
+							Node logoSignNode = logoSignNodes.item(k);
+							if(logoSignNode.getNodeName().equals("front"))
+							{
+								// front
+								isFrontLogoEnabled = Boolean.parseBoolean(logoSignNode.getTextContent());
+							}
+							else if(logoSignNode.getNodeName().equals("back"))
+							{
+								// back
+								isBackLogoEnabled = Boolean.parseBoolean(logoSignNode.getTextContent());
+							}
+							else if(logoSignNode.getNodeName().equals("left"))
+							{
+								// left
+								isLeftLogoEnabled = Boolean.parseBoolean(logoSignNode.getTextContent());
+							}
+							else if(logoSignNode.getNodeName().equals("right"))
+							{
+								// right
+								isRightLogoEnabled = Boolean.parseBoolean(logoSignNode.getTextContent());
+							}
+						}
+					}
+					else if(logoNode.getNodeName().equals("height"))
+					{
+						// height
+						logoHeight = Float.parseFloat(logoNode.getTextContent());
+					}
+					else if(logoNode.getNodeName().equals("width"))
+					{
+						// width
+						logoWidth = Float.parseFloat(logoNode.getTextContent());
+					}
+					else if(logoNode.getNodeName().equals("xPos"))
+					{
+						// xPos
+						logoXPos = Float.parseFloat(logoNode.getTextContent());
+					}
+					else if(logoNode.getNodeName().equals("yPos"))
+					{
+						// yPos
+						logoYPos = Float.parseFloat(logoNode.getTextContent());					
+					}
+					else if(logoNode.getNodeName().equals("texturePath"))
+					{
+						// texturePath
+						logoTexturePath = logoNode.getTextContent();
+					}
+				}
+			} 
+			else if(childNode.getNodeName().equals("textureMap"))
+			{
+				// textureMap
+				NodeList textureNodes = childNode.getChildNodes();
+				for (int j = 0; j < textureNodes.getLength(); j++) 
+				{
+					Node textureNode = textureNodes.item(j);
+					if(textureNode.getNodeName().equals("texture"))
+					{
+						// texture
+						String geometryName = textureNode.getAttributes().getNamedItem("geometryName").getNodeValue();
+						
+						String folderPath = spatial.getKey().getFolder();
+						String textureFile = textureNode.getAttributes().getNamedItem("textureFile").getNodeValue();
+						String texturePath = folderPath + textureFile;
+
+						textureMap.put(geometryName, texturePath);
+					}
+				}
+			}
+		}
+		
+		return new ReferenceObjectParams(isAlignSpatial, isFrontLogoEnabled, isBackLogoEnabled, isLeftLogoEnabled, 
+				isRightLogoEnabled, logoXPos, logoYPos, logoWidth, logoHeight, logoTexturePath, textureMap);
 	}
 
 

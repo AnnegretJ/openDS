@@ -145,6 +145,13 @@ public class GeometryVisitor implements SceneGraphVisitor
 				if (spatial.getName().startsWith("street_material_"))
 					texture.setAnisotropicFilter(32);
 				
+				// apply anisotropic filter to buildings (used for "Gesture Task" model only)
+				if (spatial.getName().equals("groundFloor") || spatial.getName().equals("upperFloors")
+						|| spatial.getName().equals("logoGeometry_1"))
+				{
+					texture.setAnisotropicFilter(32);
+				}
+				
 				// remove trees and bushes from scene
 				if(texturePath.matches("^\\S+EucalyptusLeaves_Diff.png$")
 						|| texturePath.matches("^\\S+CoulterPineBark_Diff.png$")

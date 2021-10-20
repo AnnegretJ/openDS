@@ -1,0 +1,20 @@
+<#ftl output_format="XML" auto_esc=false>
+<?xml version="1.0" encoding="UTF-8"?>
+<interaction xmlns="http://opends.eu/drivingtask/interaction"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://opends.eu/drivingtask/interaction ../../Schema/interaction.xsd">
+
+	<activities>
+		<activity id="playPointAtSound">
+			<action id="playSound" delay="0" repeat="0">
+				<parameter name="soundID" value="pointAt" />
+			</action>
+		</activity>
+${activities}
+	</activities>
+	
+	<triggers>
+${triggers}
+	</triggers>
+	
+</interaction>

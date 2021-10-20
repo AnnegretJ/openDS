@@ -18,7 +18,6 @@
 
 package eu.opends.basics;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,22 +25,11 @@ import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
-import com.jme3.collision.CollisionResult;
-import com.jme3.collision.CollisionResults;
-import com.jme3.material.MatParamTexture;
-import com.jme3.math.Ray;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.Spatial.CullHint;
-import com.jme3.scene.VertexBuffer;
-import com.jme3.scene.VertexBuffer.Format;
-import com.jme3.scene.VertexBuffer.Usage;
-import com.jme3.texture.Texture;
 
 import eu.opends.main.Simulator;
-import eu.opends.tools.Util;
 
 /**
  * This class is used to further process the elements on the map.
@@ -116,8 +104,13 @@ public class InternalMapProcessing
 	{
 		boolean skipPhysicModel = false;
 			
-		Node node = new Node(mapObject.getName());
-			
+		
+		if (mapObject.isReferenceObject())
+		{
+			sim.getGestureAnalyzer().addReferenceObject(mapObject);
+		}
+		
+		
 		Spatial spatial = mapObject.getSpatial();
 		spatial.breadthFirstTraversal(new GeometryVisitor());
 		
@@ -300,13 +293,13 @@ public class InternalMapProcessing
 				add(mapObject, geometry);
 		}
 		*/
-		
 
 		
        	// set FaceCullMode of spatial's geometries to off
 		// no longer needed, as FaceCullMode.Off is default setting
 		//Util.setFaceCullMode(spatial, FaceCullMode.Off);
 		
+		Node node = new Node(mapObject.getName());
     	node.attachChild(spatial);
     	node.setLocalScale(mapObject.getScale());
         node.updateModelBound();
@@ -366,7 +359,8 @@ public class InternalMapProcessing
 		else
 			sceneNode.attachChild(node);
 	}
-	
+
+
 	/* FIXME
 	private void add(MapObject mapObject, Geometry geometry)
 	{

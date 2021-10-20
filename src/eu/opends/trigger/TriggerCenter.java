@@ -229,8 +229,10 @@ public class TriggerCenter
 				int lane_car = car.getCurrentLane().getID();
 				double s_car = car.getCurrentS();
 				
-				if(roadID_trigger.equals(roadID_car) && lane_trigger == lane_car && (Math.abs(s_trigger-s_car) < 0.5d))
-					TriggerCenter.performTrigger(trigger);
+				if(roadID_trigger.equals(roadID_car) && (Math.abs(s_trigger-s_car) < 0.5d))
+					// either trigger when car is in given lane or when lane_trigger == 0 and car is in any lane 
+					if(lane_trigger == lane_car || lane_trigger == 0)
+						TriggerCenter.performTrigger(trigger);
 			}
 		}
 	}

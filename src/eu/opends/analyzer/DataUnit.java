@@ -19,11 +19,14 @@
 package eu.opends.analyzer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+
+import eu.opends.gesture.RecordedReferenceObject;
 
 /**
  * Data object containing position and speed of the car, as well as the current
@@ -37,7 +40,9 @@ public class DataUnit implements Serializable
 	private float xpos, ypos, zpos, speed, steeringWheelPos, gasPedalPos, brakePedalPos,
 			xrot, yrot, zrot, wrot, traveledDistance;
 	private boolean isEngineOn;
-	private Quaternion oculusRiftOrientation;
+	private Vector3f frontPosition;
+	private String referenceObjectData;
+	private ArrayList<RecordedReferenceObject> referenceObjectList;
 	private Date date;
 	
 
@@ -82,13 +87,16 @@ public class DataUnit implements Serializable
 	 * @param isEngineOn
 	 * 			Engine state
 	 * 
-	 * @param oculusRiftOrientation
-	 * 			Head orientation (when using Oculus Rift)
+	 * @param frontPosition 
+	 * 			Position 15 meters in front of the car
+	 * 
+	 * @param referenceObjectData
+	 * 			Angles from driver's position to reference object in scene
 	 */
 	public DataUnit(Date date, float xpos, float ypos, float zpos,
 			float xrot, float yrot, float zrot, float wrot, float speed,
 			float steeringWheelPos, float gasPedalPos, float brakePedalPos,
-			boolean isEngineOn, Quaternion oculusRiftOrientation) 
+			boolean isEngineOn, Vector3f frontPosition, String referenceObjectData) 
 	{
 		setDate(date);
 		setSpeed(speed);
@@ -103,7 +111,8 @@ public class DataUnit implements Serializable
 		setAcceleratorPedalPos(gasPedalPos);
 		setBrakePedalPos(brakePedalPos);
 		setEngineOn(isEngineOn);
-		setOculusRiftOrientation(oculusRiftOrientation);
+		setFrontPosition(frontPosition);
+		setReferenceObjectData(referenceObjectData);
 	}
 	
 
@@ -135,10 +144,14 @@ public class DataUnit implements Serializable
 	 * 
 	 * @param traveledDistance
 	 * 			traveled distance
+	 * 
+	 * @param referenceObjectList 
+	 * 			
 	 */
 	public DataUnit(Date date, Vector3f carPosition, Quaternion carRotation,
 			float speed, float steeringWheelPos, float gasPedalPos, float brakePedalPos,
-			boolean isEngineOn, float traveledDistance) 
+			boolean isEngineOn, float traveledDistance, Vector3f frontPosition, 
+			ArrayList<RecordedReferenceObject> referenceObjectList) 
 	{
 		setDate(date);
 		setSpeed(speed);
@@ -149,6 +162,8 @@ public class DataUnit implements Serializable
 		setBrakePedalPos(brakePedalPos);
 		setEngineOn(isEngineOn);
 		setTraveledDistance(traveledDistance);
+		setFrontPosition(frontPosition);
+		setReferenceObjectList(referenceObjectList);
 	}
 	
 	
@@ -369,22 +384,42 @@ public class DataUnit implements Serializable
 		this.isEngineOn = isEngineOn;
 	}
 
+
 	/**
 	 * 
-	 * @return head rotation (when using Oculus Rift)
+	 * @return position 15 m in front of the car
 	 */
-	public Quaternion getOculusRiftOrientation() {
-		return oculusRiftOrientation;
+	public Vector3f getFrontPosition() {
+		return frontPosition;
+	}
+	
+	/**
+	 * 
+	 * @param frontPosition
+	 *            position 15 m in front of the car
+	 */
+	private void setFrontPosition(Vector3f frontPosition) {
+		this.frontPosition = frontPosition;
+	}
+	
+	
+	/**
+	 * 
+	 * @return angles from driver's position to reference objects in the scene
+	 */
+	public String getReferenceObjectData() {
+		return referenceObjectData;
 	}
 
 	/**
 	 * 
-	 * @param oculusRiftOrientation
-	 *            head rotation (when using Oculus Rift)
+	 * @param referenceObjectData
+	 *             angles from driver's position to reference objects in the scene
 	 */
-	private void setOculusRiftOrientation(Quaternion oculusRiftOrientation) {
-		this.oculusRiftOrientation = oculusRiftOrientation;
+	private void setReferenceObjectData(String referenceObjectData) {
+		this.referenceObjectData = referenceObjectData;
 	}
+	
 	
 	/**
 	 * 
@@ -401,6 +436,16 @@ public class DataUnit implements Serializable
 	 */
 	private void setTraveledDistance(float traveledDistance) {
 		this.traveledDistance = traveledDistance;
+	}
+	
+	
+	public ArrayList<RecordedReferenceObject> getReferenceObjectList() {
+		return referenceObjectList;
+	}
+	
+	
+	private void setReferenceObjectList(ArrayList<RecordedReferenceObject> referenceObjectList) {
+		this.referenceObjectList = referenceObjectList;
 	}
 	
 	
@@ -496,6 +541,8 @@ public class DataUnit implements Serializable
 		float traveledDistance = previousTraveledDistance + (traveledDistanceDiff * percentage);		
 		
 		return new DataUnit(date, position, rotation, speed, steeringWheelPos, 
-				gasPedalPos, brakePedalPos, isEngineOn, traveledDistance);
+				gasPedalPos, brakePedalPos, isEngineOn, traveledDistance, previousDataUnit.getFrontPosition(),
+				previousDataUnit.getReferenceObjectList());
 	}
+
 }

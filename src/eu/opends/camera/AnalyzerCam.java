@@ -31,13 +31,15 @@ import eu.opends.main.DriveAnalyzer;
  */
 public class AnalyzerCam extends CameraFactory 
 {
+	private DriveAnalyzer analyzer;
 	private float topCamDistance = 30;
 	
 	
 	public AnalyzerCam(DriveAnalyzer analyzer, Node targetNode) 
 	{
+		this.analyzer = analyzer;
 		initCamera(analyzer, targetNode);
-		setCamMode(CameraMode.CHASE);
+		setCamMode(CameraMode.EGO);
 	}
 	
 	
@@ -45,16 +47,26 @@ public class AnalyzerCam extends CameraFactory
 	{		
 		switch (mode) 
 		{
-			case TOP:
-				camMode = CameraMode.TOP;
+			case EGO:
+				camMode = CameraMode.EGO;
+				targetNode.detachChild(mainCameraNode);
+				sim.getRootNode().attachChild(mainCameraNode);
 				chaseCam.setEnabled(false);
-				updateCamera();
 				break;
-	
+				
 			case CHASE:
 				camMode = CameraMode.CHASE;
+				sim.getRootNode().detachChild(mainCameraNode);
+				targetNode.attachChild(mainCameraNode);
 				chaseCam.setEnabled(true);
-				updateCamera();
+				chaseCam.setDragToRotate(false);
+				break;
+				
+			case TOP:
+				camMode = CameraMode.TOP;
+				targetNode.detachChild(mainCameraNode);
+				sim.getRootNode().attachChild(mainCameraNode);
+				chaseCam.setEnabled(false);
 				break;
 				
 			default: break;	
@@ -66,47 +78,46 @@ public class AnalyzerCam extends CameraFactory
 	{
 		switch (camMode) 
 		{
-			// CHASE --> TOP --> CHASE --> ...
+			// EGO --> CHASE --> TOP --> EGO --> ...
+			case EGO: setCamMode(CameraMode.CHASE); break;
 			case CHASE: setCamMode(CameraMode.TOP); break;
-			case TOP:setCamMode(CameraMode.CHASE); break;
+			case TOP:setCamMode(CameraMode.EGO); break;
 			default: break;
 		}
 	}
 	
 	
-	public void updateCamera()
+	public void updateCamera(float tpf)
 	{
-		if(camMode == CameraMode.CHASE)
+		if(camMode == CameraMode.EGO)
 		{
 			// set camera position
-			Vector3f targetPosition = targetNode.localToWorld(new Vector3f(0, 0, 0), null);
-			Vector3f camPos = new Vector3f(targetPosition.x, targetPosition.y + 2, targetPosition.z);
-			cam.setLocation(camPos);
-			
-		
+			Vector3f camPos = analyzer.getEgoCamNode().getWorldTranslation();
+			frontCameraNode.setLocalTranslation(camPos);
+					
 			// get rotation of target node
 			Quaternion targetRotation = targetNode.getLocalRotation();
-			
-			// rotate cam direction by 180 degrees, since car is actually driving backwards
-			Quaternion YAW180 = new Quaternion().fromAngleAxis(FastMath.PI, new Vector3f(0,1,0));
-			targetRotation.multLocal(YAW180);
-			
-			// set camera rotation
-			cam.setRotation(targetRotation);
+			frontCameraNode.setLocalRotation(targetRotation);
 		}
-		
+		else if(camMode == CameraMode.CHASE)
+		{
+			chaseCam.update(tpf);
+		}
 		else if(camMode == CameraMode.TOP)
 		{
-			// set camera position
+			// camera detached from car node --> update position and rotation separately
 			Vector3f targetPosition = targetNode.localToWorld(new Vector3f(0, 0, 0), null);
 			Vector3f camPos = new Vector3f(targetPosition.x, targetPosition.y + topCamDistance, targetPosition.z);
-			cam.setLocation(camPos);
+			frontCameraNode.setLocalTranslation(camPos);
 
-			// set camera direction
-			Vector3f left = new Vector3f(-1, 0, 0);
-			Vector3f up = new Vector3f(0, 0, -1);
-			Vector3f direction = new Vector3f(0, -1f, 0);
-			cam.setAxes(left, up, direction);
+			float upDirection = 0;
+			if(isCarPointingUp)
+			{
+				float[] angles = new float[3];
+				targetNode.getLocalRotation().toAngles(angles);
+				upDirection = angles[1];
+			}
+			frontCameraNode.setLocalRotation(new Quaternion().fromAngles(-FastMath.HALF_PI, upDirection, 0));
 		}
 	}
 	

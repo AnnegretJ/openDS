@@ -108,6 +108,7 @@ public class GeometryGenerator extends Simulator
         
         //the actual model would be attached to this node
         Spatial model = (Spatial) assetManager.loadModel(ScenePath);        
+        model.setLocalScale(2, 1, 2);
         rootNode.attachChild(model);
         
         AmbientLight al = new AmbientLight();

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 
@@ -29,6 +30,7 @@ import eu.opends.basics.SimulationBasics;
 import eu.opends.drivingTask.settings.SettingsLoader;
 import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.main.Simulator;
+import eu.opends.opendrive.GeometryGenerator;
 import eu.opends.opendrive.data.*;
 import eu.opends.opendrive.processed.ODPoint.GeometryType;
 import eu.opends.opendrive.util.Spiral;
@@ -592,6 +594,8 @@ public class ODRoad
 		if(vizLine)
 			visualizer.drawConnector(lineID, pointList, visualizer.blueMaterial, vizArrows);
 		
+		//System.err.println("END ROTATION line: " + (targetPoint.getOrtho() * FastMath.RAD_TO_DEG)%360f); //TODO
+		
         return pointList;
 	}
 
@@ -682,6 +686,8 @@ public class ODRoad
         if(vizArc)
         	visualizer.drawConnector(arcID, pointList, visualizer.greenMaterial, vizArrows);
         
+        //System.err.println("END ROTATION arc: " + (targetPoint.getOrtho() * FastMath.RAD_TO_DEG)%360f); //TODO
+        
         return pointList;
 	}
 	
@@ -767,6 +773,8 @@ public class ODRoad
         
         if(vizSpiral)
         	visualizer.drawConnector(spiralID, pointList, visualizer.yellowMaterial, vizArrows);
+        
+        //System.err.println("END ROTATION spiral: " + (targetPoint.getOrtho() * FastMath.RAD_TO_DEG)%360f); //TODO
         
 		return pointList;
 	}
@@ -1038,7 +1046,10 @@ public class ODRoad
 	public double getElevation(double s)
 	{
 		if(road == null)
-			System.err.println("ODRoad::getElevation(): road is null");
+		{
+			if(!(sim instanceof GeometryGenerator))
+				System.err.println("ODRoad::getElevation(): road is null");
+		}
 		else
 		{
 			if(road.getElevationProfile() == null || road.getElevationProfile().getElevation() == null)

@@ -71,7 +71,7 @@ public class OpenDriveCenter
 	private static String schemaFile = "assets/DrivingTasks/Schema/OpenDRIVE_1.5M.xsd";
 	private boolean drawCompass = false;
 	private boolean drawMarker = true;
-	private boolean textureProjectionEnabled = true;
+	private boolean textureProjectionEnabled = false;
 	private double projectionOffset = 0.1;
 	
 	private SimulationBasics sim;
@@ -87,10 +87,14 @@ public class OpenDriveCenter
 	
 	public OpenDriveCenter(SimulationBasics sim)
 	{
-		// init projection settings
-		SettingsLoader settingsLoader = SimulationBasics.getSettingsLoader();
-		textureProjectionEnabled = settingsLoader.getSetting(Setting.OpenDrive_projectOntoTerrain, true);
-		projectionOffset = settingsLoader.getSetting(Setting.OpenDrive_projectionOffset, 0.1);
+		
+		if(!(sim instanceof GeometryGenerator))
+		{
+			// init projection settings
+			SettingsLoader settingsLoader = SimulationBasics.getSettingsLoader();
+			textureProjectionEnabled = settingsLoader.getSetting(Setting.OpenDrive_projectOntoTerrain, false);
+			projectionOffset = settingsLoader.getSetting(Setting.OpenDrive_projectionOffset, 0.1);
+		}
 		
 		this.sim = sim;
 		visualizer = new ODVisualizer(sim, drawCompass, drawMarker);

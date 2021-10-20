@@ -394,6 +394,38 @@ public class InteractionMethods
 
 	
 	@Action(
+			name = "setActiveReferenceObject", 
+			layer = Layer.SCENE, 
+			description = "Sets the given scene object to the focus of the gesture analyzer",
+			defaultDelay = 0,
+			defaultRepeat = 0,
+			param = {@Parameter(name="id", type="String", defaultValue="model01", 
+								description="ID of the model to manipulate")
+					}
+		)
+	public TriggerAction setActiveReferenceObject(SimulationBasics sim, float delay, int repeat, Properties parameterList)
+	{
+		String parameter = "";
+		
+		try {
+
+			// look up id of object to set to focus
+			parameter = "id";
+			String id = parameterList.getProperty(parameter);
+			if(id == null)
+				throw new Exception();
+			
+			// create SetActiveReferenceObjectTriggerAction
+			return new SetActiveReferenceObjectTriggerAction(sim, delay, repeat, id);
+			
+		} catch (Exception e) {
+
+			reportError("setActiveReferenceObject", parameter);
+			return null;
+		}
+	}
+	
+	@Action(
 			name = "setAutoPilot", 
 			layer = Layer.INTERACTION, 
 			description = "Starts/stopps auto pilot",

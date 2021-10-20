@@ -231,7 +231,10 @@ This list can be considered as static declaration where unique identifiers have 
     					values).
     				</xs:documentation>
     			</xs:annotation>
-    		</xs:element>
+    		</xs:element>
+
+
+
     		<xs:choice minOccurs="1" maxOccurs="1">
     			<xs:element type="translation" name="translation"
     				maxOccurs="1" minOccurs="1">
@@ -246,7 +249,8 @@ This list can be considered as static declaration where unique identifiers have 
     				type="openDrivePositionType" maxOccurs="1" minOccurs="1">
     			</xs:element>
     		</xs:choice>
-    		<xs:element name="ambientLight" type="ambientLight" maxOccurs="1" minOccurs="0">
+    		<xs:element name="ambientLight" type="ambientLight"
+    			maxOccurs="1" minOccurs="0">
     			<xs:annotation>
     				<xs:documentation>
     					Color of ambient light illuminating the model as
@@ -254,7 +258,7 @@ This list can be considered as static declaration where unique identifiers have 
     				</xs:documentation>
     			</xs:annotation>
     		</xs:element>
-            <xs:element name="shadowMode" maxOccurs="1" minOccurs="0">
+    		<xs:element name="shadowMode" maxOccurs="1" minOccurs="0">
     			<xs:simpleType>
     				<xs:restriction base="xs:string">
     					<xs:enumeration value="CastAndReceive"></xs:enumeration>
@@ -264,7 +268,10 @@ This list can be considered as static declaration where unique identifiers have 
     				</xs:restriction>
     			</xs:simpleType>
     		</xs:element>
-        </xs:sequence>
+    		<xs:element name="referenceObject" type="referenceObject"
+    			maxOccurs="1" minOccurs="0">
+    		</xs:element>
+    	</xs:sequence>
     	<xs:attribute name="id" type="xs:string">
     		<xs:annotation>
     			<xs:documentation>
@@ -883,5 +890,72 @@ This list can be considered as static declaration where unique identifiers have 
         <xs:all>
     		<xs:element name="text" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
     	</xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="referenceObject">
+        <xs:all>
+        	<xs:element name="alignToGrid" type="xs:boolean"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+
+        	<xs:element name="logo" type="logo" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="textureMap" type="textureMap"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        </xs:all>
+
+    </xs:complexType>
+
+    <xs:complexType name="enableLogoSigns">
+        <xs:all>
+        	<xs:element name="front" type="xs:boolean" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="back" type="xs:boolean" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="left" type="xs:boolean" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="right" type="xs:boolean" maxOccurs="1" minOccurs="0"></xs:element>
+        </xs:all>
+
+    </xs:complexType>
+
+    <xs:complexType name="logo">
+        <xs:all>
+        	<xs:element name="enableLogoSigns" type="enableLogoSigns"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="xPos" type="xs:float" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="yPos" type="xs:float" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="width" type="xs:float" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="height" type="xs:float" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="texturePath" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+        </xs:all>
+
+    </xs:complexType>
+
+    <xs:complexType name="textureMap">
+    	<xs:sequence>
+    		<xs:element name="texture" type="texture"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="texture">
+    	<xs:attribute name="geometryName" type="xs:string"></xs:attribute>
+    	<xs:attribute name="textureFile" type="xs:string"></xs:attribute>
     </xs:complexType>
 </xs:schema>

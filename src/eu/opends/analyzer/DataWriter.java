@@ -29,12 +29,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
 
 import eu.opends.car.Car;
-import eu.opends.main.Simulator;
-import eu.opends.oculusRift.OculusRift;
 import eu.opends.tools.Util;
 
 /**
@@ -61,6 +58,18 @@ public class DataWriter
 	private File analyzerDataFile;
 	private boolean dataWriterEnabled = false;
 	private String relativeDrivingTaskPath;
+	
+	private Vector3f frontPosition = new Vector3f(0,0,0);
+	public void setFrontPosition(Vector3f frontPosition)
+	{
+		this.frontPosition = frontPosition;
+	}
+	
+	private String referenceObjectData = "[]";
+	public void setReferenceObjectData(String referenceObjectData)
+	{
+		this.referenceObjectData = referenceObjectData;
+	}
 
 
 	public DataWriter(String outputFolder, Car car, String driverName, String absoluteDrivingTaskPath, int trackNumber) 
@@ -96,11 +105,6 @@ public class DataWriter
 			i++;
 		}
 		
-		
-		String occulusHeader = "";
-		if(Simulator.oculusRiftAttached)
-			occulusHeader = " : OculusRift Horizontal Angle (- = left, + = right): OculusRift Vertical Angle (- = down, + = up)";
-		
 		try {
 			out = new BufferedWriter(new FileWriter(outFile));
 			out.write("Driving Task: " + relativeDrivingTaskPath + newLine);
@@ -110,7 +114,7 @@ public class DataWriter
 			out.write("Driver: " + driverName + newLine);
 			out.write("Used Format = Time (ms) : Position (x,y,z) : Rotation (x,y,z,w) :"
 					+ " Speed (km/h) : Steering Wheel Position [-1,1] : Gas Pedal Position :"
-					+ " Brake Pedal Position : Engine Running" + occulusHeader + newLine);
+					+ " Brake Pedal Position : Engine Running : Front Position(x,y,z) : Reference Objects" + newLine);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -140,33 +144,33 @@ public class DataWriter
 		
 		Date curDate = new Date();
 
-		if (curDate.getTime() - lastAnalyzerDataSave/*.getTime()*/ >= 2*updateInterval) 
+		if (curDate.getTime() - lastAnalyzerDataSave >= 2*updateInterval) 
 		{
 			lastAnalyzerDataSave = curDate.getTime() - 2*updateInterval;
 		}
 		
 		
-		if (curDate.getTime() - lastAnalyzerDataSave/*.getTime()*/ >= updateInterval) 
+		if (curDate.getTime() - lastAnalyzerDataSave >= updateInterval) 
 		{
 			//System.err.println("diff: " + (curDate.getTime() - lastAnalyzerDataSave));
 			write(
 					curDate,
-					Math.round(car.getPosition().x * 1000) / 1000.0f,
-					Math.round(car.getPosition().y * 1000) / 1000.0f,
-					Math.round(car.getPosition().z * 1000) / 1000.0f,
-					Math.round(car.getRotation().getX() * 10000) / 10000.0f,
-					Math.round(car.getRotation().getY() * 10000) / 10000.0f,
-					Math.round(car.getRotation().getZ() * 10000) / 10000.0f,
-					Math.round(car.getRotation().getW() * 10000) / 10000.0f,
-					car.getCurrentSpeedKmhRounded(), 
-					Math.round(car.getSteeringWheelState() * 100000) / 100000.0f, 
+					car.getPosition().x,
+					car.getPosition().y,
+					car.getPosition().z,
+					car.getRotation().getX(),
+					car.getRotation().getY(),
+					car.getRotation().getZ(),
+					car.getRotation().getW(),
+					car.getCurrentSpeedKmhRounded(),
+					car.getSteeringWheelState(),
 					car.getAcceleratorPedalIntensity(),
 					car.getBrakePedalIntensity(),
 					car.isEngineOn(),
-					new Quaternion()
+					frontPosition,
+					referenceObjectData
 					);
 
-			//lastAnalyzerDataSave = curDate;
 			lastAnalyzerDataSave += updateInterval;
 		}
 
@@ -178,11 +182,11 @@ public class DataWriter
 	public void write(Date curDate, float x, float y, float z, float xRot,
 			float yRot, float zRot, float wRot, float linearSpeed,
 			float steeringWheelState, float gasPedalState, float brakePedalState,
-			boolean isEngineOn, Quaternion oculusRiftOrientation) 
+			boolean isEngineOn, Vector3f frontPosition, String referenceObjectData) 
 	{
 		DataUnit row = new DataUnit(curDate, x, y, z, xRot, yRot, zRot, wRot,
 				linearSpeed, steeringWheelState, gasPedalState, brakePedalState,
-				isEngineOn, oculusRiftOrientation);
+				isEngineOn, frontPosition, referenceObjectData);
 		this.write(row);
 
 	}
@@ -209,21 +213,14 @@ public class DataWriter
 			StringBuffer sb = new StringBuffer();
 			for (DataUnit r : arrayDataList) {
 				
-				String occulusData = "";
-				if(Simulator.oculusRiftAttached)
-				{
-					float[] angles = r.getOculusRiftOrientation().toAngles(null);
-					float verticalRot = Math.round(-angles[0]*FastMath.RAD_TO_DEG*100)/100f;
-					float horizontalRot = Math.round(-angles[1]*FastMath.RAD_TO_DEG*100)/100f;
-					occulusData = ":" + horizontalRot + ":" + verticalRot;
-				}
-				
 				sb.append(r.getDate().getTime() + ":" + r.getXpos() + ":"
 						+ r.getYpos() + ":" + r.getZpos() + ":" + r.getXrot()
 						+ ":" + r.getYrot() + ":" + r.getZrot() + ":"
 						+ r.getWrot() + ":" + r.getSpeed() + ":"
 						+ r.getSteeringWheelPos() + ":" + r.getAcceleratorPedalPos() + ":"
-						+ r.getBrakePedalPos() + ":" + r.isEngineOn() + occulusData + newLine
+						+ r.getBrakePedalPos() + ":" + r.isEngineOn() + ":"
+						+ r.getFrontPosition().getX() + ":" + r.getFrontPosition().getY() + ":"
+						+ r.getFrontPosition().getZ() + ":" + r.getReferenceObjectData() + newLine
 						);
 			}
 			out.write(sb.toString());

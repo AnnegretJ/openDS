@@ -609,7 +609,7 @@ public class Simulator extends SimulationBasics
 			super.simpleUpdate(tpf);
 			
 			// updates camera
-			cameraFactory.updateCamera();
+			cameraFactory.updateCamera(tpf);
 		
 			if(!isPause())
 				car.getCarControl().updateRPM(tpf);
@@ -617,8 +617,6 @@ public class Simulator extends SimulationBasics
 			PanelCenter.update();
 		
 			triggerCenter.doTriggerChecks();
-		
-			updateDataWriter();
 			
 			// send camera data via TCP to Lightning
 			if(lightningClient != null)
@@ -693,6 +691,10 @@ public class Simulator extends SimulationBasics
     		ffbController.update();
     		
     		eventCenter.update();
+    		
+    		gestureAnalyzer.updateRays(car.getPosition().add(0, 1, 0), car.getFrontGeometry().getWorldTranslation().add(0, 1, 0));
+    		
+			updateDataWriter();
     	}
     }
 

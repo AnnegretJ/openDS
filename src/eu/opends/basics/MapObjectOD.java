@@ -25,6 +25,7 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 
+import eu.opends.gesture.ReferenceObjectParams;
 import eu.opends.opendrive.OpenDriveCenter;
 import eu.opends.opendrive.processed.ODPoint;
 
@@ -97,10 +98,11 @@ public class MapObjectOD extends MapObject
 	 */
 	public MapObjectOD(String name, Spatial spatial, String roadID, float s, float lateralOffset, 
 			float verticalOffset, Quaternion rotation, Vector3f scale, boolean isVisible, boolean addToMapNode, 
-			String collisionShape, float mass, String modelPath, String collisionSound)
+			String collisionShape, float mass, String modelPath, String collisionSound, 
+			ReferenceObjectParams referenceObjectParams)
 	{
 		super(name, spatial, null, rotation, scale, isVisible, addToMapNode, collisionShape, mass, 
-				modelPath, collisionSound);
+				modelPath, collisionSound, referenceObjectParams);
 		this.roadID = roadID;
 		this.s = s;
 		this.lateralOffset = lateralOffset;

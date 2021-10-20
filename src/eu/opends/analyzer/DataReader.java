@@ -32,6 +32,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 
 import eu.opends.drivingTask.DrivingTask;
+import eu.opends.gesture.RecordedReferenceObject;
 
 /**
  * 
@@ -119,14 +120,19 @@ public class DataReader
 
 			while (inputLine != null) 
 			{
-				Vector3f carPosition = parseCarPosition(inputLine);
+				String[] splittedLineArray = inputLine.split(":");
+				
+				Long timeStamp = Long.parseLong(splittedLineArray[0]);
+				
+				Vector3f carPosition = new Vector3f(Float.parseFloat(splittedLineArray[1]), 
+						Float.parseFloat(splittedLineArray[2]), Float.parseFloat(splittedLineArray[3]));
 				carPositionList.add(carPosition);
 				
-				Quaternion carRotation = parseCarRotation(inputLine);
-				
-				Long timeStamp = parseTimeStamp(inputLine);
+				Quaternion carRotation = new Quaternion(Float.parseFloat(splittedLineArray[4]), 
+						Float.parseFloat(splittedLineArray[5]), Float.parseFloat(splittedLineArray[6]), 
+						Float.parseFloat(splittedLineArray[7]));
 
-				Float speed = parseSpeed(inputLine);
+				Float speed = Float.parseFloat(splittedLineArray[8]);
 				
 				if(previousPos == null)
 					previousPos = carPosition;
@@ -134,17 +140,22 @@ public class DataReader
 				traveledDistance += carPosition.distance(previousPos);
 				previousPos = carPosition;
 				
-				Float steeringWheelPosition = parseSteeringWheelPosition(inputLine);
+				Float steeringWheelPosition = Float.parseFloat(splittedLineArray[9]);
 				
-				Float acceleratorPedalPosition = parseAcceleratorPedalPosition(inputLine);
+				Float acceleratorPedalPosition = Float.parseFloat(splittedLineArray[10]);
 				
-				Float brakePedalPosition = parseBrakePedalPosition(inputLine);
+				Float brakePedalPosition = Float.parseFloat(splittedLineArray[11]);
 				
-				Boolean isEngineOn = parseIsEngineOn(inputLine);
+				Boolean isEngineOn = Boolean.parseBoolean(splittedLineArray[12]);
+				
+				Vector3f forwardPosition = new Vector3f(Float.parseFloat(splittedLineArray[13]), 
+						Float.parseFloat(splittedLineArray[14]), Float.parseFloat(splittedLineArray[15]));
+				
+				ArrayList<RecordedReferenceObject> referenceObjectList = parseRecordedReferenceData(splittedLineArray[16]);
 
 				DataUnit dataUnit = new DataUnit(new Date(timeStamp), carPosition, carRotation,
 						speed, steeringWheelPosition, acceleratorPedalPosition, brakePedalPosition,
-						isEngineOn, traveledDistance);
+						isEngineOn, traveledDistance, forwardPosition, referenceObjectList);
 				dataUnitList.add(dataUnit);
 				
 				inputLine = inputReader.readLine();
@@ -160,6 +171,42 @@ public class DataReader
 	}
 	
 	
+	private ArrayList<RecordedReferenceObject> parseRecordedReferenceData(String recordedReferenceDataString)
+	{
+		ArrayList<RecordedReferenceObject> recordedReferenceObjectList= new ArrayList<RecordedReferenceObject>();
+		
+		recordedReferenceDataString = recordedReferenceDataString.replace("[", "");
+		recordedReferenceDataString = recordedReferenceDataString.replace("]", "");
+		
+		if(!recordedReferenceDataString.isEmpty())
+		{
+			String[] referenceObjectStringArray = recordedReferenceDataString.split(";");
+			for(String referenceObjectString : referenceObjectStringArray)
+			{
+				// group4_building1(-1.0781823, -0.8631047, -0.010994518, 0.10122352, false)
+			
+				referenceObjectString = referenceObjectString.replace(")", "");
+				String[] nameAndPropertiesArray = referenceObjectString.split("\\(");
+				
+				String name = nameAndPropertiesArray[0].trim();
+				String propertiesString = nameAndPropertiesArray[1];
+			
+				String[] propertiesArray = propertiesString.split(",");
+				float minLatAngle = Float.parseFloat(propertiesArray[0]);
+				float maxLatAngle = Float.parseFloat(propertiesArray[1]);
+				float minVertAngle = Float.parseFloat(propertiesArray[2]);
+				float maxVertAngle = Float.parseFloat(propertiesArray[3]);
+				boolean isActive = Boolean.parseBoolean(propertiesArray[4].trim());
+			
+				recordedReferenceObjectList.add(new RecordedReferenceObject(name, minLatAngle, maxLatAngle, minVertAngle, 
+					maxVertAngle, isActive));
+			}
+		}
+		
+		return recordedReferenceObjectList;
+	}
+
+
 	public String getNameOfDriver() 
 	{
 		return nameOfDriver;
@@ -235,68 +282,5 @@ public class DataReader
 		
 		return true;
 	}
-	
-	
-	private Long parseTimeStamp(String inputLine) 
-	{
-		String[] splittedLineArray = inputLine.split(":");
-		return Long.parseLong(splittedLineArray[0]);
-	}
-	
 
-	private Vector3f parseCarPosition(String inputLine) 
-	{
-		String[] splittedLineArray = inputLine.split(":");
-
-		return new Vector3f(Float.parseFloat(splittedLineArray[1]), Float
-				.parseFloat(splittedLineArray[2]), Float
-				.parseFloat(splittedLineArray[3]));
-	}
-
-	
-	private Quaternion parseCarRotation(String inputLine)
-	{
-		String[] splittedLineArray = inputLine.split(":");
-
-		return new Quaternion(Float.parseFloat(splittedLineArray[4]), Float
-				.parseFloat(splittedLineArray[5]), Float
-				.parseFloat(splittedLineArray[6]), Float
-				.parseFloat(splittedLineArray[7]));
-	}
-	
-	
-	private Float parseSpeed(String inputLine) 
-	{
-		String[] splittedLineArray = inputLine.split(":");
-		return Float.parseFloat(splittedLineArray[8]);
-
-	}
-	
-	
-	private Float parseSteeringWheelPosition(String inputLine) 
-	{
-		String[] splittedLineArray = inputLine.split(":");
-		return Float.parseFloat(splittedLineArray[9]);
-	}
-	
-	
-	private Float parseAcceleratorPedalPosition(String inputLine) 
-	{
-		String[] splittedLineArray = inputLine.split(":");
-		return Float.parseFloat(splittedLineArray[10]);
-	}
-	
-	
-	private Float parseBrakePedalPosition(String inputLine) 
-	{
-		String[] splittedLineArray = inputLine.split(":");
-		return Float.parseFloat(splittedLineArray[11]);
-	}
-
-	
-	private Boolean parseIsEngineOn(String inputLine) 
-	{
-		String[] splittedLineArray = inputLine.split(":");
-		return Boolean.parseBoolean(splittedLineArray[12]);
-	}
 }

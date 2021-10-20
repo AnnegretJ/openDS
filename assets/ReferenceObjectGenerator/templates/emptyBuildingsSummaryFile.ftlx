@@ -1,0 +1,3 @@
+<#ftl output_format="XML" auto_esc=false>
+Group;Building;IsActive;RoadID;LongitudinalOffset;BuildingPosition;RoadSide;LateralOffset;ScalingFactor;RotationAngle;FloorArea;NoOfUpperFloors;LogoCategory;LogoName;LogoWidth;LogoHeight;LogoXPos;LogoYPos;GroundFloorID;upperFloorsID
+${buildingSummary}

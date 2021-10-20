@@ -1,0 +1,19 @@
+<#ftl output_format="XML" auto_esc=false>
+<?xml version="1.0" encoding="UTF-8"?>
+<geometryDescription xmlns="http://opends.eu/geometryDescription"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://opends.eu/geometryDescription geometryDescription.xsd">
+          
+    <road id="road1">
+    	<start x="0" y="0" hdg="0" />
+    	<geometries>
+		
+${segmentList}
+    	</geometries>
+    	<noOfLanes>2</noOfLanes>
+    	<width>6.50</width>
+    	<speedLimit>100</speedLimit>
+    </road>  
+    
+</geometryDescription>
+

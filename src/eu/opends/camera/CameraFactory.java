@@ -333,7 +333,7 @@ public abstract class CameraFactory
 	public abstract void changeCamera();
 
 	
-	public abstract void updateCamera();
+	public abstract void updateCamera(float tpf);
 
 	
 	private void setupCamera(int index, int totalInt) 

@@ -22,6 +22,8 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 
+import eu.opends.gesture.ReferenceObjectParams;
+
 
 
 /**
@@ -43,6 +45,7 @@ public class MapObject
 	protected float mass;
 	protected String modelPath;
 	protected String collisionSound;
+	protected ReferenceObjectParams referenceObjectParams;
 	
 
 	/**
@@ -82,9 +85,13 @@ public class MapObject
 	 * 
 	 * @param collisionSound 
 	 * 			Sound played when driver car collides with object
+	 * 
+	 * @param referenceObjectParams 
+	 * 			Parameters used if map object is a reference object
 	 */
 	public MapObject(String name, Spatial spatial, Vector3f location, Quaternion rotation, Vector3f scale,
-			boolean isVisible, boolean addToMapNode, String collisionShape, float mass, String modelPath, String collisionSound)
+			boolean isVisible, boolean addToMapNode, String collisionShape, float mass, String modelPath, 
+			String collisionSound, ReferenceObjectParams referenceObjectParams)
 	{
 		this.name = name;
 		this.spatial = spatial;
@@ -97,6 +104,7 @@ public class MapObject
 		this.mass = mass;
 		this.modelPath = modelPath;
 		this.collisionSound = collisionSound;
+		this.referenceObjectParams = referenceObjectParams;
 	}
 
 	
@@ -354,6 +362,18 @@ public class MapObject
 	public void setCollisionSound(String collisionSound) 
 	{
 		this.collisionSound = collisionSound;
+	}
+
+
+	public boolean isReferenceObject()
+	{
+		return (referenceObjectParams != null);
+	}
+	
+	
+	public ReferenceObjectParams getReferenceObjectParams()
+	{
+		return referenceObjectParams;
 	}
 
 }

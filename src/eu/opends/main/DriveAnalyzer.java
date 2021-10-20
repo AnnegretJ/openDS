@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -38,6 +39,7 @@ import com.jme3.asset.plugins.FileLocator;
 import com.jme3.font.BitmapText;
 import com.jme3.scene.Mesh.Mode;
 import com.jme3.scene.Spatial.CullHint;
+import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Curve;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.system.AppSettings;
@@ -49,10 +51,12 @@ import eu.opends.analyzer.DataReader;
 import eu.opends.analyzer.IdealLine;
 import eu.opends.analyzer.IdealLine.IdealLineStatus;
 import eu.opends.basics.InternalMapProcessing;
+import eu.opends.basics.MapObject;
 import eu.opends.basics.MapObjectOD;
 import eu.opends.basics.SimulationBasics;
 import eu.opends.camera.AnalyzerCam;
 import eu.opends.drivingTask.DrivingTask;
+import eu.opends.gesture.RecordedReferenceObject;
 import eu.opends.input.KeyBindingCenter;
 import eu.opends.knowledgeBase.KnowledgeBase;
 import eu.opends.niftyGui.AnalyzerFileSelectionGUIController;
@@ -88,6 +92,8 @@ public class DriveAnalyzer extends SimulationBasics
 	private Node lineNode = new Node();
 	private Node coneNode = new Node();
 	private Node target = new Node();
+	private Node frontNode = new Node();
+	private Node egoCamNode = new Node();
 	private int targetIndex = 0;
 	
 	private double totalDistance = 0;
@@ -172,7 +178,7 @@ public class DriveAnalyzer extends SimulationBasics
 		
 		super.simpleInitApp();	
 
-    	//load map model and setup car
+    	//load map model
 		InternalMapProcessing internalMapProcessing = new InternalMapProcessing(this);
 		
 		// setup key binding
@@ -217,7 +223,6 @@ public class DriveAnalyzer extends SimulationBasics
 		
         // setup camera settings
 		cameraFactory = new AnalyzerCam(this, target);
-		//target.attachChild(cameraFactory.getMainCameraNode()); // TODO
         
         visualizeData();
         
@@ -230,9 +235,17 @@ public class DriveAnalyzer extends SimulationBasics
 		if(autorun)
 			startReplay();
 		
+		// set front node which is always placed 15 meters in front of the current position
+        frontNode.setLocalTranslation(0, 0, -15);
+		target.attachChild(frontNode);
+		
+		// set ego cam node which is always placed 2 meters up and 1 cm behind the current position
+		egoCamNode.setLocalTranslation(0, 2, 0.01f);
+		target.attachChild(egoCamNode);
+		
         initializationFinished = true;
 	}
-
+	
 
 
 	/**
@@ -512,7 +525,6 @@ public class DriveAnalyzer extends SimulationBasics
 		
 		target.setLocalTranslation(currentDataUnit.getCarPosition());
 		target.setLocalRotation(currentDataUnit.getCarRotation());
-		cameraFactory.updateCamera();
 		
 		// update speed text
 		DecimalFormat decimalFormat = new DecimalFormat("#0.00");
@@ -536,7 +548,47 @@ public class DriveAnalyzer extends SimulationBasics
 		if(nextCone != null)
 			nextCone.setCullHint(CullHint.Always);
 		
+		updateReferenceObjects();
+		
 		updateMessageBox();
+	}
+
+
+	private void updateReferenceObjects()
+	{
+		String activeReferenceObjectName = null;
+		ArrayList<String> visibleObjects = new ArrayList<String>();
+		
+		// walk through all logged reference objects at the current position
+		ArrayList<RecordedReferenceObject> recRefObjList = currentDataUnit.getReferenceObjectList();
+		for(RecordedReferenceObject recRefObj : recRefObjList)
+		{
+			// collect the name of the current active reference object
+			if(recRefObj.isActive())
+				activeReferenceObjectName = recRefObj.getName();
+			
+			// collect the IDs of all buildings visible at the current position
+			visibleObjects.add(recRefObj.getName());
+		}
+		
+		// walk through ALL registered reference objects (type: MapObject)
+		for(MapObject mapObject : gestureAnalyzer.getReferenceObjectList())
+		{
+			// make object visible if contained in list and invisible if not
+			if(visibleObjects.contains(mapObject.getName()))
+				mapObject.getSpatial().getParent().setCullHint(CullHint.Inherit);
+			else
+				mapObject.getSpatial().getParent().setCullHint(CullHint.Always);
+		}
+
+		// set active reference object
+		gestureAnalyzer.setActiveReferenceObject(activeReferenceObjectName);
+		
+		// draw rays
+		Vector3f origin = currentDataUnit.getCarPosition().add(0, 2f, 0);
+		//Vector3f frontPos = frontNode.getWorldTranslation().add(0, 1, 0);	  // frontPos of DriveAnalyzer
+		Vector3f frontPos = currentDataUnit.getFrontPosition().add(0, 2f, 0);  // original frontPos of Simulator
+		gestureAnalyzer.updateRays(origin, frontPos);
 	}
 
 
@@ -630,6 +682,8 @@ public class DriveAnalyzer extends SimulationBasics
     	{
 			// updates camera
 			super.simpleUpdate(tpf);
+			
+			cameraFactory.updateCamera(tpf);
 			
 			if(updateMessageBox)
 				PanelCenter.getMessageBox().update();
@@ -760,6 +814,18 @@ public class DriveAnalyzer extends SimulationBasics
 	public void toggleMessageBoxUpdates() 
 	{
 		updateMessageBox = !updateMessageBox;
+	}
+
+
+	public Node getFrontNode()
+	{
+		return frontNode;		
+	}
+	
+	
+	public Node getEgoCamNode()
+	{
+		return egoCamNode;		
 	}
 
 }

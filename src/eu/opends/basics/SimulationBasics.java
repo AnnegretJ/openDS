@@ -51,6 +51,7 @@ import eu.opends.drivingTask.scene.SceneLoader;
 import eu.opends.drivingTask.settings.SettingsLoader;
 import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.environment.TrafficLightCenter;
+import eu.opends.gesture.GestureAnalyzer;
 import eu.opends.input.KeyBindingCenter;
 import eu.opends.main.SimulationDefaults;
 import eu.opends.main.Simulator;
@@ -96,6 +97,7 @@ public class SimulationBasics extends SimpleApplication
 	protected boolean debugEnabled = false;
 	protected int numberOfScreens;
 	protected StereoCamAppState stereoCamAppState;
+	protected GestureAnalyzer gestureAnalyzer;
 	protected Spatial observer = new Node("observer");
 	protected Node skyNode = new Node("skyNode");
 	protected Node coordinateSystem = new Node("coordinateSystem");
@@ -167,6 +169,12 @@ public class SimulationBasics extends SimpleApplication
     }
     
     
+	public GestureAnalyzer getGestureAnalyzer()
+	{
+		return gestureAnalyzer;
+	}
+    
+	
     public PhysicsSpace getBulletPhysicsSpace() 
     {
         return bulletAppState.getPhysicsSpace();
@@ -341,6 +349,8 @@ public class SimulationBasics extends SimpleApplication
         keyMappingGUI = new KeyMappingGUI(this);
         shutDownGUI = new ShutDownGUI(this);
         instructionScreenGUI = new InstructionScreenGUI(this);
+        
+        gestureAnalyzer = new GestureAnalyzer(this);
         
         createCoordinateSystem();
     }
