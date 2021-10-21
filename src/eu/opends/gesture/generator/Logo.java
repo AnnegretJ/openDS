@@ -82,7 +82,7 @@ public class Logo
 				"\t\t\t<directional value=\"false\" />\n" + 
 				"\t\t\t<loop>false</loop>\n" + 
 				"\t\t\t<pitch>1</pitch>\n" + 
-				"\t\t\t<volume>1</volume>\n" + 
+				"\t\t\t<volume>0.1</volume>\n" + 
 				"\t\t</sound>\n";
 		
 		return soundNodeString;

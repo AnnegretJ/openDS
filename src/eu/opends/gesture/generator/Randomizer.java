@@ -35,8 +35,8 @@ public class Randomizer
 {
 	// parameters
 	// ----------
-	private boolean applyUserDefinedSeed = false;
-	private long userDefinedSeed = 6439588709713432156L; // good for 8 / 16 building setting
+	private boolean applyUserDefinedSeed = true;
+	private long userDefinedSeed = 6439588709713432156L; //6439588709713432156L; // good for 8 / 16 building setting
 	
 	private String openDriveFile = "road.xodr";
 	
@@ -49,8 +49,8 @@ public class Randomizer
 	private int maxG = 72; // number of ground floor textures
 	private int maxU = 99; // number of upper floor textures
 	
-	private int numberOfBuildingsLowDensity = 10; // number of buildings in a "low-density group"
-	private int numberOfBuildingsHighDensity = 20; // number of buildings in a "high-density group"
+	private int numberOfBuildingsLowDensity = 8; // number of buildings in a "low-density group"
+	private int numberOfBuildingsHighDensity = 16; // number of buildings in a "high-density group"
 	
 	// starting positions (s values) of each line segment that can be used to place a building group
 	private ArrayList<LineSegment> lineSegmentList;
@@ -274,7 +274,7 @@ public class Randomizer
 	public float getActivateRefGroupS(int groupIndex)
 	{
 		// s value of the trigger to set active reference object
-		return getLineStartS(groupIndex);
+		return getLineStartS(groupIndex) - 40;
 	}
 	
 	
@@ -299,7 +299,7 @@ public class Randomizer
 	{
 		// s value of the group's first building
 		// --> 195 meters before the last building of the group
-		return getBuildingEndS(groupIndex) - 195;
+		return getBuildingEndS(groupIndex) - 155; //- 195;
 	}
 
 	

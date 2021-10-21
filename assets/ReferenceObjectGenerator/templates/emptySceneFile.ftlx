@@ -10,7 +10,7 @@
     		<directional value="false" />
     		<loop>false</loop>
     		<pitch>1</pitch>
-    		<volume>1</volume>
+    		<volume>0.1</volume>
     	</sound>
 ${soundList}
     </sounds>
