@@ -33,11 +33,18 @@ import eu.opends.gesture.generator.summary.SummaryWriter;
 
 public class ReferenceObjectGenerator extends SimpleApplication 
 {
-	private String projectFolder = "assets/DrivingTasks/Projects/BBB";
+	private static String projectFolder = "assets/DrivingTasks/Projects/BBB";
+	private static Long seed = null;
 	
 	
     public static void main(String[] args) 
     {
+    	if(args.length > 0)
+    		projectFolder = args[0];
+    	
+    	if(args.length > 1)
+    		seed = Long.parseLong(args[1]);
+    	
     	java.util.logging.Logger.getLogger("").setLevel(java.util.logging.Level.SEVERE);
     	ReferenceObjectGenerator app = new ReferenceObjectGenerator();
         app.start(Type.Headless);
@@ -53,7 +60,7 @@ public class ReferenceObjectGenerator extends SimpleApplication
 				"summary_groups.csv", "summary_buildings.csv", "summary_positions.csv");
 		SceneWriter sceneWriter = new SceneWriter(projectFolder, "scene.xml");
 		InteractionWriter interactionWriter = new InteractionWriter(projectFolder, "interaction.xml");
-    	Randomizer randomizer = new Randomizer(projectFolder, assetManager, summaryWriter);
+    	Randomizer randomizer = new Randomizer(projectFolder, seed, assetManager, summaryWriter);
     	Random seededRandom = randomizer.getSeededRandom();
 
     	// forward list of all available logos to scene writer (initialization of audio nodes)

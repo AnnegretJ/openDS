@@ -35,8 +35,8 @@ public class Randomizer
 {
 	// parameters
 	// ----------
-	private boolean applyUserDefinedSeed = true;
-	private long userDefinedSeed = 6439588709713432156L; //6439588709713432156L; // good for 8 / 16 building setting
+	private boolean applyUserDefinedSeed = false;
+	private long userDefinedSeed = 8693760534096910605L; //6439588709713432156L; // good for 8 / 16 building setting
 	
 	private String openDriveFile = "road.xodr";
 	
@@ -67,8 +67,14 @@ public class Randomizer
 	private int currentU = 1;
 
 	
-	public Randomizer(String projectFolder, AssetManager assetManager, SummaryWriter summaryWriter)
+	public Randomizer(String projectFolder, Long seedFromArgumentList, AssetManager assetManager, SummaryWriter summaryWriter)
 	{
+		if(seedFromArgumentList != null)
+		{
+			userDefinedSeed = seedFromArgumentList;
+			applyUserDefinedSeed = true;
+		}
+		
 		if(!applyUserDefinedSeed)
 		{
 			Random random = new Random();

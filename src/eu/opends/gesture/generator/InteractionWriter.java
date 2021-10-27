@@ -107,17 +107,32 @@ public class InteractionWriter
 		}	
 			
 		
-		// set active reference object activities
+		// set active reference object (pointing task) or pedestrian activity (non-pointing task)
 		for(int groupIndex=1; groupIndex<=maxGroupIndex; groupIndex++)
 		{
-			int buildingIndex = referenceBuildingIndex[groupIndex-1]+1;
+			boolean isPointingTask = randomizer.isPointingTask(groupIndex);
+			
+			if(isPointingTask)
+			{
+				int buildingIndex = referenceBuildingIndex[groupIndex-1]+1;
 					
-			activitiesString += 
-				"\t\t<activity id=\"set_active_reference_group_" + groupIndex + "\">\n" +
-					"\t\t\t<action id=\"setActiveReferenceObject\" delay=\"0\" repeat=\"0\">\n" +
-						"\t\t\t\t<parameter name=\"id\" value=\"group" + groupIndex + "_building" + buildingIndex + "\" />\n" +
-					"\t\t\t</action>\n" +
-				"\t\t</activity>\n";
+				activitiesString += 
+					"\t\t<activity id=\"set_active_reference_group_" + groupIndex + "\">\n" +
+						"\t\t\t<action id=\"setActiveReferenceObject\" delay=\"0\" repeat=\"0\">\n" +
+							"\t\t\t\t<parameter name=\"id\" value=\"group" + groupIndex + "_building" + buildingIndex + "\" />\n" +
+						"\t\t\t</action>\n" +
+					"\t\t</activity>\n";
+			}
+			else
+			{
+				activitiesString += 
+					"\t\t<activity id=\"set_pedestrian_to_WP_" + groupIndex + "\">\n" +
+						"\t\t\t<action id=\"moveTraffic\" delay=\"0\" repeat=\"0\">\n" +
+							"\t\t\t\t<parameter name=\"trafficObjectID\" value=\"pedestrian01\" />\n" +
+							"\t\t\t\t<parameter name=\"wayPointID\" value=\"WP" + groupIndex + "Start\" />\n" +
+						"\t\t\t</action>\n" +
+					"\t\t</activity>\n";
+			}
 		}
 		
 			
@@ -125,14 +140,25 @@ public class InteractionWriter
 		for(int groupIndex=1; groupIndex<=maxGroupIndex; groupIndex++)
 		{
 			String roadID = "road1";
-			int lane = -1;
+			//int lane = -1;
 			int triggerShowGroupS = (int) randomizer.getTriggerShowGroupS(groupIndex);
 			boolean isPointingTask = randomizer.isPointingTask(groupIndex);
 					
 			// add trigger to show group
 			triggersString +=
 				"\t\t<trigger id=\"show_group_" + groupIndex + "_trigger\" priority=\"1\">\n" +
-					"\t\t\t<activities>\n" +
+					"\t\t\t<activities>\n";
+			
+			if(!isPointingTask)
+				triggersString += 
+						"\t\t\t\t<activity ref=\"set_pedestrian_to_WP_" + groupIndex +  "\" />\n";
+			
+			// make sure previous group is REALLY hidden (2nd attempt)
+			if(groupIndex-1 > 0)
+				triggersString +=
+						"\t\t\t\t<activity ref=\"hide_group_" + (groupIndex-1) + "\" />\n";
+			
+			triggersString +=
 						"\t\t\t\t<activity ref=\"show_group_" + groupIndex + "\" />\n" +
 					"\t\t\t</activities>\n" +
 					"\t\t\t<condition>\n" +
@@ -154,7 +180,7 @@ public class InteractionWriter
 				int triggerActivateRefGroupS = (int) randomizer.getActivateRefGroupS(groupIndex);
 				
 			
-				// add trigger to activate reference object and play beep sound
+				// add trigger to activate reference object and play "Point at <logo>" sound
 				triggersString +=
 					"\t\t<trigger id=\"set_active_reference_group_" + groupIndex + "_trigger\" priority=\"1\">\n" +
 						"\t\t\t<activities>\n" +
@@ -167,6 +193,27 @@ public class InteractionWriter
 								"\t\t\t\t\t<roadID>" + roadID + "</roadID>\n" + 
 								//"\t\t\t\t\t<lane>" + lane + "</lane>\n" +  // trigger in any lane
 								"\t\t\t\t\t<s>" + triggerActivateRefGroupS + "</s>\n" + 
+							"\t\t\t\t</openDrivePos>\n" + 
+						"\t\t\t</condition>\n" + 
+					"\t\t</trigger>\n";
+			}
+			else
+			{
+				// play sound at exactly that position where the activation of the reference object 
+				// would be located in a pointing task
+				int triggerWaveSoundS = (int) randomizer.getActivateRefGroupS(groupIndex);
+			
+				// add trigger to play "Wave at the pedestrian" sound
+				triggersString +=
+					"\t\t<trigger id=\"play_wave_at_pedestrian_group_" + groupIndex + "_trigger\" priority=\"1\">\n" +
+						"\t\t\t<activities>\n" +
+							"\t\t\t\t<activity ref=\"playWaveAtThePedestrianSound\" />\n" +
+						"\t\t\t</activities>\n" +
+						"\t\t\t<condition>\n" +
+							"\t\t\t\t<openDrivePos>\n" + 
+								"\t\t\t\t\t<roadID>" + roadID + "</roadID>\n" + 
+								//"\t\t\t\t\t<lane>" + lane + "</lane>\n" +  // trigger in any lane
+								"\t\t\t\t\t<s>" + triggerWaveSoundS + "</s>\n" + 
 							"\t\t\t\t</openDrivePos>\n" + 
 						"\t\t\t</condition>\n" + 
 					"\t\t</trigger>\n";

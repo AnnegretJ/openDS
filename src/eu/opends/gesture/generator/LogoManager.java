@@ -28,6 +28,8 @@ import com.jme3.asset.AssetManager;
 
 public class LogoManager
 {
+	private boolean mixLogoCategoriesWithinGroup = true;
+	
 	private String generalLogoPath = "assets/GestureTask/Logos/";
 	private String generalSoundPath = "assets/GestureTask/Sounds/";
 	
@@ -37,6 +39,9 @@ public class LogoManager
 	private ArrayList<Logo> bankLogoList;
 	private ArrayList<Logo> restaurantLogoList;
 	private ArrayList<Logo> supermarketLogoList;
+	
+	// mixed list containing all logos from the previous lists at random position
+	private ArrayList<Logo> mixedLogoList = new ArrayList<Logo>();
 	
 	// mixed list containing the reference logo of group x at index x
 	private ArrayList<Logo> referenceLogos = new ArrayList<Logo>();
@@ -56,6 +61,9 @@ public class LogoManager
 		bankLogoList = createLogoList(LogoCategory.Bank);
 		restaurantLogoList = createLogoList(LogoCategory.Restaurant);
 		supermarketLogoList = createLogoList(LogoCategory.Supermarket);
+		mixedLogoList.addAll(bankLogoList);
+		mixedLogoList.addAll(restaurantLogoList);
+		mixedLogoList.addAll(supermarketLogoList);
 		
 		// Fill reference logo list with all available logos and shuffle it.
 		// If needed, append one ore more shuffled lists to the end
@@ -115,7 +123,7 @@ public class LogoManager
 		
 		// if a new group (starting with building index 0) has been requested, shuffle respective logo list first
 		if(absBuildingIndex == 0)
-			shuffleLogoList(referenceLogo.getCategory());
+			shuffleLogoList(mixLogoCategoriesWithinGroup, referenceLogo.getCategory());
 		
 		// if current building is used as reference building
 		if(absRefBuildingIndex == absBuildingIndex)
@@ -126,7 +134,7 @@ public class LogoManager
 		else
 		{
 			// otherwise select a logo from the list of the same category
-			ArrayList<Logo> logoList = getLogoListByCategory(referenceLogo.getCategory());
+			ArrayList<Logo> logoList = getLogoListByCategory(mixLogoCategoriesWithinGroup, referenceLogo.getCategory());
 			 
 			// the logo used for the current building (with index x) can be found in the logo list at position x
 			// this avoids a logo being used more than once in the same group
@@ -136,33 +144,49 @@ public class LogoManager
 			if(!returnLogo.getName().equals(referenceLogo.getName()))
 				return returnLogo;
 			else
-				// if so, use the logo at the position having the same index as the reference building instead 
-				return logoList.get(absRefBuildingIndex);
+			{
+				if(mixLogoCategoriesWithinGroup)
+					// if same logo + mixed categories: use the logo at the end of the list
+					return logoList.get(logoList.size() - 1);
+				else
+					// if same logo + same category: use the logo at the position having the same index as the reference building instead 
+					return logoList.get(absRefBuildingIndex);
+			}
 		}
 	}
 
 
-	private void shuffleLogoList(LogoCategory category)
+	private void shuffleLogoList(boolean isMixed, LogoCategory category)
 	{
-		if(category == LogoCategory.Bank)
-			Collections.shuffle(bankLogoList);
-		else if(category == LogoCategory.Restaurant)
-			Collections.shuffle(restaurantLogoList);
-		else if(category == LogoCategory.Supermarket)
-			Collections.shuffle(supermarketLogoList);
+		if(isMixed)
+			Collections.shuffle(mixedLogoList);
+		else
+		{
+			if(category == LogoCategory.Bank)
+				Collections.shuffle(bankLogoList);
+			else if(category == LogoCategory.Restaurant)
+				Collections.shuffle(restaurantLogoList);
+			else if(category == LogoCategory.Supermarket)
+				Collections.shuffle(supermarketLogoList);
+		}
 	}
 
 	
-	private ArrayList<Logo> getLogoListByCategory(LogoCategory category)
+	private ArrayList<Logo> getLogoListByCategory(boolean isMixed, LogoCategory category)
 	{
 		ArrayList<Logo> logoList;
 		
-		if(category == LogoCategory.Bank)
-			logoList = bankLogoList;
-		else if(category == LogoCategory.Restaurant)
-			logoList = restaurantLogoList;
-		else // --> category == LogoCategory.Supermarket
-			logoList = supermarketLogoList;
+		if(isMixed)
+			logoList = mixedLogoList;
+		else
+		{
+			if(category == LogoCategory.Bank)
+				logoList = bankLogoList;
+			else if(category == LogoCategory.Restaurant)
+				logoList = restaurantLogoList;
+			else // --> category == LogoCategory.Supermarket
+				logoList = supermarketLogoList;
+		}
 		
 		return logoList;
 	}

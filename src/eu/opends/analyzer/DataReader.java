@@ -80,7 +80,7 @@ public class DataReader
 			splittedLineArray = inputLine.split(": ");
 			try {
 				// Save the date
-				fileDate = new SimpleDateFormat("yyyy_mm_dd-hh_mm_ss")
+				fileDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 						.parse(splittedLineArray[1]);
 				if(verbose)
 					System.out.println("Creation Time: " + fileDate);
@@ -124,15 +124,17 @@ public class DataReader
 				
 				Long timeStamp = Long.parseLong(splittedLineArray[0]);
 				
-				Vector3f carPosition = new Vector3f(Float.parseFloat(splittedLineArray[1]), 
-						Float.parseFloat(splittedLineArray[2]), Float.parseFloat(splittedLineArray[3]));
+				//skip splittedLineArray[1], which is a human readable time stamp 
+				
+				Vector3f carPosition = new Vector3f(Float.parseFloat(splittedLineArray[2]), 
+						Float.parseFloat(splittedLineArray[3]), Float.parseFloat(splittedLineArray[4]));
 				carPositionList.add(carPosition);
 				
-				Quaternion carRotation = new Quaternion(Float.parseFloat(splittedLineArray[4]), 
-						Float.parseFloat(splittedLineArray[5]), Float.parseFloat(splittedLineArray[6]), 
-						Float.parseFloat(splittedLineArray[7]));
+				Quaternion carRotation = new Quaternion(Float.parseFloat(splittedLineArray[5]), 
+						Float.parseFloat(splittedLineArray[6]), Float.parseFloat(splittedLineArray[7]), 
+						Float.parseFloat(splittedLineArray[8]));
 
-				Float speed = Float.parseFloat(splittedLineArray[8]);
+				Float speed = Float.parseFloat(splittedLineArray[9]);
 				
 				if(previousPos == null)
 					previousPos = carPosition;
@@ -140,18 +142,18 @@ public class DataReader
 				traveledDistance += carPosition.distance(previousPos);
 				previousPos = carPosition;
 				
-				Float steeringWheelPosition = Float.parseFloat(splittedLineArray[9]);
+				Float steeringWheelPosition = Float.parseFloat(splittedLineArray[10]);
 				
-				Float acceleratorPedalPosition = Float.parseFloat(splittedLineArray[10]);
+				Float acceleratorPedalPosition = Float.parseFloat(splittedLineArray[11]);
 				
-				Float brakePedalPosition = Float.parseFloat(splittedLineArray[11]);
+				Float brakePedalPosition = Float.parseFloat(splittedLineArray[12]);
 				
-				Boolean isEngineOn = Boolean.parseBoolean(splittedLineArray[12]);
+				Boolean isEngineOn = Boolean.parseBoolean(splittedLineArray[13]);
 				
-				Vector3f forwardPosition = new Vector3f(Float.parseFloat(splittedLineArray[13]), 
-						Float.parseFloat(splittedLineArray[14]), Float.parseFloat(splittedLineArray[15]));
+				Vector3f forwardPosition = new Vector3f(Float.parseFloat(splittedLineArray[14]), 
+						Float.parseFloat(splittedLineArray[15]), Float.parseFloat(splittedLineArray[16]));
 				
-				ArrayList<RecordedReferenceObject> referenceObjectList = parseRecordedReferenceData(splittedLineArray[16]);
+				ArrayList<RecordedReferenceObject> referenceObjectList = parseRecordedReferenceData(splittedLineArray[17]);
 
 				DataUnit dataUnit = new DataUnit(new Date(timeStamp), carPosition, carRotation,
 						speed, steeringWheelPosition, acceleratorPedalPosition, brakePedalPosition,

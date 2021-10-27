@@ -10,10 +10,58 @@
 				<parameter name="soundID" value="pointAt" />
 			</action>
 		</activity>
+		<activity id="playWaveAtThePedestrianSound">
+			<action id="playSound" delay="0" repeat="0">
+				<parameter name="soundID" value="waveAtThePedestrian" />
+			</action>
+		</activity>
+		<activity id="startLogging">
+			<action id="startRecording" delay="0" repeat="0">
+				<parameter name="track" value="1" />
+			</action>
+		</activity>
+		<activity id="pauseSim">
+			<action id="pauseSimulation" delay="0" repeat="0">
+				<parameter name="duration" value="0" />
+			</action>
+		</activity>
 ${activities}
 	</activities>
 	
 	<triggers>
+		<trigger id="start_logging_trigger" priority="1">
+			<activities>
+				<activity ref="startLogging" />
+			</activities>
+			<condition>
+				<openDrivePos>
+					<roadID>road1</roadID>
+					<s>50</s>
+				</openDrivePos>
+			</condition>
+		</trigger>
+		<trigger id="half_time_pause" priority="1">
+			<activities>
+				<activity ref="pauseSim" />
+			</activities>
+			<condition>
+				<openDrivePos>
+					<roadID>road1</roadID>
+					<s>24498</s>
+				</openDrivePos>
+			</condition>
+		</trigger>
+		<trigger id="finish_pause" priority="1">
+			<activities>
+				<activity ref="pauseSim" />
+			</activities>
+			<condition>
+				<openDrivePos>
+					<roadID>road2</roadID>
+					<s>100</s>
+				</openDrivePos>
+			</condition>
+		</trigger>
 ${triggers}
 	</triggers>
 	

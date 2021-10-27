@@ -108,11 +108,11 @@ public class DataWriter
 		try {
 			out = new BufferedWriter(new FileWriter(outFile));
 			out.write("Driving Task: " + relativeDrivingTaskPath + newLine);
-			out.write("Date-Time: "
-					+ new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss")
+			out.write("Creation Time: "
+					+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 							.format(new Date()) + newLine);
 			out.write("Driver: " + driverName + newLine);
-			out.write("Used Format = Time (ms) : Position (x,y,z) : Rotation (x,y,z,w) :"
+			out.write("Used Format = Time (ms) : Timestamp : Position (x,y,z) : Rotation (x,y,z,w) :"
 					+ " Speed (km/h) : Steering Wheel Position [-1,1] : Gas Pedal Position :"
 					+ " Brake Pedal Position : Engine Running : Front Position(x,y,z) : Reference Objects" + newLine);
 
@@ -210,13 +210,13 @@ public class DataWriter
 	public void flush() 
 	{	
 		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss.SSS");
 			StringBuffer sb = new StringBuffer();
-			for (DataUnit r : arrayDataList) {
-				
-				sb.append(r.getDate().getTime() + ":" + r.getXpos() + ":"
-						+ r.getYpos() + ":" + r.getZpos() + ":" + r.getXrot()
-						+ ":" + r.getYrot() + ":" + r.getZrot() + ":"
-						+ r.getWrot() + ":" + r.getSpeed() + ":"
+			for (DataUnit r : arrayDataList)
+			{	
+				sb.append(r.getDate().getTime() + ":" + sdf.format(r.getDate()) + ":" + r.getXpos() + ":"
+						+ r.getYpos() + ":" + r.getZpos() + ":" + r.getXrot() + ":" + r.getYrot() + ":" 
+						+ r.getZrot() + ":"	+ r.getWrot() + ":" + r.getSpeed() + ":"
 						+ r.getSteeringWheelPos() + ":" + r.getAcceleratorPedalPos() + ":"
 						+ r.getBrakePedalPos() + ":" + r.isEngineOn() + ":"
 						+ r.getFrontPosition().getX() + ":" + r.getFrontPosition().getY() + ":"
