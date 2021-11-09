@@ -19,6 +19,7 @@
 package eu.opends.trigger;
 
 import eu.opends.analyzer.DataWriter;
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 import eu.opends.tools.PanelCenter;
 
@@ -28,10 +29,10 @@ import eu.opends.tools.PanelCenter;
  */
 public class StartRecordingTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private int trackNumber;
 	
-	public StartRecordingTriggerAction(float delay, int maxRepeat, Simulator sim, int trackNumber)
+	public StartRecordingTriggerAction(float delay, int maxRepeat, SimulationBasics sim, int trackNumber)
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
@@ -42,15 +43,15 @@ public class StartRecordingTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{		
-			if (sim.getMyDataWriter() == null)
+			if (((Simulator)sim).getMyDataWriter() == null)
 			{
-				sim.initializeDataWriter(trackNumber);
+				((Simulator)sim).initializeDataWriter(trackNumber);
 			}
 			
 			// start recording drive
-			DataWriter dataWriter = sim.getMyDataWriter();
+			DataWriter dataWriter = ((Simulator)sim).getMyDataWriter();
 	
 			if (!dataWriter.isDataWriterEnabled()) 
 			{

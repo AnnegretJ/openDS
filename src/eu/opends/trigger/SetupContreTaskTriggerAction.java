@@ -18,7 +18,9 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
+import eu.opends.taskDescription.contreTask.SteeringTask;
 
 /**
  * 
@@ -26,23 +28,28 @@ import eu.opends.main.Simulator;
  */
 public class SetupContreTaskTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private float targetObjectSpeed;
 	
-	public SetupContreTaskTriggerAction(float delay, int maxRepeat, Simulator sim, float targetObjectSpeed)
+	public SetupContreTaskTriggerAction(float delay, int maxRepeat, SimulationBasics sim, float targetObjectSpeed)
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
 		this.targetObjectSpeed = targetObjectSpeed;
 	}
 	
+	
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded() && sim.getSteeringTask()!=null)
-		{	
-			sim.getSteeringTask().setLateralSpeedOfTargetObject(targetObjectSpeed);
-			updateCounter();
+		if(!isExceeded() && sim instanceof Simulator)
+		{
+			SteeringTask steeringTask = ((Simulator)sim).getSteeringTask();
+			if(steeringTask != null)
+			{	
+				steeringTask.setLateralSpeedOfTargetObject(targetObjectSpeed);
+				updateCounter();
+			}
 		}
 	}
 

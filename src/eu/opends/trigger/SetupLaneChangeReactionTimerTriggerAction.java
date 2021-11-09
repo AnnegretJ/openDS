@@ -18,6 +18,7 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 
 /**
@@ -26,7 +27,7 @@ import eu.opends.main.Simulator;
  */
 public class SetupLaneChangeReactionTimerTriggerAction extends TriggerAction
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private String timerID;
 	private String reactionGroupID;
 	private String startLane;
@@ -44,7 +45,7 @@ public class SetupLaneChangeReactionTimerTriggerAction extends TriggerAction
 	public SetupLaneChangeReactionTimerTriggerAction(float delay, int maxRepeat, String timerID, String reactionGroupID, 
 			String startLane, String targetLane, float minSteeringAngle, float taskCompletionAfterTime, 
 			float taskCompletionAfterDistance, boolean allowBrake, float holdLaneFor, String failSound,
-			String successSound, String comment, Simulator sim) 
+			String successSound, String comment, SimulationBasics sim) 
 	{
 		super(delay, maxRepeat);
 		
@@ -67,9 +68,9 @@ public class SetupLaneChangeReactionTimerTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			sim.getReactionCenter().setupLaneChangeReactionTimer(timerID, reactionGroupID, startLane, targetLane,
+			((Simulator)sim).getReactionCenter().setupLaneChangeReactionTimer(timerID, reactionGroupID, startLane, targetLane,
 					minSteeringAngle, taskCompletionAfterTime, taskCompletionAfterDistance, allowBrake, holdLaneFor,
 					failSound, successSound, comment);
 			

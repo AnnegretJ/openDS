@@ -18,6 +18,7 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 
 /**
@@ -26,22 +27,23 @@ import eu.opends.main.Simulator;
  */
 public class OpenInstructionsScreenTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private String instructionID;
 	
-	public OpenInstructionsScreenTriggerAction(float delay, int maxRepeat, Simulator sim, String instructionID)
+	public OpenInstructionsScreenTriggerAction(float delay, int maxRepeat, SimulationBasics sim, String instructionID)
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
 		this.instructionID = instructionID;
 	}
 	
+	
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{	
-			sim.setInstructionScreen(instructionID);
+			((Simulator)sim).setInstructionScreen(instructionID);
 			updateCounter();
 		}
 	}

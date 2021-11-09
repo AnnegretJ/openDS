@@ -18,6 +18,7 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.car.Car;
 import eu.opends.main.Simulator;
 import eu.opends.tools.SpeedControlCenter;
@@ -30,9 +31,9 @@ public class GetTimeUntilSpeedChangeTriggerAction extends TriggerAction
 {
 	private String triggerName;
 	private int speedChange;
-	private Simulator sim;
+	private SimulationBasics sim;
 	
-	public GetTimeUntilSpeedChangeTriggerAction(float delay, int maxRepeat, String triggerName, int speedChange, Simulator sim)
+	public GetTimeUntilSpeedChangeTriggerAction(float delay, int maxRepeat, String triggerName, int speedChange, SimulationBasics sim)
 	{
 		super(delay, maxRepeat);
 		this.triggerName = triggerName;
@@ -44,9 +45,9 @@ public class GetTimeUntilSpeedChangeTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			Car car = sim.getCar();
+			Car car = ((Simulator)sim).getCar();
 			SpeedControlCenter.startSpeedChangeTimer(triggerName, speedChange, car);
 
 			updateCounter();

@@ -20,7 +20,7 @@ package eu.opends.trigger.condition;
 
 import java.util.ArrayList;
 
-import eu.opends.main.Simulator;
+import eu.opends.basics.SimulationBasics;
 import eu.opends.trigger.TriggerAction;
 
 
@@ -35,7 +35,7 @@ public abstract class TriggerCondition
 	}
 	
 	
-	public abstract void evaluate(Simulator sim, int priority, ArrayList<TriggerAction> triggerActionList);
+	public abstract void evaluate(SimulationBasics sim, int priority, ArrayList<TriggerAction> triggerActionList);
 }
 
 

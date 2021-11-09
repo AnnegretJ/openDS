@@ -72,7 +72,8 @@ public class DataWriter
 	}
 
 
-	public DataWriter(String outputFolder, Car car, String driverName, String absoluteDrivingTaskPath, int trackNumber) 
+	public DataWriter(String outputFolder, Car car, String driverName, String absoluteDrivingTaskPath, 
+			Date creationDate, int trackNumber) 
 	{
 		this.car = car;
 		this.relativeDrivingTaskPath = getRelativePath(absoluteDrivingTaskPath);
@@ -105,12 +106,15 @@ public class DataWriter
 			i++;
 		}
 		
+		if(creationDate == null)
+			creationDate = new Date();
+		
 		try {
 			out = new BufferedWriter(new FileWriter(outFile));
 			out.write("Driving Task: " + relativeDrivingTaskPath + newLine);
 			out.write("Creation Time: "
 					+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-							.format(new Date()) + newLine);
+							.format(creationDate) + newLine);
 			out.write("Driver: " + driverName + newLine);
 			out.write("Used Format = Time (ms) : Timestamp : Position (x,y,z) : Rotation (x,y,z,w) :"
 					+ " Speed (km/h) : Steering Wheel Position [-1,1] : Gas Pedal Position :"

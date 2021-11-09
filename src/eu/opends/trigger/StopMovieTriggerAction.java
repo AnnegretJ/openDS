@@ -18,6 +18,7 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 
 /**
@@ -26,20 +27,22 @@ import eu.opends.main.Simulator;
  */
 public class StopMovieTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	
-	public StopMovieTriggerAction(Simulator sim, float delay, int maxRepeat)
+	
+	public StopMovieTriggerAction(SimulationBasics sim, float delay, int maxRepeat)
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
 	}
 	
+	
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			sim.getMoviePlayer().stop();
+			((Simulator)sim).getMoviePlayer().stop();
 			
 			updateCounter();
 		}

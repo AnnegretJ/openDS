@@ -18,6 +18,7 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 
 
@@ -27,13 +28,13 @@ import eu.opends.main.Simulator;
  */
 public class SetCrosswindTriggerAction extends TriggerAction
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private String direction;
 	private float force;
 	private int duration;
 	
 	
-	public SetCrosswindTriggerAction(float delay, int maxRepeat, Simulator sim, String direction, float force, int duration)
+	public SetCrosswindTriggerAction(float delay, int maxRepeat, SimulationBasics sim, String direction, float force, int duration)
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
@@ -46,9 +47,9 @@ public class SetCrosswindTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			sim.getCar().setupCrosswind(direction, force, duration);
+			((Simulator)sim).getCar().setupCrosswind(direction, force, duration);
 			updateCounter();
 		}
 	}

@@ -24,14 +24,18 @@ import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
 
 import com.jme3.asset.AssetNotFoundException;
+import com.jme3.collision.CollisionResult;
+import com.jme3.collision.CollisionResults;
 import com.jme3.material.MatParamTexture;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Ray;
 import com.jme3.math.Spline;
 import com.jme3.math.Vector3f;
 import com.jme3.math.Spline.SplineType;
@@ -49,12 +53,14 @@ import eu.opends.analyzer.DataWriter;
 import eu.opends.basics.MapObject;
 import eu.opends.basics.SimulationBasics;
 import eu.opends.main.DriveAnalyzer;
+import eu.opends.main.PostProcessor;
 import eu.opends.main.Simulator;
 import eu.opends.tools.Util;
 
 public class GestureAnalyzer
 {
 	private boolean debug = false;
+	private boolean visualizeGazeWithinBounds = true;
 	
 	private SimulationBasics sim;
 	private ArrayList<MapObject> referenceObjectList = new ArrayList<MapObject>();
@@ -65,8 +71,13 @@ public class GestureAnalyzer
 	private HashMap<String, Node> connectorMap = new HashMap<String, Node>();
 	
 	private Material greenMaterial;
+	private Material yellowMaterial;
+	private Material orangeMaterial;
 	private Material redMaterial;
+	private Material whiteMaterial;
 	
+	private Float lateralGazeAngle = null;
+	private Float verticalGazeAngle = null;
 	
 	public ArrayList<MapObject> getReferenceObjectList()
 	{
@@ -82,9 +93,21 @@ public class GestureAnalyzer
 		greenMaterial.getAdditionalRenderState().setWireframe(false);
 		greenMaterial.setColor("Color", ColorRGBA.Green);
 		
+		yellowMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		yellowMaterial.getAdditionalRenderState().setWireframe(false);
+		yellowMaterial.setColor("Color", ColorRGBA.Yellow);
+		
+		orangeMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		orangeMaterial.getAdditionalRenderState().setWireframe(false);
+		orangeMaterial.setColor("Color", ColorRGBA.Orange);
+		
 		redMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		redMaterial.getAdditionalRenderState().setWireframe(false);
 		redMaterial.setColor("Color", ColorRGBA.Red);
+		
+		whiteMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		whiteMaterial.getAdditionalRenderState().setWireframe(false);
+		whiteMaterial.setColor("Color", ColorRGBA.White);
 	}
 	
 
@@ -358,8 +381,18 @@ public class GestureAnalyzer
 	}
 	
 
-	public void updateRays(Vector3f origin, Vector3f forwardPos)
+	public ArrayList<RecordedReferenceObject> updateRays(Vector3f origin, Vector3f forwardPos, Vector3f gazeDirectionWorld)
 	{
+		// visualize gaze (if not null)
+		if(gazeDirectionWorld != null)
+			updateGazeRay(origin, forwardPos, gazeDirectionWorld);
+		else
+		{
+			lateralGazeAngle = null;
+			verticalGazeAngle = null;
+			deleteRay("gazeRay");
+		}
+		
 		ArrayList<RecordedReferenceObject> logList = new ArrayList<RecordedReferenceObject>();
 		for(MapObject referenceObject : referenceObjectList)
 		{
@@ -373,6 +406,7 @@ public class GestureAnalyzer
 				deleteRays(referenceObject);
 		}
 		
+
 		// write log data (= angles between forward direction and ray towards building corner positions) to file
 		if(sim instanceof Simulator)
 		{
@@ -396,7 +430,7 @@ public class GestureAnalyzer
 				dataWriter.setReferenceObjectData(logString);
 			}
 		}
-		else if(sim instanceof DriveAnalyzer)
+		else if(sim instanceof DriveAnalyzer || sim instanceof PostProcessor)
 		{
 			/**/
 			String logString = "[";
@@ -411,12 +445,14 @@ public class GestureAnalyzer
 			
 			logString += "]";
 			
-			System.err.println(logString);
+			//System.err.println(logString);
 			/**/
 		}
+		
+		return logList;
 	}
-	
-	
+
+
 	private RecordedReferenceObject drawRaysPerObject(Vector3f origin, Vector3f forwardPos, MapObject referenceObject)
 	{
 		RecordedReferenceObject recRefObj = null;
@@ -480,10 +516,38 @@ public class GestureAnalyzer
 					if(verticalAngle < minVertAngle)
 						minVertAngle = verticalAngle;
 					
+					
 					if(referenceObject.equals(activeReferenceObject))
 						drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, greenMaterial);
 					else
 						drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, redMaterial);
+				}
+			}
+			
+			
+			// Overwrite red/green color if current gaze vector is set and 
+			// within lateral and vertical boundary of reference object.
+			// Exclude reference objects that are out of sight (angle > 90 degrees).
+			if(visualizeGazeWithinBounds && 
+					lateralGazeAngle != null && verticalGazeAngle != null &&
+					FastMath.abs(minLatAngle) < FastMath.HALF_PI && FastMath.abs(maxLatAngle) < FastMath.HALF_PI &&
+					FastMath.abs(minVertAngle) < FastMath.HALF_PI && FastMath.abs(maxVertAngle) < FastMath.HALF_PI &&
+					minLatAngle < lateralGazeAngle && lateralGazeAngle < maxLatAngle &&
+					minVertAngle < verticalGazeAngle && verticalGazeAngle < maxVertAngle)
+			{
+				for(int i=0; i<8; i++)
+				{
+					Spatial cornerNode = cornerNodes.getChild("cornerNode_" + i);
+					if(cornerNode != null)
+					{
+						// world coordinate system !!!
+						Vector3f cornerPos = cornerNode.getWorldTranslation();
+						
+						if(referenceObject.equals(activeReferenceObject))
+							drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, yellowMaterial);
+						else
+							drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, orangeMaterial);
+					}
 				}
 			}
 			
@@ -566,12 +630,12 @@ public class GestureAnalyzer
 			{
 				// create new sphere
 				marker = new Geometry(ID, new Sphere(10, 10, 0.5f));
-				marker.setLocalTranslation(targetPosition);
 				
 		        sim.getSceneNode().attachChild(marker);
 		        markerMap.put(ID, marker);
 			}
-
+			
+			marker.setLocalTranslation(targetPosition);
 			marker.setMaterial(material);
 			
 			Spatial connector = connectorMap.get(ID + "_connector");
@@ -614,21 +678,30 @@ public class GestureAnalyzer
 			for(int i=0; i<8; i++)
 			{
 				String ID = referenceObject.getName() + "_cornerRay_" + i;
-				
-				Spatial marker = markerMap.get(ID);
-				if(marker != null)
-				{
-					sim.getSceneNode().detachChild(marker);
-					markerMap.remove(ID);
-				}
-			
-				Spatial connector = connectorMap.get(ID + "_connector");
-				if(connector != null)
-				{
-					sim.getSceneNode().detachChild(connector);
-					connectorMap.remove(ID + "_connector");
-				}
+				deleteRay(ID);
 			}
+		}
+	}
+	
+	
+	private void deleteRay(String ID)
+	{
+		if(debug)
+		{
+			Spatial marker = markerMap.get(ID);
+			if(marker != null)
+			{
+				sim.getSceneNode().detachChild(marker);
+				markerMap.remove(ID);
+			}
+			
+			Spatial connector = connectorMap.get(ID + "_connector");
+			if(connector != null)
+			{
+				sim.getSceneNode().detachChild(connector);
+				connectorMap.remove(ID + "_connector");
+			}
+
 		}
 	}
 	
@@ -673,4 +746,111 @@ public class GestureAnalyzer
 		else
 			return 0;
 	}
+	
+	
+	private void updateGazeRay(Vector3f origin, Vector3f forwardPos, Vector3f direction)
+	{
+		// reset collision results list
+		CollisionResults results = new CollisionResults();
+		
+		// normalize direction vector
+		direction.normalizeLocal();
+
+		// aim a ray from the camera towards the target
+		Ray ray = new Ray(origin, direction);
+
+		// collect intersections between ray and scene elements in results list.
+		sim.getSceneNode().collideWith(ray, results);
+		
+		// if no reference object hit --> draw a ray of 1km length
+		Vector3f endOfRay = direction.mult(1000).add(origin);
+
+		boolean isReferenceObjectHit = false;
+		
+		if (results.size() > 0) 
+		{
+			Iterator<CollisionResult> resultIt = results.iterator();
+			
+			while(resultIt.hasNext())
+			{
+				// get closest visible reference object
+				CollisionResult result = resultIt.next();
+				MapObject referenceObject = getParentReferenceObject(result.getGeometry());
+				float distance = result.getDistance();
+				
+				if(referenceObject != null && distance < 1000)
+				{
+					if(!referenceObject.getSpatial().getCullHint().equals(CullHint.Always))
+					{
+						String hitObject = referenceObject.getName();
+						
+						//System.err.println("HIT: " + hitObject + "; DIST: " + distance);
+						
+						isReferenceObjectHit = true;
+						endOfRay = result.getContactPoint();
+
+						break;
+					}
+				}
+			}
+		}
+		
+		//if(!isReferenceObjectHit)
+			//System.err.println("No HIT");
+		
+		drawRay("gazeRay", endOfRay, origin, whiteMaterial);
+		
+		updateGazeAngles(origin, forwardPos, endOfRay);
+	}
+
+
+	private void updateGazeAngles(Vector3f origin, Vector3f forwardPos, Vector3f endOfRay)
+	{
+		// lateral angle
+		// -------------
+		
+		// relative position of corner point (with regard to driving direction)
+		// --> left side:    1
+		// --> right side : -1
+		int lDirection = getRelativeLPosition(forwardPos, origin, endOfRay);
+		
+		// angle between driving direction of traffic car and direction towards corner position
+		lateralGazeAngle = lDirection * Util.getAngleBetweenPoints(forwardPos, origin, endOfRay, true);
+		//System.err.println("lateralGazeAngle: " + lateralGazeAngle * FastMath.RAD_TO_DEG);
+		
+		
+		// vertical angle
+		// --------------
+		
+		// relative position of corner point (with regard to the horizon)
+		// --> above:  1
+		// --> below: -1
+		int vDirection = getRelativeVPosition(origin, endOfRay);
+		
+		// projection of the corner position to the level of the ray's origin
+		Vector3f projectionPos = new Vector3f(endOfRay.getX(), origin.getY(), endOfRay.getZ());
+		
+		// angle between driving direction of traffic car and direction towards corner position
+		verticalGazeAngle = vDirection * Util.getAngleBetweenPoints(projectionPos, origin, endOfRay, false);
+		//System.err.println("verticalGazeAngle: " + verticalGazeAngle * FastMath.RAD_TO_DEG);
+	}
+
+
+	private MapObject getParentReferenceObject(Geometry geometry)
+	{
+		for(MapObject referenceObject : referenceObjectList)
+		{
+			Spatial spatial = referenceObject.getSpatial();
+			
+			if(spatial instanceof Node)
+			{
+				Node node = (Node)spatial;
+				if(node.hasChild(geometry))
+					return referenceObject;
+			}
+		}
+		
+		return null;
+	}
+
 }

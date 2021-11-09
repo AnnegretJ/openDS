@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.JoyButtonTrigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.input.KeyActionListener;
-import eu.opends.main.Simulator;
 import eu.opends.trigger.TriggerAction;
 
 public class PressButtonTriggerCondition extends TriggerCondition 
@@ -42,7 +42,7 @@ public class PressButtonTriggerCondition extends TriggerCondition
 
 
 	@Override
-	public void evaluate(Simulator sim, int priority, ArrayList<TriggerAction> triggerActionList)
+	public void evaluate(SimulationBasics sim, int priority, ArrayList<TriggerAction> triggerActionList)
 	{
 		InputManager inputManager = sim.getInputManager();
 		inputManager.addMapping(triggerName, new JoyButtonTrigger(deviceID, buttonNumber));

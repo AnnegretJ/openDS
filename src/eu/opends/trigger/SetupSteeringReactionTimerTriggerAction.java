@@ -18,18 +18,19 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 
 public class SetupSteeringReactionTimerTriggerAction extends TriggerAction
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private String timerID;
 	private String reactionGroup; 
 	private String comment;
 	
 	
 	public SetupSteeringReactionTimerTriggerAction(float delay, int maxRepeat, String timerID, String reactionGroup, 
-			String comment, Simulator sim) 
+			String comment, SimulationBasics sim) 
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
@@ -42,9 +43,9 @@ public class SetupSteeringReactionTimerTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			sim.getReactionCenter().setupSteeringReactionTimer(timerID, reactionGroup, comment);
+			((Simulator)sim).getReactionCenter().setupSteeringReactionTimer(timerID, reactionGroup, comment);
 			
 			updateCounter();
 		}

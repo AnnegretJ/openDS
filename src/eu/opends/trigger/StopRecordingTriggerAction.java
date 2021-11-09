@@ -19,6 +19,7 @@
 package eu.opends.trigger;
 
 import eu.opends.analyzer.DataWriter;
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 import eu.opends.tools.PanelCenter;
 
@@ -28,9 +29,9 @@ import eu.opends.tools.PanelCenter;
  */
 public class StopRecordingTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	
-	public StopRecordingTriggerAction(float delay, int maxRepeat, Simulator sim)
+	public StopRecordingTriggerAction(float delay, int maxRepeat, SimulationBasics sim)
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
@@ -39,9 +40,9 @@ public class StopRecordingTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			DataWriter dataWriter = sim.getMyDataWriter();
+			DataWriter dataWriter = ((Simulator)sim).getMyDataWriter();
 			if (dataWriter != null)
 			{
 				// stop recording drive	

@@ -18,8 +18,8 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.knowledgeBase.KnowledgeBase;
-import eu.opends.main.Simulator;
 
 /**
  * 
@@ -33,7 +33,7 @@ public class WriteToKnowledgeBaseTriggerAction extends TriggerAction
 	private String propertyType;
 	
 
-	public WriteToKnowledgeBaseTriggerAction(float delay, int maxRepeat, Simulator sim, 
+	public WriteToKnowledgeBaseTriggerAction(float delay, int maxRepeat, SimulationBasics sim, 
 			String path, String propertyName, String propertyValue, String propertyType) 
 	{
 		super(delay, maxRepeat);

@@ -18,8 +18,8 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.effects.EffectCenter;
-import eu.opends.main.Simulator;
 
 
 /**
@@ -33,7 +33,7 @@ public class SetWeatherTriggerAction extends TriggerAction
 	private Float fogPercentage;
 	
 	
-	public SetWeatherTriggerAction(float delay, int maxRepeat, Simulator sim, Float snowingPercentage,
+	public SetWeatherTriggerAction(float delay, int maxRepeat, SimulationBasics sim, Float snowingPercentage,
 			Float rainingPercentage, Float fogPercentage)
 	{
 		super(delay, maxRepeat);

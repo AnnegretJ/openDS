@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import eu.opends.basics.MapObject;
 import eu.opends.basics.SimulationBasics;
 import eu.opends.drivingTask.scene.SceneLoader;
-import eu.opends.main.Simulator;
 import eu.opends.trigger.TriggerAction;
 
 public class CollideWithTriggerCondition extends TriggerCondition
@@ -41,7 +40,7 @@ public class CollideWithTriggerCondition extends TriggerCondition
 
 	
 	@Override
-	public void evaluate(Simulator sim, int priority, ArrayList<TriggerAction> triggerActionList)
+	public void evaluate(SimulationBasics sim, int priority, ArrayList<TriggerAction> triggerActionList)
 	{
 		boolean modelIDExists = false;
 		for(MapObject mapObject : sceneLoader.getMapObjects())

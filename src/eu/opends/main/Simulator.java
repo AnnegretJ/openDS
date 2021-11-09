@@ -597,7 +597,7 @@ public class Simulator extends SimulationBasics
 	public void initializeDataWriter(int trackNumber) 
 	{
 		dataWriter = new DataWriter(outputFolder, car, SimulationDefaults.driverName, 
-				SimulationDefaults.drivingTaskFileName, trackNumber);
+				SimulationDefaults.drivingTaskFileName, null, trackNumber);
 	}
 	
 	
@@ -692,7 +692,10 @@ public class Simulator extends SimulationBasics
     		
     		eventCenter.update();
     		
-    		gestureAnalyzer.updateRays(car.getPosition().add(0, 1, 0), car.getFrontGeometry().getWorldTranslation().add(0, 1, 0));
+    		Vector3f driversPos = car.getPosition().add(0, 1, 0);
+    		Vector3f frontPos = car.getFrontGeometry().getWorldTranslation().add(0, 1, 0);
+    		Vector3f gazeDirection = null; // only used by DriveAnalyzer
+    		gestureAnalyzer.updateRays(driversPos, frontPos, gazeDirection);
     		
 			updateDataWriter();
     	}

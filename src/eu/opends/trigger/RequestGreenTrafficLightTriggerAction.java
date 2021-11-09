@@ -18,6 +18,8 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
+import eu.opends.environment.TrafficLightCenter;
 import eu.opends.environment.TrafficLightCenter.TriggerType;
 import eu.opends.main.Simulator;
 
@@ -27,11 +29,11 @@ import eu.opends.main.Simulator;
  */
 public class RequestGreenTrafficLightTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private String trafficLightName;
 	
 	
-	public RequestGreenTrafficLightTriggerAction(float delay, int maxRepeat, Simulator sim, String trafficLightID)
+	public RequestGreenTrafficLightTriggerAction(float delay, int maxRepeat, SimulationBasics sim, String trafficLightID)
 	{
 		super(delay, maxRepeat);
 		
@@ -45,7 +47,9 @@ public class RequestGreenTrafficLightTriggerAction extends TriggerAction
 	{
 		if(!isExceeded())
 		{
-			sim.getTrafficLightCenter().reportCollision(trafficLightName, TriggerType.REQUEST);
+			TrafficLightCenter trafficLightCenter = sim.getTrafficLightCenter();
+			if(trafficLightCenter != null)
+				trafficLightCenter.reportCollision(trafficLightName, TriggerType.REQUEST);
 				
 			updateCounter();
 		}

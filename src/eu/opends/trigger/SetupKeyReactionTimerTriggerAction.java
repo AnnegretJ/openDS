@@ -18,6 +18,7 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 
 /**
@@ -26,7 +27,7 @@ import eu.opends.main.Simulator;
  */
 public class SetupKeyReactionTimerTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private String timerID;
 	private String reactionGroup; 
 	private String correctReaction;
@@ -35,7 +36,7 @@ public class SetupKeyReactionTimerTriggerAction extends TriggerAction
 	
 	
 	public SetupKeyReactionTimerTriggerAction(float delay, int maxRepeat, String timerID, String reactionGroup, 
-			String correctReaction, String failureReaction, String comment, Simulator sim) 
+			String correctReaction, String failureReaction, String comment, SimulationBasics sim) 
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
@@ -50,9 +51,9 @@ public class SetupKeyReactionTimerTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			sim.getReactionCenter().setupKeyReactionTimer(timerID, reactionGroup, correctReaction, 
+			((Simulator)sim).getReactionCenter().setupKeyReactionTimer(timerID, reactionGroup, correctReaction, 
 					failureReaction, comment);
 			
 			updateCounter();

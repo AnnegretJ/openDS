@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Properties;
 
 import eu.opends.basics.SimulationBasics;
-import eu.opends.main.Simulator;
 import eu.opends.trigger.TriggerAction;
 import eu.opends.trigger.condition.TriggerCondition;
 
@@ -54,16 +53,13 @@ public class TriggerDescription
 		this.activityRefList = activityRefList;
 		this.activityMap = activityMap;
 		
-		if(sim instanceof Simulator)
+		ArrayList<TriggerAction> triggerActionList =  getTriggerActionList();
+		for(TriggerCondition condition : conditionList)
 		{
-			ArrayList<TriggerAction> triggerActionList =  getTriggerActionList();
-			for(TriggerCondition condition : conditionList)
-			{
-				if(!triggerActionList.isEmpty())
-					condition.evaluate((Simulator)sim, priority, triggerActionList);
-				else
-					System.err.println("Trigger '" + triggerName + "' has empty triggerActionList");
-			}
+			if(!triggerActionList.isEmpty())
+				condition.evaluate(sim, priority, triggerActionList);
+			else
+				System.err.println("Trigger '" + triggerName + "' has empty triggerActionList");
 		}
 	}
 

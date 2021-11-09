@@ -30,9 +30,6 @@ import eu.opends.events.Event;
 import eu.opends.hmi.LocalDangerWarningPresentationModel;
 import eu.opends.hmi.PresentationModel;
 import eu.opends.hmi.RoadWorksInformationPresentationModel;
-import eu.opends.main.Simulator;
-import eu.opends.opendrive.processed.ODLaneSection;
-import eu.opends.opendrive.processed.ODRoad;
 import eu.opends.opendrive.processed.ODLane.Position;
 import eu.opends.opendrive.util.ODPosition;
 import eu.opends.trigger.*;
@@ -389,7 +386,7 @@ public class InteractionMethods
 	public TriggerAction shutDownSimulation(SimulationBasics sim, float delay, int repeat, Properties parameterList)
 	{
 		// create ShutDownSimulationTriggerAction
-		return new ShutDownSimulationTriggerAction((Simulator)sim, delay, repeat);
+		return new ShutDownSimulationTriggerAction(sim, delay, repeat);
 	}
 
 	
@@ -448,7 +445,7 @@ public class InteractionMethods
 			boolean autopilotOn = Boolean.parseBoolean(autopilotString);
 			
 			// create SetAutoPilotTriggerAction
-			return new SetAutoPilotTriggerAction(delay, repeat, (Simulator) sim, autopilotOn);
+			return new SetAutoPilotTriggerAction(delay, repeat, sim, autopilotOn);
 			
 		} catch (Exception e) {
 	
@@ -481,7 +478,7 @@ public class InteractionMethods
 			int trackNumber = Integer.parseInt(trackString);
 			
 			// create StartRecordingTriggerAction
-			return new StartRecordingTriggerAction(delay, repeat, (Simulator) sim, trackNumber);
+			return new StartRecordingTriggerAction(delay, repeat, sim, trackNumber);
 			
 		} catch (Exception e) {
 	
@@ -502,7 +499,7 @@ public class InteractionMethods
 	public TriggerAction stopRecording(SimulationBasics sim, float delay, int repeat, Properties parameterList)
 	{
 		// create StopRecordingTriggerAction
-		return new StopRecordingTriggerAction(delay, repeat,(Simulator)sim);
+		return new StopRecordingTriggerAction(delay, repeat, sim);
 	}
 
 
@@ -547,7 +544,7 @@ public class InteractionMethods
 				throw new Exception();
 			
 			// create ResetCarToResetPointAction
-			return new ResetCarToResetPointTriggerAction(delay, repeat, resetPointID, (Simulator)sim);
+			return new ResetCarToResetPointTriggerAction(delay, repeat, resetPointID, sim);
 			
 		} catch (Exception e) {
 	
@@ -856,7 +853,7 @@ public class InteractionMethods
 			}
 			
 			// create PresentationTaskAction
-			return new PresentationTaskTriggerAction(delay, repeat, presentationModel, (Simulator)sim);
+			return new PresentationTaskTriggerAction(delay, repeat, presentationModel, sim);
 			
 		} catch (Exception e) {
 	
@@ -1177,7 +1174,7 @@ public class InteractionMethods
 			int speedChange = Integer.parseInt(speedChangeString);
 			
 			// create GetTimeUntilBrakeAction
-			return new GetTimeUntilSpeedChangeTriggerAction(delay, repeat, triggerName, speedChange, (Simulator)sim);
+			return new GetTimeUntilSpeedChangeTriggerAction(delay, repeat, triggerName, speedChange, sim);
 			
 		} catch (Exception e) {
 			
@@ -1381,7 +1378,7 @@ public class InteractionMethods
 				throw new Exception();
 
 			// create PlayMovieAction
-			return new PlayMovieTriggerAction((Simulator)sim, delay, repeat, movieID);
+			return new PlayMovieTriggerAction(sim, delay, repeat, movieID);
 			
 		} catch (Exception e) {
 			
@@ -1420,7 +1417,7 @@ public class InteractionMethods
 	public TriggerAction playNextMovie(SimulationBasics sim, float delay, int repeat, Properties parameterList)
 	{	
 		// create PlayNextMovieAction
-		return new PlayNextMovieTriggerAction((Simulator)sim, delay, repeat);
+		return new PlayNextMovieTriggerAction(sim, delay, repeat);
 	}
 	
 	
@@ -1452,9 +1449,8 @@ public class InteractionMethods
 		)
 	public TriggerAction stopMovie(SimulationBasics sim, float delay, int repeat, Properties parameterList)
 	{
-			
 			// create StopMovieAction
-			return new StopMovieTriggerAction((Simulator)sim, delay, repeat);
+			return new StopMovieTriggerAction(sim, delay, repeat);
 	}
 	
 	
@@ -1500,7 +1496,7 @@ public class InteractionMethods
 				throw new Exception();
 
 			// create RequestGreenTrafficLightAction
-			return new RequestGreenTrafficLightTriggerAction(delay, repeat, (Simulator)sim, trafficLightID);
+			return new RequestGreenTrafficLightTriggerAction(delay, repeat, sim, trafficLightID);
 			
 		} catch (Exception e) {
 			
@@ -1539,7 +1535,7 @@ public class InteractionMethods
 	public TriggerAction startReactionMeasurement(SimulationBasics sim, float delay, int repeat, Properties parameterList)
 	{	
 		// create StartReactionMeasurementTriggerAction
-		return new StartReactionMeasurementTriggerAction(delay, repeat, (Simulator)sim);
+		return new StartReactionMeasurementTriggerAction(delay, repeat, sim);
 	}
 	
 	
@@ -1595,7 +1591,7 @@ public class InteractionMethods
 	
 			// create SetupKeyReactionTimerTriggerAction
 			return new SetupKeyReactionTimerTriggerAction(delay, repeat, timerID, reactionGroup, correctReaction, 
-					failureReaction, comment, (Simulator)sim);
+					failureReaction, comment, sim);
 			
 		} catch (Exception e) {
 			
@@ -1645,7 +1641,7 @@ public class InteractionMethods
 	
 			// create SetupKeyReactionTimerTriggerAction
 			return new SetupSteeringReactionTimerTriggerAction(delay, repeat, timerID, reactionGroup, 
-					comment, (Simulator)sim);
+					comment, sim);
 			
 		} catch (Exception e) {
 			
@@ -1725,7 +1721,7 @@ public class InteractionMethods
 	
 			// create SetupKeyReactionTimerTriggerAction
 			return new SetupKeyReactionTimerTriggerAction(delay, repeat, timerID, reactionGroup, correctReaction, 
-					failureReaction, comment, (Simulator)sim);
+					failureReaction, comment, sim);
 			
 		} catch (Exception e) {
 			
@@ -1852,7 +1848,7 @@ public class InteractionMethods
 			// create SetupLaneChangeReactionTimerTriggerAction
 			return new SetupLaneChangeReactionTimerTriggerAction(delay, repeat, timerID, reactionGroupID, startLane, 
 					targetLane, minSteeringAngle, taskCompletionAfterTime, taskCompletionAfterDistance, allowBrake, 
-					holdLaneFor, failSound, successSound, comment, (Simulator)sim);
+					holdLaneFor, failSound, successSound, comment, sim);
 			
 		} catch (Exception e) {
 			
@@ -1975,7 +1971,7 @@ public class InteractionMethods
 			// create SetupBrakeReactionTimerTriggerAction
 			return new SetupBrakeReactionTimerTriggerAction(delay, repeat, timerID, reactionGroupID, startSpeed, 
 					targetSpeed, mustPressBrakePedal, taskCompletionAfterTime, taskCompletionAfterDistance, 
-					allowLaneChange, holdSpeedFor, failSound, successSound, comment, (Simulator)sim);
+					allowLaneChange, holdSpeedFor, failSound, successSound, comment, sim);
 			
 		} catch (Exception e) {
 			
@@ -2102,7 +2098,7 @@ public class InteractionMethods
 			speed = FastMath.abs(speed);
 	
 			// create ReportSpeedTriggerAction
-			return new ReportSpeedTriggerAction(delay, repeat, type, speed, (Simulator)sim);
+			return new ReportSpeedTriggerAction(delay, repeat, type, speed, sim);
 			
 		} catch (Exception e) {
 			
@@ -2484,7 +2480,7 @@ public class InteractionMethods
 				throw new Exception();
 			
 			// create StartRecordingTriggerAction
-			return new OpenInstructionsScreenTriggerAction(delay, repeat, (Simulator) sim, instructionID);
+			return new OpenInstructionsScreenTriggerAction(delay, repeat, sim, instructionID);
 			
 		} catch (Exception e) {
 	
@@ -2552,7 +2548,7 @@ public class InteractionMethods
 			int duration = Integer.parseInt(durationString);
 						
 			// create SetCrosswindTriggerAction
-			return new SetCrosswindTriggerAction(delay, repeat, (Simulator) sim, direction, force, duration);
+			return new SetCrosswindTriggerAction(delay, repeat, sim, direction, force, duration);
 			
 		} catch (Exception e) {
 	
@@ -2603,7 +2599,7 @@ public class InteractionMethods
 				burnedFuel = Float.parseFloat(burnedFuelString);
 						
 			// create SetFuelConsumptionTriggerAction
-			return new SetFuelConsumptionTriggerAction(delay, repeat, (Simulator) sim, burnedFuel);
+			return new SetFuelConsumptionTriggerAction(delay, repeat, sim, burnedFuel);
 			
 		} catch (Exception e) {
 	
@@ -2673,7 +2669,7 @@ public class InteractionMethods
 
 						
 		// create SetWeatherTriggerAction
-		return new SetWeatherTriggerAction(delay, repeat, (Simulator) sim, snowingPercentage, rainingPercentage, fogPercentage);
+		return new SetWeatherTriggerAction(delay, repeat, sim, snowingPercentage, rainingPercentage, fogPercentage);
 	}
 	
 	
@@ -2727,7 +2723,7 @@ public class InteractionMethods
 		
 		
 		// create WarningFrameTriggerAction
-		return new WarningFrameTriggerAction((Simulator) sim, delay, repeat, interval, duration);
+		return new WarningFrameTriggerAction(sim, delay, repeat, interval, duration);
 	}
 	
 	
@@ -2773,7 +2769,7 @@ public class InteractionMethods
 				throw new Exception();
 			
 			// create SetTVPTStimulusTriggerAction
-			return new SetTVPTStimulusTriggerAction(delay, repeat, (Simulator) sim, stimulusID);
+			return new SetTVPTStimulusTriggerAction(delay, repeat, sim, stimulusID);
 			
 		} catch (Exception e) {
 	
@@ -2824,7 +2820,7 @@ public class InteractionMethods
 				throw new Exception();
 			
 			// create SetMotorwayTaskStimulusTriggerAction
-			return new SetMotorwayTaskStimulusTriggerAction(delay, repeat, (Simulator) sim, stimulusID);
+			return new SetMotorwayTaskStimulusTriggerAction(delay, repeat, sim, stimulusID);
 			
 		} catch (Exception e) {
 	
@@ -2899,7 +2895,7 @@ public class InteractionMethods
 				throw new Exception();
 	
 			// create WriteToKnowledgeBaseTriggerAction
-			return new WriteToKnowledgeBaseTriggerAction(delay, repeat, (Simulator)sim, 
+			return new WriteToKnowledgeBaseTriggerAction(delay, repeat, sim, 
 					path, propertyName, propertyValue, propertyType);
 			
 		} catch (Exception e) {
@@ -2951,7 +2947,7 @@ public class InteractionMethods
 			float targetObjectSpeed = Float.parseFloat(targetObjectSpeedString);
 			
 			// create SetupContreTaskTriggerAction
-			return new SetupContreTaskTriggerAction(delay, repeat, (Simulator) sim, targetObjectSpeed);
+			return new SetupContreTaskTriggerAction(delay, repeat, sim, targetObjectSpeed);
 			
 		} catch (Exception e) {
 	

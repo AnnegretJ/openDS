@@ -21,7 +21,6 @@ package eu.opends.trigger.condition;
 import java.util.ArrayList;
 
 import eu.opends.basics.SimulationBasics;
-import eu.opends.main.Simulator;
 import eu.opends.opendrive.util.ODPosition;
 import eu.opends.traffic.OpenDRIVECarData;
 import eu.opends.traffic.PhysicalTraffic;
@@ -43,7 +42,7 @@ public class OpenDrivePosTriggerCondition extends TriggerCondition
 
 	
 	@Override
-	public void evaluate(Simulator sim, int priority, ArrayList<TriggerAction> triggerActionList)
+	public void evaluate(SimulationBasics sim, int priority, ArrayList<TriggerAction> triggerActionList)
 	{
 		if(trafficCarID == null)
 		{

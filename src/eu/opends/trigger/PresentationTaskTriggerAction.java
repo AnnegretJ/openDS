@@ -18,6 +18,7 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.car.Car;
 import eu.opends.hmi.HMIThread;
 import eu.opends.hmi.PresentationModel;
@@ -29,11 +30,11 @@ import eu.opends.main.Simulator;
  */
 public class PresentationTaskTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private PresentationModel presentationModel;
 	
 
-	public PresentationTaskTriggerAction(float delay, int maxRepeat, PresentationModel presentationModel, Simulator sim) 
+	public PresentationTaskTriggerAction(float delay, int maxRepeat, PresentationModel presentationModel, SimulationBasics sim) 
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
@@ -44,9 +45,9 @@ public class PresentationTaskTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			Car car = sim.getCar();
+			Car car = ((Simulator)sim).getCar();
 			
 			// set car at this point, since driving car was created after the presentation
 			// model and could not be set earlier

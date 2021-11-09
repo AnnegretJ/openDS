@@ -20,6 +20,7 @@ package eu.opends.trigger;
 
 import java.util.List;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.car.Car;
 import eu.opends.car.ResetPosition;
 import eu.opends.main.Simulator;
@@ -30,11 +31,11 @@ import eu.opends.main.Simulator;
  */
 public class ResetCarToResetPointTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private int resetPosition = -1;
 	
 	
-	public ResetCarToResetPointTriggerAction(float delay, int maxRepeat, String resetPointName, Simulator sim) 
+	public ResetCarToResetPointTriggerAction(float delay, int maxRepeat, String resetPointName, SimulationBasics sim) 
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
@@ -54,9 +55,9 @@ public class ResetCarToResetPointTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			Car car = sim.getCar();
+			Car car = ((Simulator)sim).getCar();
 			
 			if((resetPosition != -1) && (car != null))
 				car.setToResetPosition(resetPosition);

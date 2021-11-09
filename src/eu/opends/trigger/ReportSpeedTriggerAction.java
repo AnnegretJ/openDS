@@ -18,6 +18,7 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 
 
@@ -32,10 +33,10 @@ public class ReportSpeedTriggerAction extends TriggerAction
 {
 	private String type;
 	private float targetSpeed;
-	private Simulator sim;
+	private SimulationBasics sim;
 	
 
-	public ReportSpeedTriggerAction(float delay, int maxRepeat, String type, float targetSpeed, Simulator sim) 
+	public ReportSpeedTriggerAction(float delay, int maxRepeat, String type, float targetSpeed, SimulationBasics sim) 
 	{
 		super(delay, maxRepeat);
 		this.type = type;
@@ -47,9 +48,9 @@ public class ReportSpeedTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			float currentSpeed = sim.getCar().getCurrentSpeedKmh();
+			float currentSpeed = ((Simulator) sim).getCar().getCurrentSpeedKmh();
 			
 			if(type.equalsIgnoreCase("greaterThan") && (currentSpeed > targetSpeed))
 				Simulator.getDrivingTaskLogger().reportText("Car exceeded maximum speed of " + 

@@ -18,6 +18,8 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
+import eu.opends.car.SteeringCar;
 import eu.opends.main.Simulator;
 
 /**
@@ -26,11 +28,11 @@ import eu.opends.main.Simulator;
  */
 public class SetAutoPilotTriggerAction extends TriggerAction
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private boolean autopilotOn;
 	
 	
-	public SetAutoPilotTriggerAction(float delay, int maxRepeat, Simulator sim, boolean autopilotOn) 
+	public SetAutoPilotTriggerAction(float delay, int maxRepeat, SimulationBasics sim, boolean autopilotOn) 
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
@@ -41,10 +43,11 @@ public class SetAutoPilotTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			sim.getCar().setAutoPilot(autopilotOn);
-			sim.getCar().setODAutoPilot(autopilotOn);
+			SteeringCar car = ((Simulator)sim).getCar();
+			car.setAutoPilot(autopilotOn);
+			car.setODAutoPilot(autopilotOn);
 				
 			updateCounter();
 		}

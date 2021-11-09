@@ -23,7 +23,9 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +49,7 @@ import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.Nifty;
 import eu.opends.analyzer.DataUnit;
 import eu.opends.analyzer.DeviationComputer;
+import eu.opends.analyzer.GazeDirectionRecord;
 import eu.opends.analyzer.DataReader;
 import eu.opends.analyzer.IdealLine;
 import eu.opends.analyzer.IdealLine.IdealLineStatus;
@@ -61,7 +64,13 @@ import eu.opends.input.KeyBindingCenter;
 import eu.opends.knowledgeBase.KnowledgeBase;
 import eu.opends.niftyGui.AnalyzerFileSelectionGUIController;
 import eu.opends.opendrive.OpenDriveCenter;
+import eu.opends.opendrive.processed.ODLane;
+import eu.opends.opendrive.util.ODPosition;
 import eu.opends.tools.PanelCenter;
+import eu.opends.trigger.PlaySoundTriggerAction;
+import eu.opends.trigger.Trigger;
+import eu.opends.trigger.TriggerAction;
+import eu.opends.trigger.TriggerCenter;
 
 /**
  * 
@@ -102,6 +111,8 @@ public class DriveAnalyzer extends SimulationBasics
 	
 	private ArrayList<Vector3f> carPositionList = new ArrayList<Vector3f>();
 	private LinkedList<DataUnit> dataUnitList = new LinkedList<DataUnit>();
+	
+	private GazeDirectionRecord gazeDirectionRecord;
 	
 	private DataReader dataReader = new DataReader();
 	private Long initialTimeStamp = 0l;
@@ -175,6 +186,8 @@ public class DriveAnalyzer extends SimulationBasics
 		PanelCenter.init(this);
 		
 		loadData();
+		
+		gazeDirectionRecord = new GazeDirectionRecord(analyzerFilePath);
 		
 		super.simpleInitApp();	
 
@@ -551,6 +564,54 @@ public class DriveAnalyzer extends SimulationBasics
 		updateReferenceObjects();
 		
 		updateMessageBox();
+		
+		doTriggerCheck();
+	}
+	
+	
+	private HashSet<ODLane> expectedLanes = new HashSet<ODLane>();
+	private void doTriggerCheck()
+	{
+		// get most probable lane from result list according to expected lane list (and 
+		// highest score concerning least heading deviation and least elevation difference)
+		Vector3f carPos = target.getWorldTranslation();
+		ODLane lane = openDriveCenter.getMostProbableLane(carPos, expectedLanes);
+		if(lane != null)
+		{
+			String roadID_car = lane.getODRoad().getID();
+			int lane_car = lane.getID();
+			double s_car = lane.getCurrentInnerBorderPoint().getS();
+			
+			System.err.println("POS: " + roadID_car + "," + lane_car + "," + s_car);
+			
+			for(Entry<ODPosition, Trigger> item : SimulationBasics.getODTriggerActionListMap().entrySet())
+			{
+				ODPosition openDrivePos = item.getKey();
+				Trigger trigger = item.getValue();
+				
+				String roadID_trigger = openDrivePos.getRoadID();
+				int lane_trigger = openDrivePos.getLane();
+				double s_trigger = openDrivePos.getS();
+
+				
+				if(roadID_trigger.equals(roadID_car) && (Math.abs(s_trigger-s_car) < 1.5d))
+				{
+					// either trigger when car is in given lane or when lane_trigger == 0 and car is in any lane 
+					if(lane_trigger == lane_car || lane_trigger == 0)
+					{
+						for(TriggerAction ta : trigger.getTriggerActionList())
+						{
+							if(ta instanceof PlaySoundTriggerAction)
+							{
+								System.err.println(roadID_trigger + "," + lane_trigger + "," + s_trigger + " --> PlaySoundTriggerAction");
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+			System.err.println("Car is off the road");
 	}
 
 
@@ -585,10 +646,29 @@ public class DriveAnalyzer extends SimulationBasics
 		gestureAnalyzer.setActiveReferenceObject(activeReferenceObjectName);
 		
 		// draw rays
-		Vector3f origin = currentDataUnit.getCarPosition().add(0, 2f, 0);
-		//Vector3f frontPos = frontNode.getWorldTranslation().add(0, 1, 0);	  // frontPos of DriveAnalyzer
-		Vector3f frontPos = currentDataUnit.getFrontPosition().add(0, 2f, 0);  // original frontPos of Simulator
-		gestureAnalyzer.updateRays(origin, frontPos);
+		Vector3f origin = currentDataUnit.getCarPosition().add(0, 1f, 0);
+		//Vector3f frontPos = frontNode.getWorldTranslation().add(0, 1f, 0);   // frontPos of DriveAnalyzer
+		Vector3f frontPos = currentDataUnit.getFrontPosition().add(0, 1f, 0);  // original frontPos of Simulator
+		
+		// lookup local gaze direction (relative to vehicle coordinate system)
+		Vector3f gazeDirectionLocal = gazeDirectionRecord.lookupGazeDirectionByTimestamp(currentDataUnit.getDate());
+		Vector3f gazeDirectionWorld = localToWorld(gazeDirectionLocal);
+		
+		gestureAnalyzer.updateRays(origin, frontPos, gazeDirectionWorld);
+	}
+
+
+	private Vector3f localToWorld(Vector3f gazeDirectionLocal)
+	{
+		if(gazeDirectionLocal != null)
+		{
+			Vector3f worldPos = target.localToWorld(gazeDirectionLocal, null);
+			Vector3f gazeDirectionWorld = worldPos.subtract(currentDataUnit.getCarPosition());
+			gazeDirectionWorld.normalizeLocal();
+			return gazeDirectionWorld;
+		}
+		
+		return null;
 	}
 
 
@@ -826,6 +906,28 @@ public class DriveAnalyzer extends SimulationBasics
 	public Node getEgoCamNode()
 	{
 		return egoCamNode;		
+	}
+
+
+	public float getTargetHeading() 
+	{
+		// get Euler angles from rotation quaternion
+		float[] angles = target.getWorldRotation().toAngles(null);
+		
+		// heading in radians
+		float heading = -angles[1];
+		
+		// normalize radian angle
+		float fullAngle = 2*FastMath.PI;
+		float angle_rad = (heading + fullAngle) % fullAngle;
+		
+		return angle_rad;
+	}
+	
+	
+	public float getTargetHeadingDegree()
+	{
+		return getTargetHeading()  * FastMath.RAD_TO_DEG;
 	}
 
 }

@@ -21,7 +21,6 @@ package eu.opends.trigger.condition;
 import java.util.ArrayList;
 
 import eu.opends.basics.SimulationBasics;
-import eu.opends.main.Simulator;
 import eu.opends.trigger.TriggerAction;
 
 public class CameraWaypointTriggerCondition extends TriggerCondition
@@ -37,7 +36,7 @@ public class CameraWaypointTriggerCondition extends TriggerCondition
 
 	
 	@Override
-	public void evaluate(Simulator sim, int priority, ArrayList<TriggerAction> triggerActionList)
+	public void evaluate(SimulationBasics sim, int priority, ArrayList<TriggerAction> triggerActionList)
 	{
 		if(!triggerActionList.isEmpty())
 			SimulationBasics.getCameraWaypointTriggerActionListMap().put(waypointID, triggerActionList);

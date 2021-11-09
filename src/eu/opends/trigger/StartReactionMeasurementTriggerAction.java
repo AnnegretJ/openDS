@@ -18,6 +18,7 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 
 /**
@@ -26,10 +27,10 @@ import eu.opends.main.Simulator;
  */
 public class StartReactionMeasurementTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	
 	
-	public StartReactionMeasurementTriggerAction(float delay, int maxRepeat, Simulator sim) 
+	public StartReactionMeasurementTriggerAction(float delay, int maxRepeat, SimulationBasics sim) 
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
@@ -39,9 +40,9 @@ public class StartReactionMeasurementTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			sim.getReactionCenter().start();
+			((Simulator)sim).getReactionCenter().start();
 			
 			updateCounter();
 		}

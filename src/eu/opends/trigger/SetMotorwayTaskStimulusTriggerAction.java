@@ -18,6 +18,7 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 
 /**
@@ -26,11 +27,11 @@ import eu.opends.main.Simulator;
  */
 public class SetMotorwayTaskStimulusTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private String stimulusID;
 	
 	
-	public SetMotorwayTaskStimulusTriggerAction(float delay, int maxRepeat, Simulator sim,	String stimulusID) 
+	public SetMotorwayTaskStimulusTriggerAction(float delay, int maxRepeat, SimulationBasics sim,	String stimulusID) 
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;
@@ -41,9 +42,9 @@ public class SetMotorwayTaskStimulusTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded()&& sim instanceof Simulator)
 		{
-			sim.getMotorwayTask().setStimulus(stimulusID);
+			((Simulator)sim).getMotorwayTask().setStimulus(stimulusID);
 			updateCounter();
 		}
 	}

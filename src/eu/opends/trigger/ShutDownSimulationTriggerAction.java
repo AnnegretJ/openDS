@@ -18,7 +18,7 @@
 
 package eu.opends.trigger;
 
-import eu.opends.main.Simulator;
+import eu.opends.basics.SimulationBasics;
 
 /**
  * 
@@ -26,9 +26,9 @@ import eu.opends.main.Simulator;
  */
 public class ShutDownSimulationTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	
-	public ShutDownSimulationTriggerAction(Simulator sim, float delay, int maxRepeat)
+	public ShutDownSimulationTriggerAction(SimulationBasics sim, float delay, int maxRepeat)
 	{
 		super(delay, maxRepeat);
 		this.sim = sim;

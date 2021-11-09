@@ -18,6 +18,7 @@
 
 package eu.opends.trigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.main.Simulator;
 
 /**
@@ -26,7 +27,7 @@ import eu.opends.main.Simulator;
  */
 public class SetupBrakeReactionTimerTriggerAction extends TriggerAction 
 {
-	private Simulator sim;
+	private SimulationBasics sim;
 	private String timerID;
 	private String reactionGroupID;
 	private float startSpeed;
@@ -44,7 +45,7 @@ public class SetupBrakeReactionTimerTriggerAction extends TriggerAction
 	public SetupBrakeReactionTimerTriggerAction(float delay, int maxRepeat, String timerID, String reactionGroupID, 
 			float startSpeed, float targetSpeed, boolean mustPressBrakePedal, float taskCompletionAfterTime, 
 			float taskCompletionAfterDistance, boolean allowLaneChange, float holdSpeedFor, String failSound,
-			String successSound, String comment, Simulator sim) 
+			String successSound, String comment, SimulationBasics sim) 
 	{
 		super(delay, maxRepeat);
 		
@@ -66,9 +67,9 @@ public class SetupBrakeReactionTimerTriggerAction extends TriggerAction
 	@Override
 	protected void execute() 
 	{
-		if(!isExceeded())
+		if(!isExceeded() && sim instanceof Simulator)
 		{
-			sim.getReactionCenter().setupBrakeReactionTimer(timerID, reactionGroupID, startSpeed, targetSpeed,
+			((Simulator)sim).getReactionCenter().setupBrakeReactionTimer(timerID, reactionGroupID, startSpeed, targetSpeed,
 					mustPressBrakePedal, taskCompletionAfterTime, taskCompletionAfterDistance, allowLaneChange, 
 					holdSpeedFor, failSound, successSound, comment);
 			

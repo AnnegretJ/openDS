@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import com.jme3.input.InputManager;
 import com.jme3.input.controls.JoyAxisTrigger;
 
+import eu.opends.basics.SimulationBasics;
 import eu.opends.drivingTask.settings.SettingsLoader;
 import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.input.AxisAnalogListener;
-import eu.opends.main.Simulator;
 import eu.opends.trigger.TriggerAction;
 
 public class PressPedalTriggerCondition extends TriggerCondition 
@@ -47,7 +47,7 @@ public class PressPedalTriggerCondition extends TriggerCondition
 	
 
 	@Override
-	public void evaluate(Simulator sim, int priority, ArrayList<TriggerAction> triggerActionList)
+	public void evaluate(SimulationBasics sim, int priority, ArrayList<TriggerAction> triggerActionList)
 	{
 		int controllerID = 0;
 		int axis = 0;

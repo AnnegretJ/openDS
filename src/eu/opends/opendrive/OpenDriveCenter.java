@@ -47,6 +47,8 @@ import eu.opends.car.SteeringCar;
 import eu.opends.codriver.ScenarioMessage;
 import eu.opends.drivingTask.settings.SettingsLoader;
 import eu.opends.drivingTask.settings.SettingsLoader.Setting;
+import eu.opends.main.DriveAnalyzer;
+import eu.opends.main.PostProcessor;
 import eu.opends.main.Simulator;
 import eu.opends.opendrive.data.*;
 import eu.opends.opendrive.processed.LinkData;
@@ -309,84 +311,95 @@ public class OpenDriveCenter
 	{
 		ODLane mostProbableLane = null;
 		
-		if(sim instanceof Simulator)
+		// reset collision results list
+		CollisionResults results = new CollisionResults();
+					
+		// downward direction
+		Vector3f direction = new Vector3f(0,-1,0);
+					
+		// aim a ray from the car's position towards the target
+		Ray ray = new Ray(new Vector3f(carPos.x, 10000, carPos.z), direction);
+	
+		// collect intersections between ray and scene elements in results list.
+		sim.getOpenDriveNode().collideWith(ray, results);
+
+		float overallBestScore = -1;
+
+		for(int i=0; i<results.size(); i++)
 		{
-			// reset collision results list
-			CollisionResults results = new CollisionResults();
-					
-			// downward direction
-			Vector3f direction = new Vector3f(0,-1,0);
-					
-			// aim a ray from the car's position towards the target
-			Ray ray = new Ray(new Vector3f(carPos.x, 10000, carPos.z), direction);
-	
-			// collect intersections between ray and scene elements in results list.
-			sim.getOpenDriveNode().collideWith(ray, results);
-
-			float overallBestScore = -1;
-
-			for(int i=0; i<results.size(); i++)
-			{
-				String geometryName = results.getCollision(i).getGeometry().getName();
+			String geometryName = results.getCollision(i).getGeometry().getName();
 			
-				// the closest collision point is what was truly hit
-				//CollisionResult closest = results.getClosestCollision();
-				//String geometryName = closest.getGeometry().getName();
-				//System.out.println(geometryName);
+			// the closest collision point is what was truly hit
+			//CollisionResult closest = results.getClosestCollision();
+			//String geometryName = closest.getGeometry().getName();
+			//System.out.println(geometryName);
 				
-				String[] array = geometryName.split("_");
-				if(array.length == 3 && "ODarea".equals(array[0]) && roadMap.containsKey(array[1]))
+			String[] array = geometryName.split("_");
+			if(array.length == 3 && "ODarea".equals(array[0]) && roadMap.containsKey(array[1]))
+			{
+				String roadID = array[1];
+				ODRoad road = roadMap.get(roadID);
+	
+				Vector3f carPos2D = new Vector3f(carPos.x, 0, carPos.z);
+				HashMap<Integer,ODLane> laneMap = road.getLaneInformationAtPosition(carPos2D);
+				if(laneMap!=null)
 				{
-					String roadID = array[1];
-					ODRoad road = roadMap.get(roadID);
+					int laneID = Integer.parseInt(array[2]);
+					ODLane lane = laneMap.get(laneID);
 	
-					Vector3f carPos2D = new Vector3f(carPos.x, 0, carPos.z);
-					HashMap<Integer,ODLane> laneMap = road.getLaneInformationAtPosition(carPos2D);
-					if(laneMap!=null)
+					if(lane != null)
 					{
-						int laneID = Integer.parseInt(array[2]);
-						ODLane lane = laneMap.get(laneID);
-	
-						if(lane != null)
+						// give priority to expected lanes
+						if(expectedLanes.contains(lane))
+							return lane;
+							
+						// otherwise choose lane with highest score
+						
+						float carHeadingDegree = 90;
+						if(sim instanceof Simulator)
 						{
-							// give priority to expected lanes
-							if(expectedLanes.contains(lane))
-								return lane;
-							
-							// otherwise choose lane with highest score
-							
-							// get linear heading score:
-							// diff <= 20 degree --> 100 %
-							// diff >= 90 degree -->   0 %
-							float absHdgDiff = FastMath.abs(lane.getHeadingDiff(((Simulator)sim).getCar().getHeadingDegree()));
-							float hdgScore = Util.map(absHdgDiff, 20f, 90f, 1.0f, 0.0f);
-
-							// get linear vertical distance score (e.g. bridge):
-							// diff <= 0.5 meters --> 100 %
-							// diff >= 2.0 meters -->   0 %
-							float absDistDiff = FastMath.abs(carPos.getY() - results.getCollision(i).getContactPoint().getY());
-							float distScore = Util.map(absDistDiff, 0.5f, 2.0f, 1.0f, 0.0f);
-							
-							// get weighted total score (40 % of heading and 60 % of distance score)
-							float totalScore = (0.4f * hdgScore) + (0.6f * distScore);
-							
-							/*
-							System.err.println("roadID: " + roadID + "; absHdgDiff:" + absHdgDiff + "; " + 
-									"hdgScore: " + hdgScore + "; absDistDiff:" + absDistDiff + "; " + 
-									"distScore: " + distScore + "; totalScore:" + totalScore + "; ");
-							*/
-							
-							// choose lane with highest score
-							if(totalScore > overallBestScore)
-							{
-								overallBestScore = totalScore;
-								mostProbableLane = lane;
-							}
+							carHeadingDegree = ((Simulator)sim).getCar().getHeadingDegree();
 						}
-						else
-							System.err.println("Geometry '" + geometryName + "' does not exist");
-					}				
-				}
+						else if(sim instanceof DriveAnalyzer)
+						{
+							carHeadingDegree = ((DriveAnalyzer)sim).getTargetHeadingDegree();
+						}
+						else if(sim instanceof PostProcessor)
+						{
+							carHeadingDegree = ((PostProcessor)sim).getTargetHeadingDegree();
+						}
+							
+						// get linear heading score:
+						// diff <= 20 degree --> 100 %
+						// diff >= 90 degree -->   0 %
+						float absHdgDiff = FastMath.abs(lane.getHeadingDiff(carHeadingDegree));
+						float hdgScore = Util.map(absHdgDiff, 20f, 90f, 1.0f, 0.0f);
+
+						// get linear vertical distance score (e.g. bridge):
+						// diff <= 0.5 meters --> 100 %
+						// diff >= 2.0 meters -->   0 %
+						float absDistDiff = FastMath.abs(carPos.getY() - results.getCollision(i).getContactPoint().getY());
+						float distScore = Util.map(absDistDiff, 0.5f, 2.0f, 1.0f, 0.0f);
+							
+						// get weighted total score (40 % of heading and 60 % of distance score)
+						float totalScore = (0.4f * hdgScore) + (0.6f * distScore);
+							
+						/*
+						System.err.println("roadID: " + roadID + "; absHdgDiff:" + absHdgDiff + "; " + 
+								"hdgScore: " + hdgScore + "; absDistDiff:" + absDistDiff + "; " + 
+								"distScore: " + distScore + "; totalScore:" + totalScore + "; ");
+						*/
+							
+						// choose lane with highest score
+						if(totalScore > overallBestScore)
+						{
+							overallBestScore = totalScore;
+							mostProbableLane = lane;
+						}
+					}
+					else
+						System.err.println("Geometry '" + geometryName + "' does not exist");
+				}				
 			}
 		}
 		
