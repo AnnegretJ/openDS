@@ -36,6 +36,7 @@ import eu.opends.profiler.BasicProfilerState;
 import com.jme3.app.StatsAppState;
 //import com.jme3.app.state.VideoRecorderAppState;
 import com.jme3.input.Joystick;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.Spatial.CullHint;
@@ -693,9 +694,12 @@ public class Simulator extends SimulationBasics
     		eventCenter.update();
     		
     		Vector3f driversPos = car.getPosition().add(0, 1, 0);
+    		Quaternion rotation = car.getRotation();
     		Vector3f frontPos = car.getFrontGeometry().getWorldTranslation().add(0, 1, 0);
-    		Vector3f gazeDirection = null; // only used by DriveAnalyzer
-    		gestureAnalyzer.updateRays(driversPos, frontPos, gazeDirection);
+    		Vector3f headGazeDirection = null; // only used by DriveAnalyzer
+    		Vector3f pointingDirection = null; // only used by DriveAnalyzer
+    		Boolean isNoise = null;            // only used by DriveAnalyzer
+    		gestureAnalyzer.updateRays(driversPos, rotation, frontPos, headGazeDirection, pointingDirection, isNoise);
     		
 			updateDataWriter();
     	}

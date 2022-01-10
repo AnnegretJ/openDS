@@ -23,8 +23,12 @@ public class RecordedReferenceObject
 {
 	private String name;
 	private float minLatAngle;
+	private Float visibleMinLatAngle = null;
+	private Float centerLatAngle;
 	private float maxLatAngle;
+	private Float visibleMaxLatAngle = null;
 	private float minVertAngle;
+	private Float centerVertAngle;
 	private float maxVertAngle;
 	private boolean isActive;
 	
@@ -32,10 +36,19 @@ public class RecordedReferenceObject
 	public RecordedReferenceObject(String name, float minLatAngle, float maxLatAngle, float minVertAngle,
 			float maxVertAngle, boolean isActive)
 	{
+		this(name, minLatAngle, null, maxLatAngle, minVertAngle, null, maxVertAngle, isActive);
+	}
+
+
+	public RecordedReferenceObject(String name, float minLatAngle, Float centerLatAngle, float maxLatAngle, 
+			float minVertAngle, Float centerVertAngle, float maxVertAngle, boolean isActive)
+	{
 		this.name = name;
 		this.minLatAngle = minLatAngle;
+		this.centerLatAngle = centerLatAngle;
 		this.maxLatAngle = maxLatAngle;
 		this.minVertAngle = minVertAngle;
+		this.centerVertAngle = centerVertAngle;
 		this.maxVertAngle = maxVertAngle;
 		this.isActive = isActive;
 	}
@@ -51,6 +64,24 @@ public class RecordedReferenceObject
 	{
 		return minLatAngle;
 	}
+	
+	
+	public void setVisibleMinLatAngle(float visibleMinLatAngle)
+	{
+		this.visibleMinLatAngle = visibleMinLatAngle;
+	}
+	
+	
+	public Float getVisibleMinLatAngle()
+	{
+		return visibleMinLatAngle;
+	}
+	
+	
+	public Float getCenterLatAngle()
+	{
+		return centerLatAngle;
+	}
 
 
 	public float getMaxLatAngle()
@@ -58,10 +89,28 @@ public class RecordedReferenceObject
 		return maxLatAngle;
 	}
 
-
+	
+	public void setVisibleMaxLatAngle(float visibleMaxLatAngle)
+	{
+		this.visibleMaxLatAngle = visibleMaxLatAngle;
+	}
+	
+	
+	public Float getVisibleMaxLatAngle()
+	{
+		return visibleMaxLatAngle;
+	}
+	
+	
 	public float getMinVertAngle()
 	{
 		return minVertAngle;
+	}
+	
+	
+	public Float getCenterVertAngle()
+	{
+		return centerVertAngle;
 	}
 
 
@@ -69,7 +118,7 @@ public class RecordedReferenceObject
 	{
 		return maxVertAngle;
 	}
-
+	
 
 	public boolean isActive()
 	{
@@ -78,7 +127,10 @@ public class RecordedReferenceObject
 
 	public String toString()
 	{
-		return name + "(" + minLatAngle +", " + maxLatAngle + ", " + minVertAngle +	", " + maxVertAngle + ", " + isActive + ")";
+		return name + "(" + minLatAngle + ", " + visibleMinLatAngle + ", " + centerLatAngle + ", " 
+					+ maxLatAngle + ", " + visibleMaxLatAngle + ", " + minVertAngle + ", " 
+					+ centerVertAngle + ", " + maxVertAngle + ", " + isActive + ")";
 	}
+
 	
 }

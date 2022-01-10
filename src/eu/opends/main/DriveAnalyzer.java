@@ -33,6 +33,7 @@ import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -49,10 +50,11 @@ import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.Nifty;
 import eu.opends.analyzer.DataUnit;
 import eu.opends.analyzer.DeviationComputer;
-import eu.opends.analyzer.GazeDirectionRecord;
+import eu.opends.analyzer.RayDirectionRecord;
 import eu.opends.analyzer.DataReader;
 import eu.opends.analyzer.IdealLine;
 import eu.opends.analyzer.IdealLine.IdealLineStatus;
+import eu.opends.analyzer.NoiseRecord;
 import eu.opends.basics.InternalMapProcessing;
 import eu.opends.basics.MapObject;
 import eu.opends.basics.MapObjectOD;
@@ -112,7 +114,9 @@ public class DriveAnalyzer extends SimulationBasics
 	private ArrayList<Vector3f> carPositionList = new ArrayList<Vector3f>();
 	private LinkedList<DataUnit> dataUnitList = new LinkedList<DataUnit>();
 	
-	private GazeDirectionRecord gazeDirectionRecord;
+	private RayDirectionRecord headGazeDirectionRecord;
+	private RayDirectionRecord pointingDirectionRecord;
+	private NoiseRecord noiseRecord;
 	
 	private DataReader dataReader = new DataReader();
 	private Long initialTimeStamp = 0l;
@@ -187,7 +191,15 @@ public class DriveAnalyzer extends SimulationBasics
 		
 		loadData();
 		
-		gazeDirectionRecord = new GazeDirectionRecord(analyzerFilePath);
+		String headGazeDirectionFileName = "headgaze_smooth.txt";
+		headGazeDirectionRecord = new RayDirectionRecord(analyzerFilePath, headGazeDirectionFileName, false);
+		
+		String pointingDirectionFileName = "gesture_aptive_smooth.txt";
+		pointingDirectionRecord = new RayDirectionRecord(analyzerFilePath, pointingDirectionFileName, true);
+		
+		String noiseFileName = "audio.txt";
+		noiseRecord = new NoiseRecord(analyzerFilePath, noiseFileName);
+		
 		
 		super.simpleInitApp();	
 
@@ -507,27 +519,19 @@ public class DriveAnalyzer extends SimulationBasics
 	
 	/**
 	 * <code>moveFocus()</code> sets the position of the target. The target's
-	 * position is equal to one of the data-points, whereas the direction
-	 * specifies which of the neighbors in the data-point list should be taken.
+	 * position is equal to one of the data-points, whereas the step specifies
+	 * direction and distance to be taken.
 	 * 
-	 * @param direction
-	 * 			Specifies which of the neighbors (1 or -1) in the data-point list should be taken.
+	 * @param step
+	 * 			Specifies which data-point from the list should be taken.
 	 */
-	public void moveFocus(int direction) 
+	public void moveFocus(int step) 
 	{
-		if(!replayIsRunning)
+		if(!replayIsRunning && !isPause()
+			&& 0 <= (targetIndex + step) && (targetIndex + step) < dataUnitList.size())
 		{
-			if (!isPause() && direction == 1 && (targetIndex + 1) < dataUnitList.size()) 
-			{
-				targetIndex++;
-				updateView(dataUnitList.get(targetIndex));
-			}
-	
-			if (!isPause() && direction == -1 && (targetIndex - 1) >= 0)
-			{
-				targetIndex--;
-				updateView(dataUnitList.get(targetIndex));
-			}
+			targetIndex += step;
+			updateView(dataUnitList.get(targetIndex));
 		}
 	}
 
@@ -546,6 +550,11 @@ public class DriveAnalyzer extends SimulationBasics
 		// update timestamp
 		updateTimestamp();
 
+		// make cone 100 steps before invisible (if exists)
+		Spatial previous100Cone = coneNode.getChild("cone_" + (targetIndex-100));		
+		if(previous100Cone != null)
+			previous100Cone.setCullHint(CullHint.Always);
+				
 		// make previous cone invisible (if exists)
 		Spatial previousCone = coneNode.getChild("cone_" + (targetIndex-1));		
 		if(previousCone != null)
@@ -560,6 +569,11 @@ public class DriveAnalyzer extends SimulationBasics
 		Spatial nextCone = coneNode.getChild("cone_" + (targetIndex+1));
 		if(nextCone != null)
 			nextCone.setCullHint(CullHint.Always);
+		
+		// make cone 100 steps ahead invisible (if exists)
+		Spatial next100Cone = coneNode.getChild("cone_" + (targetIndex+100));		
+		if(next100Cone != null)
+			next100Cone.setCullHint(CullHint.Always);
 		
 		updateReferenceObjects();
 		
@@ -582,7 +596,7 @@ public class DriveAnalyzer extends SimulationBasics
 			int lane_car = lane.getID();
 			double s_car = lane.getCurrentInnerBorderPoint().getS();
 			
-			System.err.println("POS: " + roadID_car + "," + lane_car + "," + s_car);
+			//System.err.println("POS: " + roadID_car + "," + lane_car + "," + s_car);
 			
 			for(Entry<ODPosition, Trigger> item : SimulationBasics.getODTriggerActionListMap().entrySet())
 			{
@@ -610,8 +624,8 @@ public class DriveAnalyzer extends SimulationBasics
 				}
 			}
 		}
-		else
-			System.err.println("Car is off the road");
+		//else
+			//System.err.println("Car is off the road");
 	}
 
 
@@ -647,25 +661,33 @@ public class DriveAnalyzer extends SimulationBasics
 		
 		// draw rays
 		Vector3f origin = currentDataUnit.getCarPosition().add(0, 1f, 0);
+		Quaternion rotation = currentDataUnit.getCarRotation();
 		//Vector3f frontPos = frontNode.getWorldTranslation().add(0, 1f, 0);   // frontPos of DriveAnalyzer
 		Vector3f frontPos = currentDataUnit.getFrontPosition().add(0, 1f, 0);  // original frontPos of Simulator
 		
-		// lookup local gaze direction (relative to vehicle coordinate system)
-		Vector3f gazeDirectionLocal = gazeDirectionRecord.lookupGazeDirectionByTimestamp(currentDataUnit.getDate());
-		Vector3f gazeDirectionWorld = localToWorld(gazeDirectionLocal);
+		// lookup local headpose+gaze direction (relative to vehicle coordinate system)
+		Vector3f headGazeDirectionLocal = headGazeDirectionRecord.lookupRayDirectionByTimestamp(currentDataUnit.getDate());
+		Vector3f headGazeDirectionWorld = localToWorld(headGazeDirectionLocal);
 		
-		gestureAnalyzer.updateRays(origin, frontPos, gazeDirectionWorld);
+		// lookup local pointing direction (relative to vehicle coordinate system)
+		Vector3f pointingDirectionLocal = pointingDirectionRecord.lookupRayDirectionByTimestamp(currentDataUnit.getDate());
+		Vector3f pointingDirectionWorld = localToWorld(pointingDirectionLocal);
+		
+		// lookup noise
+		Boolean isNoise = noiseRecord.lookupNoiseByTimestamp(currentDataUnit.getDate());
+		
+		gestureAnalyzer.updateRays(origin, rotation, frontPos, headGazeDirectionWorld, pointingDirectionWorld, isNoise);
 	}
 
 
-	private Vector3f localToWorld(Vector3f gazeDirectionLocal)
+	private Vector3f localToWorld(Vector3f directionVectorLocal)
 	{
-		if(gazeDirectionLocal != null)
+		if(directionVectorLocal != null)
 		{
-			Vector3f worldPos = target.localToWorld(gazeDirectionLocal, null);
-			Vector3f gazeDirectionWorld = worldPos.subtract(currentDataUnit.getCarPosition());
-			gazeDirectionWorld.normalizeLocal();
-			return gazeDirectionWorld;
+			Vector3f worldPos = target.localToWorld(directionVectorLocal, null);
+			Vector3f directionVectorWorld = worldPos.subtract(currentDataUnit.getCarPosition());
+			directionVectorWorld.normalizeLocal();
+			return directionVectorWorld;
 		}
 		
 		return null;

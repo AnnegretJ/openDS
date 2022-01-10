@@ -26,16 +26,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import com.jme3.asset.AssetNotFoundException;
-import com.jme3.collision.CollisionResult;
-import com.jme3.collision.CollisionResults;
 import com.jme3.material.MatParamTexture;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
-import com.jme3.math.Ray;
 import com.jme3.math.Spline;
 import com.jme3.math.Vector3f;
 import com.jme3.math.Spline.SplineType;
@@ -55,29 +53,44 @@ import eu.opends.basics.SimulationBasics;
 import eu.opends.main.DriveAnalyzer;
 import eu.opends.main.PostProcessor;
 import eu.opends.main.Simulator;
+import eu.opends.tools.RefObjComparator;
 import eu.opends.tools.Util;
 
 public class GestureAnalyzer
 {
-	private boolean debug = false;
+	private boolean debug = true;
 	private boolean visualizeGazeWithinBounds = true;
+	private boolean drawTargetRayConnectors = true;
+	private boolean drawDistractorRayConnectors = false;
+	private boolean drawHeadGazeRayConnector = true;
+	private boolean drawPointingRayConnector = true;
+	private boolean drawVisibilityRaysTarget = false;
+	private boolean drawVisibilityRaysDistractor = false;
 	
 	private SimulationBasics sim;
 	private ArrayList<MapObject> referenceObjectList = new ArrayList<MapObject>();
 	private MapObject activeReferenceObject = null;
+	private Node target = new Node();
 	
 	// using maps to access markers/connectors by ID
 	private HashMap<String, Geometry> markerMap = new HashMap<String, Geometry>();
 	private HashMap<String, Node> connectorMap = new HashMap<String, Node>();
 	
-	private Material greenMaterial;
-	private Material yellowMaterial;
-	private Material orangeMaterial;
-	private Material redMaterial;
+	private Material darkGreenMaterial;
+	private Material brightGreenMaterial;
+	private Material brightRedMaterial;
+	private Material darkRedMaterial;
 	private Material whiteMaterial;
+	private Material blueMaterial;
+	private Material yellowMaterial;
 	
-	private Float lateralGazeAngle = null;
-	private Float verticalGazeAngle = null;
+	private Float lateralHeadGazeAngle = null;
+	private Float verticalHeadGazeAngle = null;
+	private Float lateralPointingAngle = null;
+	private Float verticalPointingAngle = null;
+	private SceneRay headGazeRay = null;
+	private SceneRay pointingRay = null;
+	
 	
 	public ArrayList<MapObject> getReferenceObjectList()
 	{
@@ -89,25 +102,36 @@ public class GestureAnalyzer
 	{
 		this.sim = sim;
 		
-		greenMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		greenMaterial.getAdditionalRenderState().setWireframe(false);
-		greenMaterial.setColor("Color", ColorRGBA.Green);
+		if(sim instanceof Simulator)
+			debug = false;
 		
-		yellowMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		yellowMaterial.getAdditionalRenderState().setWireframe(false);
-		yellowMaterial.setColor("Color", ColorRGBA.Yellow);
+		darkGreenMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		darkGreenMaterial.getAdditionalRenderState().setWireframe(false);
+		darkGreenMaterial.setColor("Color", new ColorRGBA(0, 0.5f, 0, 1));
 		
-		orangeMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		orangeMaterial.getAdditionalRenderState().setWireframe(false);
-		orangeMaterial.setColor("Color", ColorRGBA.Orange);
+		brightGreenMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		brightGreenMaterial.getAdditionalRenderState().setWireframe(false);
+		brightGreenMaterial.setColor("Color", ColorRGBA.Green);
 		
-		redMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		redMaterial.getAdditionalRenderState().setWireframe(false);
-		redMaterial.setColor("Color", ColorRGBA.Red);
+		darkRedMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		darkRedMaterial.getAdditionalRenderState().setWireframe(false);
+		darkRedMaterial.setColor("Color", new ColorRGBA(0.5f, 0, 0, 1));
+		
+		brightRedMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		brightRedMaterial.getAdditionalRenderState().setWireframe(false);
+		brightRedMaterial.setColor("Color", ColorRGBA.Red);
 		
 		whiteMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		whiteMaterial.getAdditionalRenderState().setWireframe(false);
 		whiteMaterial.setColor("Color", ColorRGBA.White);
+		
+		blueMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		blueMaterial.getAdditionalRenderState().setWireframe(false);
+		blueMaterial.setColor("Color", ColorRGBA.Blue);
+		
+		yellowMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		yellowMaterial.getAdditionalRenderState().setWireframe(false);
+		yellowMaterial.setColor("Color", ColorRGBA.Yellow);
 	}
 	
 
@@ -166,7 +190,13 @@ public class GestureAnalyzer
 			// add a node to attach all 8 corner positions as sub-nodes
 			Node cornerNodes = new Node("cornerNodes");
 			((Node)childNode).attachChild(cornerNodes);
+			
+			// add a node to attach inner positions as sub-nodes
+			Node innerNodes = new Node("innerNodes");
+			((Node)childNode).attachChild(innerNodes);
 		
+			Vector3f centerPosition = new Vector3f(0, 0, 0);
+			
 			// add all 8 corner positions as sub-nodes of "cornerNodes"
 			for(int i=0; i<8; i++)
 			{
@@ -176,7 +206,17 @@ public class GestureAnalyzer
 				Node cornerNode = new Node("cornerNode_" + i);
 				cornerNode.setLocalTranslation(cornerPosition);
 				cornerNodes.attachChild(cornerNode);
+				
+				// calculate center position by summing all 8 corner points and dividing by 8
+				centerPosition.addLocal(cornerPosition);
 			}
+			
+			centerPosition.divideLocal(8);
+			
+			Node centerNode = new Node("centerNode");
+			centerNode.setLocalTranslation(centerPosition);
+			innerNodes.attachChild(centerNode);
+
 
 			HashMap<String,String> textureMap = params.getTextureMap();
 			if(textureMap.size() > 0)
@@ -381,26 +421,43 @@ public class GestureAnalyzer
 	}
 	
 
-	public ArrayList<RecordedReferenceObject> updateRays(Vector3f origin, Vector3f forwardPos, Vector3f gazeDirectionWorld)
+	public TreeMap<String, RecordedReferenceObject> updateRays(Vector3f origin, Quaternion rotation, Vector3f forwardPos, 
+			Vector3f gazeDirectionWorld, Vector3f pointingDirectionWorld, Boolean isNoise)
 	{
-		// visualize gaze (if not null)
+		// update car representation
+		target.setLocalTranslation(origin);
+		target.setLocalRotation(rotation);
+		
+		// visualize headpose+gaze (if not null)
 		if(gazeDirectionWorld != null)
-			updateGazeRay(origin, forwardPos, gazeDirectionWorld);
+			updateHeadGazeRay(origin, forwardPos, gazeDirectionWorld);
 		else
 		{
-			lateralGazeAngle = null;
-			verticalGazeAngle = null;
-			deleteRay("gazeRay");
+			lateralHeadGazeAngle = null;
+			verticalHeadGazeAngle = null;
+			headGazeRay = null;
+			deleteRay("headGazeRay");
 		}
 		
-		ArrayList<RecordedReferenceObject> logList = new ArrayList<RecordedReferenceObject>();
+		// visualize pointing (if not null)
+		if(pointingDirectionWorld != null /*&& isNoise != null && isNoise*/)
+			updatePointingRay(origin, forwardPos, pointingDirectionWorld);
+		else
+		{
+			lateralPointingAngle = null;
+			verticalPointingAngle = null;
+			pointingRay = null;
+			deleteRay("pointingRay");
+		}
+		
+		TreeMap<String, RecordedReferenceObject> logList = new TreeMap<String, RecordedReferenceObject>(new RefObjComparator());
 		for(MapObject referenceObject : referenceObjectList)
 		{
 			if(!referenceObject.getSpatial().getCullHint().equals(CullHint.Always))
 			{
 				RecordedReferenceObject recRefObj = drawRaysPerObject(origin, forwardPos, referenceObject);
 				if(recRefObj != null)
-					logList.add(recRefObj);
+					logList.put(recRefObj.getName(), recRefObj);
 			}
 			else
 				deleteRays(referenceObject);
@@ -412,12 +469,19 @@ public class GestureAnalyzer
 		{
 			String logString = "[";
 			
-			for(int i=0; i<logList.size(); i++)
+			Iterator<RecordedReferenceObject> it = logList.values().iterator();
+			int index = 0;
+			while(it.hasNext())
 			{
-				if(i!=0)
+				if(index!=0)
 					logString +=  "; ";
 				
-				logString += logList.get(i).toString();
+				RecordedReferenceObject recRefObj = it.next();
+				logString += recRefObj.getName() + "(" + recRefObj.getMinLatAngle() + ", " + recRefObj.getMaxLatAngle() 
+								+ ", " + recRefObj.getMinVertAngle() +	", " + recRefObj.getMaxVertAngle() 
+								+ ", " + recRefObj.isActive() + ")";
+				
+				index++;
 			}
 			
 			logString += "]";
@@ -432,26 +496,184 @@ public class GestureAnalyzer
 		}
 		else if(sim instanceof DriveAnalyzer || sim instanceof PostProcessor)
 		{
-			/**/
-			String logString = "[";
-			
-			for(int i=0; i<logList.size(); i++)
-			{
-				if(i!=0)
-					logString +=  "; ";
-				
-				logString += logList.get(i).toString();
-			}
-			
-			logString += "]";
-			
-			//System.err.println(logString);
-			/**/
+			addLatVisibilityAngles(logList, origin);
 		}
 		
 		return logList;
 	}
+	
+	
+	private void addLatVisibilityAngles(TreeMap<String, RecordedReferenceObject> logList, Vector3f origin)
+	{
+		for(RecordedReferenceObject currentRecRefObj : logList.values())
+		{
+			try {
+				
+				String currentBuildingName = currentRecRefObj.getName();
+				
+				// lateral angles towards the left and right border of this building
+				float currentMinLatAngle = currentRecRefObj.getMinLatAngle();
+				float currentMaxLatAngle = currentRecRefObj.getMaxLatAngle();
+				
+				// initialize visible angles with current angles (for unobstructed buildings)
+				float visibleMinLatAngle = currentMinLatAngle;
+				float visibleMaxLatAngle = currentMaxLatAngle;
+				
+				// get group number and building number of this building
+				int groupNumber = 0;
+				int currentBuildingNumber = 0;
+				String[] splitString = currentBuildingName.split("_");
+				if(splitString.length == 2)
+				{
+					// dismantle strings of type "group<a>_building<b>"
+					groupNumber = Integer.parseInt(splitString[0].replace("group", ""));
+					currentBuildingNumber = Integer.parseInt(splitString[1].replace("building", ""));
+				}
+				
+				
+				// get lateral angles towards the left and right border of the previous building
+				// where "previous building number" = "this building number" - 2 (if exists)
+				int previousBuildingNumber = currentBuildingNumber - 2;
+				if(previousBuildingNumber >= 1)
+				{
+					// lookup lateral angles of previous building (which is partially covering this one)
+					String previousBuildingName = "group" + groupNumber + "_building" + previousBuildingNumber;
+					RecordedReferenceObject previousRecRefObj = logList.get(previousBuildingName);
+					float previousMinLatAngle = previousRecRefObj.getMinLatAngle();
+					float previousMaxLatAngle = previousRecRefObj.getMaxLatAngle();
+					
+					// compute the lateral angles of this building's visible area by subtracting
+					// the area covered by the previous or next building (viewed from the current vehicle position)
+					if(currentMaxLatAngle > previousMaxLatAngle)
+					{
+						// building on right-hand side
+						visibleMinLatAngle = getVisibleLatAngle(currentMinLatAngle, previousMaxLatAngle, true, true);
+					}
+					else
+					{
+						// building on left-hand side
+						visibleMaxLatAngle = getVisibleLatAngle(currentMaxLatAngle, previousMinLatAngle, true, false);
+					}
+				}
+				
+				
+				// get lateral angles towards the left and right border of the next building
+				// where "next building number" = "this building number" + 2 (if exists)
+				int nextBuildingNumber = currentBuildingNumber + 2;
+				if(nextBuildingNumber <= logList.size())
+				{
+					// lookup lateral angles of next building (which is partially covering this one)
+					String nextBuildingName = "group" + groupNumber + "_building" + nextBuildingNumber;
+					RecordedReferenceObject nextRecRefObj = logList.get(nextBuildingName);
+					float nextMinLatAngle = nextRecRefObj.getMinLatAngle();
+					float nextMaxLatAngle = nextRecRefObj.getMaxLatAngle();
+					
+					// compute the lateral angles of this building's visible area by subtracting
+					// the area covered by the previous or next building (viewed from the current vehicle position)
+					if(nextMaxLatAngle > currentMaxLatAngle)
+					{
+						// building on right-hand side
+						visibleMaxLatAngle = getVisibleLatAngle(currentMaxLatAngle, nextMinLatAngle, false, false);
+					}
+					else
+					{
+						// building on left-hand side
+						visibleMinLatAngle = getVisibleLatAngle(currentMinLatAngle, nextMaxLatAngle, false, true);
+					}
+				}
+				
+				
+				// save visibleMinLatAngle and visibleMaxLatAngle to log
+				currentRecRefObj.setVisibleMinLatAngle(visibleMinLatAngle);
+				currentRecRefObj.setVisibleMaxLatAngle(visibleMaxLatAngle);
+				
+				/*
+				// print visibility angles of selected (e.g. right-hand side) buildings
+				if(currentBuildingNumber % 2 == 1)
+				{
+					System.err.println(currentRecRefObj.getName() + ": " + visibleMinLatAngle * FastMath.RAD_TO_DEG 
+							+ " <--> " + visibleMaxLatAngle * FastMath.RAD_TO_DEG);
+				}
+				*/
+				
+				
+				// look up whether current building is the target building
+				boolean isTarget = (activeReferenceObject != null) && currentBuildingName.equals(activeReferenceObject.getName());
+				
+				
+				if((isTarget && drawVisibilityRaysTarget)			// draw visibility rays of target building
+					|| (!isTarget && drawVisibilityRaysDistractor)) // draw visibility rays of distractor building
+				{
+					String visibleMinLatRayName = currentBuildingName + "_visibleMinLatRay";
+					drawRayFromAngles(visibleMinLatRayName, visibleMinLatAngle, 0, origin, yellowMaterial, true);
+					
+					String visibleMaxLatRayName = currentBuildingName + "_visibleMaxLatRay";
+					drawRayFromAngles(visibleMaxLatRayName, visibleMaxLatAngle, 0, origin, yellowMaterial, true);
+				}
 
+					
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
+
+	private float getVisibleLatAngle(float latAngle, float influencingLatAngle, 
+			boolean influencedByPreviousObj, boolean influencedByMaxAngle)
+	{
+		// if visibility of building is influenced by previous building AND building is ahead of the vehicle OR
+		// if visibility of building is influenced by next building AND building is behind the vehicle
+		// then consider influencing angle
+		if((influencedByPreviousObj && (FastMath.abs(latAngle) < FastMath.HALF_PI))
+			|| (!influencedByPreviousObj && (FastMath.abs(latAngle) > FastMath.HALF_PI)))
+		{
+			if(influencedByMaxAngle)
+				return Math.max(latAngle, influencingLatAngle);
+			else
+				return Math.min(latAngle, influencingLatAngle);
+		}
+	
+		return latAngle;
+	}
+
+
+	public Float getLateralHeadGazeAngle()
+	{
+		return lateralHeadGazeAngle;
+	}
+
+	
+	public Float getVerticalHeadGazeAngle()
+	{
+		return verticalHeadGazeAngle;
+	}
+	
+	
+	public Float getLateralPointingAngle()
+	{
+		return lateralPointingAngle;
+	}
+
+	
+	public Float getVerticalPointingAngle()
+	{
+		return verticalPointingAngle;
+	}
+	
+	
+	public SceneRay getHeadGazeRay()
+	{
+		return headGazeRay;
+	}
+	
+
+	public SceneRay getPointingRay()
+	{
+		return pointingRay;
+	}
+	
 
 	private RecordedReferenceObject drawRaysPerObject(Vector3f origin, Vector3f forwardPos, MapObject referenceObject)
 	{
@@ -518,22 +740,77 @@ public class GestureAnalyzer
 					
 					
 					if(referenceObject.equals(activeReferenceObject))
-						drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, greenMaterial);
+						drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, darkGreenMaterial, drawTargetRayConnectors);
 					else
-						drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, redMaterial);
+						drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, darkRedMaterial, drawDistractorRayConnectors);
 				}
 			}
 			
+			/*
+			if(referenceObject.equals(activeReferenceObject))
+			{
+				System.err.println("Building: minLat: " + minLatAngle * FastMath.RAD_TO_DEG + 
+						"; maxLat: " + maxLatAngle * FastMath.RAD_TO_DEG + "; minVert: " + minVertAngle * FastMath.RAD_TO_DEG + 
+							"; maxVert: " + maxVertAngle * FastMath.RAD_TO_DEG);
+				
+				// CAUTION: lateralPointingAngle and verticalPointingAngle may be null
+				System.err.println("PointingAngle: lat: " + lateralPointingAngle * FastMath.RAD_TO_DEG + 
+						"; vert: " + verticalPointingAngle * FastMath.RAD_TO_DEG);
+			}
+			*/
 			
-			// Overwrite red/green color if current gaze vector is set and 
-			// within lateral and vertical boundary of reference object.
-			// Exclude reference objects that are out of sight (angle > 90 degrees).
-			if(visualizeGazeWithinBounds && 
-					lateralGazeAngle != null && verticalGazeAngle != null &&
-					FastMath.abs(minLatAngle) < FastMath.HALF_PI && FastMath.abs(maxLatAngle) < FastMath.HALF_PI &&
-					FastMath.abs(minVertAngle) < FastMath.HALF_PI && FastMath.abs(maxVertAngle) < FastMath.HALF_PI &&
-					minLatAngle < lateralGazeAngle && lateralGazeAngle < maxLatAngle &&
-					minVertAngle < verticalGazeAngle && verticalGazeAngle < maxVertAngle)
+			Float centerLatAngle = null;
+			Float centerVertAngle = null;
+			
+			Node innerNodes = Util.findNode(referenceObject.getSpatial(), "innerNodes");
+			Spatial centerNode = innerNodes.getChild("centerNode");
+			if(centerNode != null)
+			{
+				// world coordinate system !!!
+				Vector3f centerPos = centerNode.getWorldTranslation();
+				
+				// lateral angle
+				// -------------
+				
+				// relative position of center point (with regard to driving direction)
+				// --> left side:    1
+				// --> right side : -1
+				int lDirection = getRelativeLPosition(forwardPos, origin, centerPos);
+				
+				// angle between driving direction of traffic car and direction towards center position
+				centerLatAngle = lDirection * Util.getAngleBetweenPoints(forwardPos, origin, centerPos, true);
+				
+				//System.err.println(lateralAngleCenter * FastMath.RAD_TO_DEG);
+
+				
+				// vertical angle
+				// --------------
+				
+				// relative position of center point (with regard to the horizon)
+				// --> above:  1
+				// --> below: -1
+				int vDirection = getRelativeVPosition(origin, centerPos);
+				
+				// projection of the center position to the level of the ray's origin
+				Vector3f projectionPos = new Vector3f(centerPos.getX(), origin.getY(), centerPos.getZ());
+				
+				// angle between driving direction of traffic car and direction towards center position
+				centerVertAngle = vDirection * Util.getAngleBetweenPoints(projectionPos, origin, centerPos, false);
+				
+				//System.err.println(verticalAngleCenter * FastMath.RAD_TO_DEG);
+				
+				
+				if(referenceObject.equals(activeReferenceObject))
+					drawRay(referenceObject.getName() + "_centerRay", centerPos, origin, darkGreenMaterial, drawTargetRayConnectors);
+				else
+					drawRay(referenceObject.getName() + "_centerRay", centerPos, origin, darkRedMaterial, drawDistractorRayConnectors);
+			}
+
+			
+			
+			// Overwrite dark red/green color with brighter red/green color if either the headpose+gaze 
+			// vector or the pointing vector is set and within lateral and vertical boundary of reference object.
+			if(visualizeGazeWithinBounds && isObjectHit(maxLatAngle, minLatAngle, maxVertAngle, minVertAngle))
 			{
 				for(int i=0; i<8; i++)
 				{
@@ -544,10 +821,22 @@ public class GestureAnalyzer
 						Vector3f cornerPos = cornerNode.getWorldTranslation();
 						
 						if(referenceObject.equals(activeReferenceObject))
-							drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, yellowMaterial);
+							drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, brightGreenMaterial, drawTargetRayConnectors);
 						else
-							drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, orangeMaterial);
+							drawRay(referenceObject.getName() + "_cornerRay_" + i, cornerPos, origin, brightRedMaterial, drawDistractorRayConnectors);
 					}
+				}
+				
+
+				if(centerNode != null)
+				{
+					// world coordinate system !!!
+					Vector3f centerPos = centerNode.getWorldTranslation();
+					
+					if(referenceObject.equals(activeReferenceObject))
+						drawRay(referenceObject.getName() + "_centerRay", centerPos, origin, brightGreenMaterial, drawTargetRayConnectors);
+					else
+						drawRay(referenceObject.getName() + "_centerRay", centerPos, origin, brightRedMaterial, drawDistractorRayConnectors);
 				}
 			}
 			
@@ -558,11 +847,39 @@ public class GestureAnalyzer
 			*/
 			
 			boolean isActive = referenceObject.equals(activeReferenceObject);			
-			recRefObj = new RecordedReferenceObject(referenceObject.getName(), minLatAngle, maxLatAngle, 
-					minVertAngle, maxVertAngle, isActive);
+			recRefObj = new RecordedReferenceObject(referenceObject.getName(), minLatAngle, centerLatAngle, 
+					maxLatAngle, minVertAngle, centerVertAngle, maxVertAngle, isActive);
 		}
 		
 		return recRefObj;
+	}
+
+
+	private boolean isObjectHit(float maxLatAngle, float minLatAngle, float maxVertAngle, float minVertAngle)
+	{
+		// exclude objects that are out of the driver's sight (angle > 120 degrees (rad: 2.094395)).
+		if(FastMath.abs(minLatAngle) > 2.094395f || FastMath.abs(maxLatAngle) > 2.094395f ||
+				FastMath.abs(minVertAngle) > 2.094395f || FastMath.abs(maxVertAngle) > 2.094395f)
+			return false;
+		
+		boolean isHitByHeadGazeRay = false;
+		if(lateralHeadGazeAngle != null && verticalHeadGazeAngle != null)
+		{
+			// check whether headpose+gaze ray hits object 
+			isHitByHeadGazeRay = minLatAngle < lateralHeadGazeAngle && lateralHeadGazeAngle < maxLatAngle &&
+									minVertAngle < verticalHeadGazeAngle && verticalHeadGazeAngle < maxVertAngle;
+		}
+		
+		boolean isHitByPointingRay = false;
+		if(lateralPointingAngle != null && verticalPointingAngle != null)
+		{
+			// check whether pointing ray hits object 
+			isHitByPointingRay = minLatAngle < lateralPointingAngle && lateralPointingAngle < maxLatAngle &&
+									minVertAngle < verticalPointingAngle && verticalPointingAngle < maxVertAngle;
+		}
+		
+		// object will be marked as "hit" if at least one of the rays has hit the object
+		return isHitByHeadGazeRay || isHitByPointingRay;	
 	}
 
 
@@ -618,9 +935,51 @@ public class GestureAnalyzer
 		
 		return resultList;
 	}
+	
+	
+	private void drawRayFromAngles(String name, float latAngle, float vertAngle, Vector3f origin, 
+			Material material, boolean drawConnector)
+	{
+		// convert angle to direction vector
+		Vector3f direction = angleToVector(latAngle, vertAngle);
+		
+		// transform vector from local to world coordinate system
+		Vector3f worldDirection = localToWorld(direction);
+		
+		// find "end of ray" position 1000 meter away from origin in given direction 
+		Vector3f endOfRay = worldDirection.mult(1000).add(origin);
+		
+		// will slow down simulation
+		//SceneRay sr = new SceneRay(sim, referenceObjectList, origin, worldDirection, null);
+		//endOfRay = sr.getEndOfRay();
+		
+		// draw ray by providing target position (instead of angles)
+		drawRay(name, endOfRay, origin, material, drawConnector);
+	}
+	
 
+	private Vector3f angleToVector(float latAngle, float vertAngle)
+	{
+		// convert lateral and vertical angle to direction vector
+		float x = -FastMath.sin(latAngle) * FastMath.cos(vertAngle);
+		float y = FastMath.sin(vertAngle);
+		float z = -FastMath.cos(latAngle) * FastMath.cos(vertAngle);
+		
+		return new Vector3f(x,y,z);
+	}
 
-	private void drawRay(String ID, Vector3f targetPosition, Vector3f vehiclePosition, Material material)
+	
+	public Vector3f localToWorld(Vector3f directionVectorLocal)
+	{
+		Vector3f worldPos = target.localToWorld(directionVectorLocal, null);
+		Vector3f directionVectorWorld = worldPos.subtract(target.getLocalTranslation());
+		directionVectorWorld.normalizeLocal();
+		
+		return directionVectorWorld;
+	}
+	
+	private void drawRay(String ID, Vector3f targetPosition, Vector3f vehiclePosition, Material material, 
+			boolean drawConnector)
 	{
 		if(debug)
 		{
@@ -645,7 +1004,8 @@ public class GestureAnalyzer
 				connectorMap.remove(ID + "_connector");
 			}
 			
-			drawConnector(ID + "_connector", vehiclePosition, targetPosition, material);
+			if(drawConnector)
+				drawConnector(ID + "_connector", vehiclePosition, targetPosition, material);
 		}
 	}
 	
@@ -677,9 +1037,18 @@ public class GestureAnalyzer
 		{
 			for(int i=0; i<8; i++)
 			{
-				String ID = referenceObject.getName() + "_cornerRay_" + i;
-				deleteRay(ID);
+				String ID_cornerRay = referenceObject.getName() + "_cornerRay_" + i;
+				deleteRay(ID_cornerRay);
 			}
+			
+			String ID_centerRay = referenceObject.getName() + "_centerRay";
+			deleteRay(ID_centerRay);
+			
+			String ID_visibleMinLatRay = referenceObject.getName() + "_visibleMinLatRay";
+			deleteRay(ID_visibleMinLatRay);
+			
+			String ID_visibleMaxLatRay = referenceObject.getName() + "_visibleMaxLatRay";
+			deleteRay(ID_visibleMaxLatRay);
 		}
 	}
 	
@@ -748,63 +1117,29 @@ public class GestureAnalyzer
 	}
 	
 	
-	private void updateGazeRay(Vector3f origin, Vector3f forwardPos, Vector3f direction)
+	private void updateHeadGazeRay(Vector3f origin, Vector3f forwardPos, Vector3f direction)
 	{
-		// reset collision results list
-		CollisionResults results = new CollisionResults();
+		headGazeRay = new SceneRay(sim, referenceObjectList, origin, direction, activeReferenceObject);
+		Vector3f endOfRay = headGazeRay.getEndOfRay();
 		
-		// normalize direction vector
-		direction.normalizeLocal();
+		drawRay("headGazeRay", endOfRay, origin, whiteMaterial, drawHeadGazeRayConnector);
+		
+		updateHeadGazeAngles(origin, forwardPos, endOfRay);
+	}
 
-		// aim a ray from the camera towards the target
-		Ray ray = new Ray(origin, direction);
-
-		// collect intersections between ray and scene elements in results list.
-		sim.getSceneNode().collideWith(ray, results);
+	
+	private void updatePointingRay(Vector3f origin, Vector3f forwardPos, Vector3f direction)
+	{
+		pointingRay = new SceneRay(sim, referenceObjectList, origin, direction, activeReferenceObject);
+		Vector3f endOfRay = pointingRay.getEndOfRay();
 		
-		// if no reference object hit --> draw a ray of 1km length
-		Vector3f endOfRay = direction.mult(1000).add(origin);
-
-		boolean isReferenceObjectHit = false;
+		drawRay("pointingRay", endOfRay, origin, blueMaterial, drawPointingRayConnector);
 		
-		if (results.size() > 0) 
-		{
-			Iterator<CollisionResult> resultIt = results.iterator();
-			
-			while(resultIt.hasNext())
-			{
-				// get closest visible reference object
-				CollisionResult result = resultIt.next();
-				MapObject referenceObject = getParentReferenceObject(result.getGeometry());
-				float distance = result.getDistance();
-				
-				if(referenceObject != null && distance < 1000)
-				{
-					if(!referenceObject.getSpatial().getCullHint().equals(CullHint.Always))
-					{
-						String hitObject = referenceObject.getName();
-						
-						//System.err.println("HIT: " + hitObject + "; DIST: " + distance);
-						
-						isReferenceObjectHit = true;
-						endOfRay = result.getContactPoint();
-
-						break;
-					}
-				}
-			}
-		}
-		
-		//if(!isReferenceObjectHit)
-			//System.err.println("No HIT");
-		
-		drawRay("gazeRay", endOfRay, origin, whiteMaterial);
-		
-		updateGazeAngles(origin, forwardPos, endOfRay);
+		updatePointingAngles(origin, forwardPos, endOfRay);
 	}
 
 
-	private void updateGazeAngles(Vector3f origin, Vector3f forwardPos, Vector3f endOfRay)
+	private void updateHeadGazeAngles(Vector3f origin, Vector3f forwardPos, Vector3f endOfRay)
 	{
 		// lateral angle
 		// -------------
@@ -814,9 +1149,9 @@ public class GestureAnalyzer
 		// --> right side : -1
 		int lDirection = getRelativeLPosition(forwardPos, origin, endOfRay);
 		
-		// angle between driving direction of traffic car and direction towards corner position
-		lateralGazeAngle = lDirection * Util.getAngleBetweenPoints(forwardPos, origin, endOfRay, true);
-		//System.err.println("lateralGazeAngle: " + lateralGazeAngle * FastMath.RAD_TO_DEG);
+		// angle between driving direction of traffic car and direction towards end of ray
+		lateralHeadGazeAngle = lDirection * Util.getAngleBetweenPoints(forwardPos, origin, endOfRay, true);
+		//System.err.println("lateralHeadGazeAngle: " + lateralHeadGazeAngle * FastMath.RAD_TO_DEG);
 		
 		
 		// vertical angle
@@ -830,27 +1165,41 @@ public class GestureAnalyzer
 		// projection of the corner position to the level of the ray's origin
 		Vector3f projectionPos = new Vector3f(endOfRay.getX(), origin.getY(), endOfRay.getZ());
 		
-		// angle between driving direction of traffic car and direction towards corner position
-		verticalGazeAngle = vDirection * Util.getAngleBetweenPoints(projectionPos, origin, endOfRay, false);
-		//System.err.println("verticalGazeAngle: " + verticalGazeAngle * FastMath.RAD_TO_DEG);
+		// angle between driving direction of traffic car and direction towards end of ray
+		verticalHeadGazeAngle = vDirection * Util.getAngleBetweenPoints(projectionPos, origin, endOfRay, false);
+		//System.err.println("verticalHeadGazeAngle: " + verticalHeadGazeAngle * FastMath.RAD_TO_DEG);
 	}
+	
 
-
-	private MapObject getParentReferenceObject(Geometry geometry)
+	private void updatePointingAngles(Vector3f origin, Vector3f forwardPos, Vector3f endOfRay)
 	{
-		for(MapObject referenceObject : referenceObjectList)
-		{
-			Spatial spatial = referenceObject.getSpatial();
-			
-			if(spatial instanceof Node)
-			{
-				Node node = (Node)spatial;
-				if(node.hasChild(geometry))
-					return referenceObject;
-			}
-		}
+		// lateral angle
+		// -------------
 		
-		return null;
+		// relative position of corner point (with regard to driving direction)
+		// --> left side:    1
+		// --> right side : -1
+		int lDirection = getRelativeLPosition(forwardPos, origin, endOfRay);
+		
+		// angle between driving direction of traffic car and direction towards end of ray
+		lateralPointingAngle = lDirection * Util.getAngleBetweenPoints(forwardPos, origin, endOfRay, true);
+		//System.err.println("lateralPointingAngle: " + lateralPointingAngle * FastMath.RAD_TO_DEG);
+		
+		
+		// vertical angle
+		// --------------
+		
+		// relative position of corner point (with regard to the horizon)
+		// --> above:  1
+		// --> below: -1
+		int vDirection = getRelativeVPosition(origin, endOfRay);
+		
+		// projection of the corner position to the level of the ray's origin
+		Vector3f projectionPos = new Vector3f(endOfRay.getX(), origin.getY(), endOfRay.getZ());
+		
+		// angle between driving direction of traffic car and direction towards end of ray
+		verticalPointingAngle = vDirection * Util.getAngleBetweenPoints(projectionPos, origin, endOfRay, false);
+		//System.err.println("verticalPointingAngle: " + verticalPointingAngle * FastMath.RAD_TO_DEG);
 	}
 
 }

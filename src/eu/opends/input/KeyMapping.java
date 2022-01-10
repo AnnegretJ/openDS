@@ -118,9 +118,10 @@ public class KeyMapping
 	public static KeyMapping TOGGLE_LINE = new KeyMapping("toggle_line", "show line", new String[] {"KEY_2"});
 	public static KeyMapping TOGGLE_CONE = new KeyMapping("toggle_cone", "show cone", new String[] {"KEY_3"});
 	public static KeyMapping TOGGLE_REPLAY = new KeyMapping("toggle_replay", "start/stop replay", new String[] {"KEY_RETURN"});
-	public static KeyMapping ZOOM_IN = new KeyMapping("zoom_in", "zoom in scene", new String[] {"KEY_PGDN"});
-	public static KeyMapping ZOOM_OUT = new KeyMapping("zoom_out", "zoom out scene", new String[] {"KEY_PGUP"});
-	
+	public static KeyMapping ZOOM_IN = new KeyMapping("zoom_in", "zoom in scene", new String[] {"KEY_F9"});
+	public static KeyMapping ZOOM_OUT = new KeyMapping("zoom_out", "zoom out scene", new String[] {"KEY_F10"});
+	public static KeyMapping JUMP_FORWARD = new KeyMapping("jump_forward", "jump forward", new String[] {"KEY_PGDN"});
+	public static KeyMapping JUMP_BACKWARD = new KeyMapping("jump_backward", "jump backward", new String[] {"KEY_PGUP"});
 	
 	
 	// look up table of joystick buttons
@@ -251,6 +252,8 @@ public class KeyMapping
 		keyMappingList.add(KeyMapping.GOTO_PREVIOUS_DATAPOINT);
 		keyMappingList.add(KeyMapping.TOGGLE_MESSAGEBOX);
 		keyMappingList.add(KeyMapping.TOGGLE_REPLAY);
+		keyMappingList.add(KeyMapping.JUMP_FORWARD);
+		keyMappingList.add(KeyMapping.JUMP_BACKWARD);
 		
 		SimulationBasics.getDrivingTask().getSettingsLoader().lookUpKeyMappings(keyMappingList);
 		

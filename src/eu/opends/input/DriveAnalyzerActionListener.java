@@ -50,11 +50,30 @@ public class DriveAnalyzerActionListener implements ActionListener
 			}
 		} 
 		
+		
 		else if (binding.equals(KeyMapping.GOTO_NEXT_DATAPOINT.getID())) 
 		{
 			if (value) 
 			{
 				analyzer.moveFocus(1);
+			}
+		}
+		
+		
+		else if (binding.equals(KeyMapping.JUMP_BACKWARD.getID())) 
+		{
+			if (value) 
+			{
+				analyzer.moveFocus(-100);
+			}
+		} 
+		
+		
+		else if (binding.equals(KeyMapping.JUMP_FORWARD.getID())) 
+		{
+			if (value) 
+			{
+				analyzer.moveFocus(100);
 			}
 		}
 		

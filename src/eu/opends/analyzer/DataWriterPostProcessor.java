@@ -31,7 +31,6 @@ import java.util.GregorianCalendar;
 
 import com.jme3.math.Vector3f;
 
-import eu.opends.car.Car;
 import eu.opends.tools.Util;
 
 /**
@@ -42,48 +41,33 @@ import eu.opends.tools.Util;
  * @author Saied
  * 
  */
-public class DataWriter 
+public class DataWriterPostProcessor 
 {
 	private Calendar startTime = new GregorianCalendar();
 
 	/**
 	 * An array list for not having to write every row directly to file.
 	 */
-	private ArrayList<DataUnit> arrayDataList;
+	private ArrayList<DataUnitPostProcessor> arrayDataList;
 	private BufferedWriter out;
 	private File outFile;
 	private String newLine = System.getProperty("line.separator");
-	private long lastAnalyzerDataSave;
-	private Car car;
 	private File analyzerDataFile;
 	private boolean dataWriterEnabled = false;
 	private String relativeDrivingTaskPath;
-	
-	private Vector3f frontPosition = new Vector3f(0,0,0);
-	public void setFrontPosition(Vector3f frontPosition)
-	{
-		this.frontPosition = frontPosition;
-	}
-	
-	private String referenceObjectData = "[]";
-	public void setReferenceObjectData(String referenceObjectData)
-	{
-		this.referenceObjectData = referenceObjectData;
-	}
 
 
-	public DataWriter(String outputFolder, Car car, String driverName, String absoluteDrivingTaskPath, 
+	public DataWriterPostProcessor(String outputFolder, String driverName, String absoluteDrivingTaskPath, 
 			Date creationDate, int trackNumber) 
 	{
-		this.car = car;
 		this.relativeDrivingTaskPath = getRelativePath(absoluteDrivingTaskPath);
 		
 		Util.makeDirectory(outputFolder);
 
 		if(trackNumber >= 0)
-			analyzerDataFile = new File(outputFolder + "/carData_track" + trackNumber + ".txt");
+			analyzerDataFile = new File(outputFolder + "/processedCarData_track" + trackNumber + ".txt");
 		else
-			analyzerDataFile = new File(outputFolder + "/carData.txt");
+			analyzerDataFile = new File(outputFolder + "/processedCarData.txt");
 
 		
 		if (analyzerDataFile.getAbsolutePath() == null) 
@@ -98,9 +82,9 @@ public class DataWriter
 		while(outFile.exists()) 
 		{
 			if(trackNumber >= 0)
-				analyzerDataFile = new File(outputFolder + "/carData_track" + trackNumber + "(" + i + ").txt");
+				analyzerDataFile = new File(outputFolder + "/processedCarData_track" + trackNumber + "(" + i + ").txt");
 			else
-				analyzerDataFile = new File(outputFolder + "/carData(" + i + ").txt");
+				analyzerDataFile = new File(outputFolder + "/processedCarData(" + i + ").txt");
 			
 			outFile = new File(analyzerDataFile.getAbsolutePath());
 			i++;
@@ -116,15 +100,18 @@ public class DataWriter
 					+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 							.format(creationDate) + newLine);
 			out.write("Driver: " + driverName + newLine);
-			out.write("Used Format = Time (ms) : Timestamp : Position (x,y,z) : Rotation (x,y,z,w) :"
-					+ " Speed (km/h) : Steering Wheel Position [-1,1] : Gas Pedal Position :"
-					+ " Brake Pedal Position : Engine Running : Front Position(x,y,z) : Reference Objects" + newLine);
+			out.write("Milliseconds:DateTime:CarPosX:CarPosY:CarPosZ:CarRotX:CarRotY:CarRotZ:CarRotW:"
+					+ "Speed(km/h):SteeringWheelPos[-1,1]:GasPedalPos[0,1]:BrakePedalPos[0,1]:IsEngineRunning:"
+					+ "FrontPosX:FrontPosY:FrontPosZ:IsTriggerPosition:HeadGazeDirectionX:HeadGazeDirectionY:"
+					+ "HeadGazeDirectionZ:PointingDirectionX:PointingDirectionY:PointingDirectionZ:"
+					+ "LateralHeadGazeAngle:VerticalHeadGazeAngle:LateralPointingAngle:VerticalPointingAngle:"
+					+ "NameOfObjectHitByHeadGazeRay:IsTargetHitByHeadGazeRay:NameOfObjectHitByPointingRay:"
+					+ "IsTargetHitByPointingRay:IsNoise:ReferenceObjects" + newLine);
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		arrayDataList = new ArrayList<DataUnit>();
-		lastAnalyzerDataSave = (new Date()).getTime();
+		arrayDataList = new ArrayList<DataUnitPostProcessor>();
 	}
 	
 	
@@ -136,64 +123,6 @@ public class DataWriter
 		
 		return relativeURI.getPath();
 	}
-
-
-	/**
-	 * Save the car data at a frequency of 20Hz. That class should be called in
-	 * the update-method <code>Simulator.java</code>.
-	 */
-	public void saveAnalyzerData() 
-	{
-		int updateInterval = 50; // = 1000/20
-		
-		Date curDate = new Date();
-
-		if (curDate.getTime() - lastAnalyzerDataSave >= 2*updateInterval) 
-		{
-			lastAnalyzerDataSave = curDate.getTime() - 2*updateInterval;
-		}
-		
-		
-		if (curDate.getTime() - lastAnalyzerDataSave >= updateInterval) 
-		{
-			//System.err.println("diff: " + (curDate.getTime() - lastAnalyzerDataSave));
-			write(
-					curDate,
-					car.getPosition().x,
-					car.getPosition().y,
-					car.getPosition().z,
-					car.getRotation().getX(),
-					car.getRotation().getY(),
-					car.getRotation().getZ(),
-					car.getRotation().getW(),
-					car.getCurrentSpeedKmhRounded(),
-					car.getSteeringWheelState(),
-					car.getAcceleratorPedalIntensity(),
-					car.getBrakePedalIntensity(),
-					car.isEngineOn(),
-					frontPosition,
-					referenceObjectData
-					);
-
-			lastAnalyzerDataSave += updateInterval;
-		}
-
-	}
-
-	
-	// see eu.opends.analyzer.IAnalyzationDataWriter#write(float,
-	//      float, float, float, java.util.Date, float, float, boolean, float)
-	public void write(Date curDate, float x, float y, float z, float xRot,
-			float yRot, float zRot, float wRot, float linearSpeed,
-			float steeringWheelState, float gasPedalState, float brakePedalState,
-			boolean isEngineOn, Vector3f frontPosition, String referenceObjectData) 
-	{
-		DataUnit row = new DataUnit(curDate, x, y, z, xRot, yRot, zRot, wRot,
-				linearSpeed, steeringWheelState, gasPedalState, brakePedalState,
-				isEngineOn, frontPosition, referenceObjectData);
-		this.write(row);
-
-	}
 	
 
 	/**
@@ -203,10 +132,10 @@ public class DataWriter
 	 * @param row
 	 * 			Datarow to write
 	 */
-	public void write(DataUnit row)
+	public void write(DataUnitPostProcessor row)
 	{
 		arrayDataList.add(row);
-		if (arrayDataList.size() > 50)
+		if (arrayDataList.size() > 500)
 			flush();
 	}
 	
@@ -216,15 +145,22 @@ public class DataWriter
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss.SSS");
 			StringBuffer sb = new StringBuffer();
-			for (DataUnit r : arrayDataList)
+			for (DataUnitPostProcessor r : arrayDataList)
 			{	
 				sb.append(r.getDate().getTime() + ":" + sdf.format(r.getDate()) + ":" + r.getXpos() + ":"
-						+ r.getYpos() + ":" + r.getZpos() + ":" + r.getXrot() + ":" + r.getYrot() + ":" 
+						+ r.getYpos() + ":" + r.getZpos() + ":" + r.getXrot() + ":" + r.getYrot() + ":"
 						+ r.getZrot() + ":"	+ r.getWrot() + ":" + r.getSpeed() + ":"
 						+ r.getSteeringWheelPos() + ":" + r.getAcceleratorPedalPos() + ":"
 						+ r.getBrakePedalPos() + ":" + r.isEngineOn() + ":"
 						+ r.getFrontPosition().getX() + ":" + r.getFrontPosition().getY() + ":"
-						+ r.getFrontPosition().getZ() + ":" + r.getReferenceObjectData() + newLine
+						+ r.getFrontPosition().getZ() + ":" + r.isTriggerPosition() + ":"
+						+ Vetor3fToString(r.getHeadGazeDirectionLocal()) + ":"
+						+ Vetor3fToString(r.getPointingDirectionLocal()) + ":"
+						+ r.getLateralHeadGazeAngle() + ":" + r.getVerticalHeadGazeAngle() + ":"
+						+ r.getLateralPointingAngle() + ":" + r.getVerticalPointingAngle() + ":"
+						+ r.getHitObjectNameByHeadGazeRay() + ":" + r.isHitTargetByHeadGazeRay() + ":"
+						+ r.getHitObjectNameByPointingRay() + ":" + r.isHitTargetByPointingRay() + ":"
+						+ r.isNoise() + ":" + r.getReferenceObjectData() + newLine
 						);
 			}
 			out.write(sb.toString());
@@ -237,6 +173,15 @@ public class DataWriter
 	}
 
 	
+	private String Vetor3fToString(Vector3f vector)
+	{
+		if(vector == null)
+			return "null:null:null";
+		else
+			return vector.getX() + ":" + vector.getY() + ":" + vector.getZ();
+	}
+
+
 	public void quit() 
 	{
 		dataWriterEnabled = false;
