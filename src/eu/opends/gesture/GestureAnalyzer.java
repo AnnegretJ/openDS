@@ -82,6 +82,7 @@ public class GestureAnalyzer
 	private Material darkRedMaterial;
 	private Material whiteMaterial;
 	private Material blueMaterial;
+	private Material cyanMaterial;
 	private Material yellowMaterial;
 	
 	private Float lateralHeadGazeAngle = null;
@@ -128,6 +129,10 @@ public class GestureAnalyzer
 		blueMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		blueMaterial.getAdditionalRenderState().setWireframe(false);
 		blueMaterial.setColor("Color", ColorRGBA.Blue);
+		
+		cyanMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		cyanMaterial.getAdditionalRenderState().setWireframe(false);
+		cyanMaterial.setColor("Color", ColorRGBA.Cyan);
 		
 		yellowMaterial = new Material(sim.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		yellowMaterial.getAdditionalRenderState().setWireframe(false);
@@ -441,7 +446,7 @@ public class GestureAnalyzer
 		
 		// visualize pointing (if not null)
 		if(pointingDirectionWorld != null /*&& isNoise != null && isNoise*/)
-			updatePointingRay(origin, forwardPos, pointingDirectionWorld);
+			updatePointingRay(origin, forwardPos, pointingDirectionWorld, isNoise);
 		else
 		{
 			lateralPointingAngle = null;
@@ -1128,12 +1133,15 @@ public class GestureAnalyzer
 	}
 
 	
-	private void updatePointingRay(Vector3f origin, Vector3f forwardPos, Vector3f direction)
+	private void updatePointingRay(Vector3f origin, Vector3f forwardPos, Vector3f direction, Boolean isNoise)
 	{
 		pointingRay = new SceneRay(sim, referenceObjectList, origin, direction, activeReferenceObject);
 		Vector3f endOfRay = pointingRay.getEndOfRay();
 		
-		drawRay("pointingRay", endOfRay, origin, blueMaterial, drawPointingRayConnector);
+		if(isNoise != null && isNoise)
+			drawRay("pointingRay", endOfRay, origin, cyanMaterial, drawPointingRayConnector);
+		else
+			drawRay("pointingRay", endOfRay, origin, blueMaterial, drawPointingRayConnector);
 		
 		updatePointingAngles(origin, forwardPos, endOfRay);
 	}

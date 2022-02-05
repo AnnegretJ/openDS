@@ -128,6 +128,8 @@ public class ODRoad
 			laneSection.initLanes(vizLanes);
 			ODLaneSectionList.add(laneSection);
 		}
+		
+		errorCheck();
 	}
 		
 	
@@ -188,6 +190,8 @@ public class ODRoad
 			
 			roadReferencePointlist.addAll(pointList);
 		}
+		
+		errorCheck();
 	}
 
 
@@ -1146,6 +1150,30 @@ public class ODRoad
 		// if road type not set
 		return null;
 	}
+	
 
+	private void errorCheck()
+	{
+		// check OpenDRIVE file for possible errors
+		// mismatching geometry lengths and mismatching road length
+		// s_2 = s_1 + length_1
+		// s_3 = s_2 + length_2
+		// s_n = s_n-1 + length_n-1
+		// s_n = length of road
+		double currentPos = 0;
+		for(TRoadPlanViewGeometry g : geometryList)
+		{
+			double diff = Math.abs(currentPos - g.getS());
+			if(diff > 0.000001)
+				System.err.println("Geometry S mismatch (roadID " + road.getId() + "): expected " + currentPos + ", actual " + g.getS());
+			
+			currentPos += g.getLength();
+		}
+		
+		double lengthOfRoad = road.getLength();
+		double diff = Math.abs(currentPos - lengthOfRoad);
+		if(diff > 0.000001)
+			System.err.println("Road length mismatch (roadID " + road.getId() + "): expected " + currentPos + ", actual " + lengthOfRoad);
+	}
 
 }

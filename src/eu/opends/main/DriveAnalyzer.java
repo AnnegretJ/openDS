@@ -24,7 +24,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,6 +51,7 @@ import com.jme3.system.AppSettings;
 
 import de.lessvoid.nifty.Nifty;
 import eu.opends.analyzer.DataUnit;
+import eu.opends.analyzer.DataUnitPostProcessor;
 import eu.opends.analyzer.DeviationComputer;
 import eu.opends.analyzer.RayDirectionRecord;
 import eu.opends.analyzer.DataReader;
@@ -62,6 +65,7 @@ import eu.opends.basics.SimulationBasics;
 import eu.opends.camera.AnalyzerCam;
 import eu.opends.drivingTask.DrivingTask;
 import eu.opends.gesture.RecordedReferenceObject;
+import eu.opends.gesture.SceneRay;
 import eu.opends.input.KeyBindingCenter;
 import eu.opends.knowledgeBase.KnowledgeBase;
 import eu.opends.niftyGui.AnalyzerFileSelectionGUIController;
@@ -84,6 +88,7 @@ public class DriveAnalyzer extends SimulationBasics
 	private boolean pointsEnabled = false;
 	private boolean lineEnabled = true;
 	private boolean coneEnabled = true;
+	private boolean printDataToCommandLine = true;
 	
 	private boolean autorun = false;
 	private String KB_ip_addr = "127.0.0.1";
@@ -132,6 +137,9 @@ public class DriveAnalyzer extends SimulationBasics
 		return currentDataUnit;
 	}
 	
+	private Vector3f headGazeDirectionLocal = null;
+	private Vector3f pointingDirectionLocal = null;
+	private Boolean isNoise = null;
 	
 	@Override
 	public void simpleInitApp() 
@@ -575,16 +583,18 @@ public class DriveAnalyzer extends SimulationBasics
 		if(next100Cone != null)
 			next100Cone.setCullHint(CullHint.Always);
 		
-		updateReferenceObjects();
+		boolean isTriggerPosition = doTriggerCheck();
+		
+		TreeMap<String, RecordedReferenceObject> logList = updateReferenceObjects();
+		
+		updateDataWriter(isTriggerPosition, logList);
 		
 		updateMessageBox();
-		
-		doTriggerCheck();
 	}
 	
 	
 	private HashSet<ODLane> expectedLanes = new HashSet<ODLane>();
-	private void doTriggerCheck()
+	private boolean doTriggerCheck()
 	{
 		// get most probable lane from result list according to expected lane list (and 
 		// highest score concerning least heading deviation and least elevation difference)
@@ -592,6 +602,8 @@ public class DriveAnalyzer extends SimulationBasics
 		ODLane lane = openDriveCenter.getMostProbableLane(carPos, expectedLanes);
 		if(lane != null)
 		{
+			//expectedLanes.add(lane);
+			
 			String roadID_car = lane.getODRoad().getID();
 			int lane_car = lane.getID();
 			double s_car = lane.getCurrentInnerBorderPoint().getS();
@@ -617,7 +629,8 @@ public class DriveAnalyzer extends SimulationBasics
 						{
 							if(ta instanceof PlaySoundTriggerAction)
 							{
-								System.err.println(roadID_trigger + "," + lane_trigger + "," + s_trigger + " --> PlaySoundTriggerAction");
+								//System.err.println(roadID_trigger + "," + lane_trigger + "," + s_trigger + " --> PlaySoundTriggerAction");
+								return true;
 							}
 						}
 					}
@@ -626,10 +639,12 @@ public class DriveAnalyzer extends SimulationBasics
 		}
 		//else
 			//System.err.println("Car is off the road");
+		
+		return false;
 	}
 
 
-	private void updateReferenceObjects()
+	private TreeMap<String, RecordedReferenceObject> updateReferenceObjects()
 	{
 		String activeReferenceObjectName = null;
 		ArrayList<String> visibleObjects = new ArrayList<String>();
@@ -666,17 +681,128 @@ public class DriveAnalyzer extends SimulationBasics
 		Vector3f frontPos = currentDataUnit.getFrontPosition().add(0, 1f, 0);  // original frontPos of Simulator
 		
 		// lookup local headpose+gaze direction (relative to vehicle coordinate system)
-		Vector3f headGazeDirectionLocal = headGazeDirectionRecord.lookupRayDirectionByTimestamp(currentDataUnit.getDate());
+		headGazeDirectionLocal = headGazeDirectionRecord.lookupRayDirectionByTimestamp(currentDataUnit.getDate());
 		Vector3f headGazeDirectionWorld = localToWorld(headGazeDirectionLocal);
 		
 		// lookup local pointing direction (relative to vehicle coordinate system)
-		Vector3f pointingDirectionLocal = pointingDirectionRecord.lookupRayDirectionByTimestamp(currentDataUnit.getDate());
+		pointingDirectionLocal = pointingDirectionRecord.lookupRayDirectionByTimestamp(currentDataUnit.getDate());
 		Vector3f pointingDirectionWorld = localToWorld(pointingDirectionLocal);
 		
 		// lookup noise
-		Boolean isNoise = noiseRecord.lookupNoiseByTimestamp(currentDataUnit.getDate());
+		isNoise = noiseRecord.lookupNoiseByTimestamp(currentDataUnit.getDate());
 		
-		gestureAnalyzer.updateRays(origin, rotation, frontPos, headGazeDirectionWorld, pointingDirectionWorld, isNoise);
+		return gestureAnalyzer.updateRays(origin, rotation, frontPos, headGazeDirectionWorld, pointingDirectionWorld, isNoise);
+	}
+
+	
+	private void updateDataWriter(boolean isTriggerPosition, TreeMap<String, RecordedReferenceObject> newReferenceObjectList) 
+	{
+		if (printDataToCommandLine) 
+		{
+			Date curDate = currentDataUnit.getDate();
+			float xPos = currentDataUnit.getXpos();
+			float yPos = currentDataUnit.getYpos();
+			float zPos = currentDataUnit.getZpos();
+			float xRot = currentDataUnit.getXrot();
+			float yRot = currentDataUnit.getYrot();
+			float zRot = currentDataUnit.getZrot();
+			float wRot = currentDataUnit.getWrot();
+			float linearSpeed = currentDataUnit.getSpeed();
+			float steeringWheelState = currentDataUnit.getSteeringWheelPos();
+			float gasPedalState = currentDataUnit.getAcceleratorPedalPos();
+			float brakePedalState = currentDataUnit.getBrakePedalPos();
+			boolean isEngineOn = currentDataUnit.isEngineOn();
+			Vector3f frontPosition = currentDataUnit.getFrontPosition();
+			
+			//isTriggerPosition
+			
+			//headGazeDirectionLocal
+			//pointingDirectionLocal
+			
+			Float lateralHeadGazeAngle = gestureAnalyzer.getLateralHeadGazeAngle();
+			Float verticalHeadGazeAngle = gestureAnalyzer.getVerticalHeadGazeAngle();
+			Float lateralPointingAngle = gestureAnalyzer.getLateralPointingAngle();
+			Float verticalPointingAngle = gestureAnalyzer.getVerticalPointingAngle();
+
+			String hitObjectNameByHeadGazeRay = null;
+			boolean isHitTargetByHeadGazeRay = false;
+			
+			SceneRay headGazeRay = gestureAnalyzer.getHeadGazeRay();
+			if(headGazeRay != null)
+			{
+				hitObjectNameByHeadGazeRay = headGazeRay.getHitObjectName();
+				isHitTargetByHeadGazeRay = headGazeRay.isHitTarget();
+			}
+			
+			String hitObjectNameByPointingRay = null;
+			boolean isHitTargetByPointingRay = false;
+			
+			SceneRay pointingRay = gestureAnalyzer.getPointingRay();
+			if(pointingRay != null)
+			{
+				hitObjectNameByPointingRay = pointingRay.getHitObjectName();
+				isHitTargetByPointingRay = pointingRay.isHitTarget();
+			}
+			
+			//isNoise
+			
+			//ArrayList<RecordedReferenceObject> originalReferenceObjectList = currentDataUnit.getReferenceObjectList();
+
+			String logString = "[";
+			
+			Iterator<RecordedReferenceObject> it = newReferenceObjectList.values().iterator();
+			int index = 0;
+			while(it.hasNext())
+			{
+				if(index!=0)
+					logString +=  "; ";
+				
+				RecordedReferenceObject recRefObj = it.next();
+				logString += recRefObj.getName() + "(" + recRefObj.getMinLatAngle() + ", " 
+								+ recRefObj.getVisibleMinLatAngle() + ", " + recRefObj.getCenterLatAngle() + ", " 
+								+ recRefObj.getMaxLatAngle() + ", " + recRefObj.getVisibleMaxLatAngle() + ", " 
+								+ recRefObj.getMinVertAngle() + ", " + recRefObj.getCenterVertAngle() + ", " 
+								+ recRefObj.getMaxVertAngle() + ", " + recRefObj.isActive() + ")";
+				
+				index++;
+			}
+			
+			logString += "]";
+
+			
+			DataUnitPostProcessor r = new DataUnitPostProcessor(curDate, xPos, yPos, zPos, xRot, yRot, zRot,
+					wRot, linearSpeed, steeringWheelState, gasPedalState, brakePedalState, isEngineOn, 
+					frontPosition, isTriggerPosition, headGazeDirectionLocal, pointingDirectionLocal,
+					lateralHeadGazeAngle, verticalHeadGazeAngle, lateralPointingAngle, verticalPointingAngle,
+					hitObjectNameByHeadGazeRay, isHitTargetByHeadGazeRay, hitObjectNameByPointingRay,
+					isHitTargetByPointingRay, isNoise, logString);
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss.SSS");
+			
+			System.out.println(r.getDate().getTime() + ":" + sdf.format(r.getDate()) + ":" + r.getXpos() + ":"
+			+ r.getYpos() + ":" + r.getZpos() + ":" + r.getXrot() + ":" + r.getYrot() + ":"
+			+ r.getZrot() + ":"	+ r.getWrot() + ":" + r.getSpeed() + ":"
+			+ r.getSteeringWheelPos() + ":" + r.getAcceleratorPedalPos() + ":"
+			+ r.getBrakePedalPos() + ":" + r.isEngineOn() + ":"
+			+ r.getFrontPosition().getX() + ":" + r.getFrontPosition().getY() + ":"
+			+ r.getFrontPosition().getZ() + ":" + r.isTriggerPosition() + ":"
+			+ Vetor3fToString(r.getHeadGazeDirectionLocal()) + ":"
+			+ Vetor3fToString(r.getPointingDirectionLocal()) + ":"
+			+ r.getLateralHeadGazeAngle() + ":" + r.getVerticalHeadGazeAngle() + ":"
+			+ r.getLateralPointingAngle() + ":" + r.getVerticalPointingAngle() + ":"
+			+ r.getHitObjectNameByHeadGazeRay() + ":" + r.isHitTargetByHeadGazeRay() + ":"
+			+ r.getHitObjectNameByPointingRay() + ":" + r.isHitTargetByPointingRay() + ":"
+			+ r.isNoise() + ":" + r.getReferenceObjectData());
+		} 
+	}
+	
+	
+	private String Vetor3fToString(Vector3f vector)
+	{
+		if(vector == null)
+			return "null:null:null";
+		else
+			return vector.getX() + ":" + vector.getY() + ":" + vector.getZ();
 	}
 
 
