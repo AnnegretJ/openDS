@@ -191,7 +191,9 @@ public class ODRoad
 			roadReferencePointlist.addAll(pointList);
 		}
 		
-		errorCheck();
+		// Do not check for errors when running GeometryGenerator or RoadGenerator
+		// --> NullPointerException
+		//errorCheck();
 	}
 
 

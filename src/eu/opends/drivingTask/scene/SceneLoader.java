@@ -67,6 +67,8 @@ import eu.opends.basics.SimulationBasics;
 import eu.opends.car.ResetPosition;
 import eu.opends.drivingTask.DrivingTaskDataQuery;
 import eu.opends.drivingTask.DrivingTaskDataQuery.Layer;
+import eu.opends.environment.vegetation.RoadSideVegetation;
+import eu.opends.environment.vegetation.RoadSideVegetation.SideOfRoad;
 import eu.opends.gesture.ReferenceObjectParams;
 import eu.opends.main.Simulator;
 import eu.opends.tools.Util;
@@ -90,6 +92,9 @@ public class SceneLoader
 	private Map<String, ResetPosition> resetPositionMap = new HashMap<String, ResetPosition>();
 	private List<MapObject> mapObjectsList = new ArrayList<MapObject>();
 	private List<MapObjectOD> dependentMapObjectsList = new ArrayList<MapObjectOD>();
+	private String pathToVegetationObjects = "assets/Models/Vegetation/vegetationObjects.txt";
+	private HashMap<String, ArrayList<String>> vegetationGroupMap = new HashMap<String, ArrayList<String>>();
+	private ArrayList<RoadSideVegetation> roadSideVegetationList = new ArrayList<RoadSideVegetation>();
 	
 	
 	public SceneLoader(DrivingTaskDataQuery dtData, SimulationBasics sim) 
@@ -102,9 +107,10 @@ public class SceneLoader
 		getPoints();
 		getResetPoints();
 		createMapObjects();
+		extractVegetationData();
 	}
-	
-	
+
+
 	public Map<String,AudioNode> getAudioNodes(AmazonPollyTTS pollyTTS)
 	{
 		Map<String,AudioNode> audioNodeList = new HashMap<String,AudioNode>();
@@ -847,6 +853,181 @@ public class SceneLoader
 		}
 	}
 
+	
+	/**
+	 * Extracts the path to a text file where all available vegetation objects will be defined,
+	 * a list of vegetation groups (= objects that may be used randomly together along a road),
+	 * and a list of OpenDRIVE roads having vegetation aside. For each road, parameters like,
+	 * range, distance from road reference line and distance between vegetation objects may be
+	 * specified (optional).
+	 */
+	public void extractVegetationData() 
+	{	
+		// Structure:
+		// <scene>
+		//     <vegetation>
+		//			<pathToVegetationObjects>Models/Vegetation/vegetationObjects.txt</pathToVegetationObjects>
+		//          <vegetationGroups>
+		//				<vegetationGroup id="pineTrees">
+		//					<vegetationObject>pineTree01</vegetationObject>
+		//					<vegetationObject>pineTree02</vegetationObject>
+		//					<vegetationObject>pineTree03</vegetationObject>
+		//				</vegetationGroup>
+		//				<vegetationGroup id="bushes">
+		//					<vegetationObject>bush01</vegetationObject>
+		//					<vegetationObject>bush02</vegetationObject>
+		//					<vegetationObject>bush03</vegetationObject>
+		//				</vegetationGroup>
+		//			</vegetationGroups>
+		//			<roadSideVegetation>
+		//				<road>
+		//					<openDriveId>road01</openDriveId>
+		//					<sideOfRoad>Left</sideOfRoad>
+		//					<range minS="100" maxS="200" />
+		//					<spacing min="10" max="15" />
+		//					<distanceFromRoad min="15" max="16" />
+		//					<vegetationGroup>pineTrees</vegetationGroup>
+		//				</road>
+		//				<road>
+		//					<openDriveId>road02</openDriveId>
+		//					<sideOfRoad>Both</sideOfRoad>
+		//					<range minS="10" maxS="500" />
+		//					<spacing min="5" max="7" />
+		//					<distanceFromRoad min="10" max="12" />
+		//					<vegetationGroup>bushes</vegetationGroup>
+		//				</road>
+		//			</roadSideVegetation>
+		try {
+			
+			String path = dtData.getValue(Layer.SCENE, 
+					"/scene:scene/scene:vegetation/scene:pathToVegetationObjects", String.class);
+			if(path != null && !path.isEmpty())
+			{
+				if(!path.startsWith("assets"))
+					path = "assets/" + path;
+				
+				pathToVegetationObjects = path;
+			}
+
+			
+			NodeList vegetationGroupNodes = (NodeList) dtData.xPathQuery(Layer.SCENE, 
+					"/scene:scene/scene:vegetation/scene:vegetationGroups/scene:vegetationGroup", XPathConstants.NODESET);
+			
+			for (int k = 1; k <= vegetationGroupNodes.getLength(); k++) 
+			{
+				Node currentvegetationGroupNode = vegetationGroupNodes.item(k-1);
+				
+				// get id
+				String id = currentvegetationGroupNode.getAttributes().getNamedItem("id").getNodeValue();			
+				if(id != null && !id.isEmpty())
+				{
+					NodeList childnodes = currentvegetationGroupNode.getChildNodes();
+					ArrayList<String> vegetationObjectList = new ArrayList<String>();
+					for (int j = 1; j <= childnodes.getLength(); j++) 
+					{
+						Node currentChild = childnodes.item(j-1);
+					
+						// get material + color
+						if(currentChild.getNodeName().equals("vegetationObject"))
+						{
+							String vegetationObjectID = currentChild.getTextContent();
+							vegetationObjectList.add(vegetationObjectID);
+						}
+					}
+					
+					if(!vegetationObjectList.isEmpty())
+						vegetationGroupMap.put(id,vegetationObjectList);
+					else
+						System.err.println("Vegetation group '" + id + "' has no vegetation objects");
+				}
+				else
+					System.err.println("Each vegetation group must have a unique ID");
+			}
+			
+			
+			
+			NodeList roadNodes = (NodeList) dtData.xPathQuery(Layer.SCENE, 
+					"/scene:scene/scene:vegetation/scene:roadSideVegetation/scene:road", XPathConstants.NODESET);
+			
+			for (int k = 1; k <= roadNodes.getLength(); k++) 
+			{
+				String roadID = null;
+				SideOfRoad sideOfRoad = null;
+				Float minS = null;
+				Float maxS = null;
+				Float minSpacing = null; 
+				Float maxSpacing = null;
+				Float minDistFromRoad = null; 
+				Float maxDistFromRoad = null;
+				ArrayList<String> vegetationNameList = null;
+				
+				Node currentRoadNode = roadNodes.item(k-1);
+				NodeList childnodes = currentRoadNode.getChildNodes();
+				for (int j = 1; j <= childnodes.getLength(); j++) 
+				{
+					Node currentChild = childnodes.item(j-1);
+					
+					if(currentChild.getNodeName().equals("openDriveId"))
+					{
+						roadID = currentChild.getTextContent();
+					}
+					else if(currentChild.getNodeName().equals("sideOfRoad"))
+					{
+						String sideOfRoadString = currentChild.getTextContent();
+						sideOfRoad = SideOfRoad.valueOf(sideOfRoadString);
+					}
+					else if(currentChild.getNodeName().equals("range"))
+					{
+						Node minSNode = currentChild.getAttributes().getNamedItem("minS");
+						if(minSNode != null)
+							minS = Float.parseFloat(minSNode.getNodeValue());
+						
+						Node maxSNode = currentChild.getAttributes().getNamedItem("maxS");
+						if(maxSNode != null)
+							maxS = Float.parseFloat(maxSNode.getNodeValue());
+					}
+					else if(currentChild.getNodeName().equals("spacing"))
+					{
+						Node minSpacingNode = currentChild.getAttributes().getNamedItem("min");
+						if(minSpacingNode != null)
+							minSpacing = Float.parseFloat(minSpacingNode.getNodeValue());
+						
+						Node maxSpacingNode = currentChild.getAttributes().getNamedItem("max");
+						if(maxSpacingNode != null)
+							maxSpacing = Float.parseFloat(maxSpacingNode.getNodeValue());
+					}
+					else if(currentChild.getNodeName().equals("distanceFromRoad"))
+					{
+						Node minDistFromRoadNode = currentChild.getAttributes().getNamedItem("min");
+						if(minDistFromRoadNode != null)
+							minDistFromRoad = Float.parseFloat(minDistFromRoadNode.getNodeValue());
+						
+						Node maxDistFromRoadNode = currentChild.getAttributes().getNamedItem("max");
+						if(maxDistFromRoadNode != null)
+							maxDistFromRoad = Float.parseFloat(maxDistFromRoadNode.getNodeValue());
+					}
+					else if(currentChild.getNodeName().equals("vegetationGroup"))
+					{
+						String vegetationGroupString = currentChild.getTextContent();
+						if(vegetationGroupMap.containsKey(vegetationGroupString))
+							vegetationNameList = vegetationGroupMap.get(vegetationGroupString);
+						else
+							System.err.println("There is no vegetation group named '" + vegetationGroupString + "'.");
+					}
+				}
+				
+				if(roadID != null && vegetationNameList != null)
+				{
+					RoadSideVegetation roadSideVegetation = new RoadSideVegetation(roadID, sideOfRoad, minS, maxS,
+						minSpacing, maxSpacing, minDistFromRoad, maxDistFromRoad, vegetationNameList);
+					roadSideVegetationList.add(roadSideVegetation);
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	private ReferenceObjectParams extractReferenceObjectParams(Node refObjNode, Spatial spatial)
 	{
@@ -1463,6 +1644,18 @@ public class SceneLoader
 	public Map<String, Vector3f> getPointMap() 
 	{
 		return pointMap;
+	}
+
+
+	public String getPathToVegetationObjects()
+	{
+		return pathToVegetationObjects;
+	}
+	
+	
+	public ArrayList<RoadSideVegetation> getRoadSideVegetationList()
+	{
+		return roadSideVegetationList;
 	}
 
 }

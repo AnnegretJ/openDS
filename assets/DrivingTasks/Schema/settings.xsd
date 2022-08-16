@@ -712,13 +712,16 @@ elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns
         	<xs:element name="interpolationStepSize" type="xs:double"
         		maxOccurs="1" minOccurs="0">
         	</xs:element>
+        	<xs:element name="ignoreNonDrivingLanes" type="xs:boolean" maxOccurs="1" minOccurs="0"></xs:element>
         	<xs:element name="projectOntoTerrain" type="xs:boolean"
         		maxOccurs="1" minOccurs="0">
         	</xs:element>
         	<xs:element name="projectionOffset" type="xs:double"
         		maxOccurs="1" minOccurs="0">
         	</xs:element>
-        	<xs:element name="addToPhysicsEngine" type="xs:boolean" maxOccurs="1" minOccurs="0"></xs:element>
+        	<xs:element name="addToPhysicsEngine" type="xs:boolean"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
         </xs:all>
 
     </xs:complexType>

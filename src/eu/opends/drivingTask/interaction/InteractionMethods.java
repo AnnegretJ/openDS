@@ -33,6 +33,7 @@ import eu.opends.hmi.RoadWorksInformationPresentationModel;
 import eu.opends.opendrive.processed.ODLane.Position;
 import eu.opends.opendrive.util.ODPosition;
 import eu.opends.trigger.*;
+import eu.opends.trigger.DetachGeometryByTexturePathTriggerAction.ComparisonType;
 
 /**
  * 
@@ -2228,6 +2229,55 @@ public class InteractionMethods
 		}
 	}
 		
+	
+	@Action(
+			name = "detachGeometryByTexturePath", 
+			layer = Layer.SCENE, 
+			description = "Detaches the geomety described by the given texture path from the scene node.",
+			defaultDelay = 0,
+			defaultRepeat = 0,
+			param = {@Parameter(name="comparisonType", type="String", defaultValue="Equals", 
+						description="How to compare the texture path with the given search string"
+										+ " (StartsWith, Equals, EndsWith)"),
+					 @Parameter(name="searchString", type="String", defaultValue="", 
+						description="(Substring of) texture path used to look up the geometry.")
+					}
+		)
+	public TriggerAction detachGeometryByTexturePath(SimulationBasics sim, float delay, int repeat, 
+			Properties parameterList)
+	{
+		String parameter = "";
+		
+		try {
+			
+			// set comparison type, if available (default: Equals)
+			parameter = "comparisonType";
+			ComparisonType comparisonType = ComparisonType.Equals;
+			String comparisonTypeString = parameterList.getProperty(parameter);
+			if(comparisonTypeString != null)
+			{
+				if(comparisonTypeString.equalsIgnoreCase("StartsWith"))
+					comparisonType = ComparisonType.StartsWith;
+				else if(comparisonTypeString.equalsIgnoreCase("EndsWith"))
+					comparisonType = ComparisonType.EndsWith;
+			}
+			
+			// set search string
+			parameter = "searchString";
+			String searchString = parameterList.getProperty(parameter);
+			if(searchString == null)
+				throw new Exception();
+			
+			// create DetachGeometryByTexturePathTriggerAction
+			return new DetachGeometryByTexturePathTriggerAction(sim, delay, repeat, comparisonType, searchString);
+			
+		} catch (Exception e) {
+
+			reportError("detachGeometryByTexturePath", parameter);
+			return null;
+		}
+	}
+	
 	
 	@Action(
 			name = "addPlannerEvent", 

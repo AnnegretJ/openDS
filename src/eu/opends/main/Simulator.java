@@ -65,6 +65,7 @@ import eu.opends.drivingTask.DrivingTask;
 import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.effects.EffectCenter;
 import eu.opends.environment.TrafficLightCenter;
+import eu.opends.environment.vegetation.VegetationGenerator;
 import eu.opends.events.EventCenter;
 import eu.opends.eyetracker.EyetrackerCenter;
 import eu.opends.hmi.HMICenter;
@@ -565,6 +566,9 @@ public class Simulator extends SimulationBasics
 		
 		eventCenter = new EventCenter(this);
 
+		vegetationGenerator = new VegetationGenerator(this);
+		vegetationGenerator.init();
+		
 		initializationFinished = true;
     }
 

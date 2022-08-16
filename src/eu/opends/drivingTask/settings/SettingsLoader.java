@@ -226,6 +226,7 @@ public class SettingsLoader
 		OpenDrive_visualizeGeometries("settings:openDrive/settings:visualizeGeometries"),
 		OpenDrive_visualizeGeometryDetails("settings:openDrive/settings:visualizeGeometryDetails"),
 		OpenDrive_interpolationStepSize("settings:openDrive/settings:interpolationStepSize"),
+		OpenDrive_ignoreNonDrivingLanes("settings:openDrive/settings:ignoreNonDrivingLanes"),
 		OpenDrive_projectOntoTerrain("settings:openDrive/settings:projectOntoTerrain"),
 		OpenDrive_projectionOffset("settings:openDrive/settings:projectionOffset"),
 		OpenDrive_addToPhysicsEngine("settings:openDrive/settings:addToPhysicsEngine"), 

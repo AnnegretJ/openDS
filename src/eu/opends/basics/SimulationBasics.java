@@ -51,6 +51,7 @@ import eu.opends.drivingTask.scene.SceneLoader;
 import eu.opends.drivingTask.settings.SettingsLoader;
 import eu.opends.drivingTask.settings.SettingsLoader.Setting;
 import eu.opends.environment.TrafficLightCenter;
+import eu.opends.environment.vegetation.VegetationGenerator;
 import eu.opends.gesture.GestureAnalyzer;
 import eu.opends.input.KeyBindingCenter;
 import eu.opends.main.SimulationDefaults;
@@ -101,7 +102,7 @@ public class SimulationBasics extends SimpleApplication
 	protected Spatial observer = new Node("observer");
 	protected Node skyNode = new Node("skyNode");
 	protected Node coordinateSystem = new Node("coordinateSystem");
-	
+	protected VegetationGenerator vegetationGenerator;
 	
 	public KeyBindingCenter getKeyBindingCenter()
 	{
@@ -297,7 +298,13 @@ public class SimulationBasics extends SimpleApplication
 		
 		return openDriveCenter;
 	}
+
 	
+	public VegetationGenerator getVegetationGenerator()
+	{
+		return vegetationGenerator;
+	}
+
 
     @Override
     public void simpleInitApp() 

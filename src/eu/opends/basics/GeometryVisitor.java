@@ -152,6 +152,12 @@ public class GeometryVisitor implements SceneGraphVisitor
 					texture.setAnisotropicFilter(32);
 				}
 				
+				// apply anisotropic filter to parking space (used for "NorthB1" and "SouthB1" model only)
+				if (spatial.getName().startsWith("parking"))
+				{
+					texture.setAnisotropicFilter(32);
+				}
+				
 				// remove trees and bushes from scene
 				if(texturePath.matches("^\\S+EucalyptusLeaves_Diff.png$")
 						|| texturePath.matches("^\\S+CoulterPineBark_Diff.png$")

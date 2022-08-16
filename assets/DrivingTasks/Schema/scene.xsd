@@ -65,6 +65,9 @@ This list can be considered as static declaration where unique identifiers have 
             		</xs:annotation>
             	</xs:element>
 
+            	<xs:element name="vegetation" type="vegetation"
+            		maxOccurs="1" minOccurs="0">
+            	</xs:element>
             	<xs:element name="resetPoints" type="points"
             		maxOccurs="1" minOccurs="0">
             		<xs:annotation>
@@ -957,5 +960,119 @@ This list can be considered as static declaration where unique identifiers have 
     <xs:complexType name="texture">
     	<xs:attribute name="geometryName" type="xs:string"></xs:attribute>
     	<xs:attribute name="textureFile" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="vegetation">
+        <xs:all>
+        	<xs:element name="pathToVegetationObjects" type="xs:string"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="vegetationGroups" type="vegetationGroups"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="roadSideVegetation"
+        		type="roadSideVegetation" maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        </xs:all>
+
+    </xs:complexType>
+
+    <xs:complexType name="vegetationGroups">
+        <xs:sequence>
+    		<xs:element name="vegetationGroup" type="vegetationGroup" maxOccurs="unbounded" minOccurs="1">
+    		</xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="roadSideVegetation">
+    	<xs:sequence>
+    		<xs:element name="road" type="road" maxOccurs="unbounded" minOccurs="1"></xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="vegetationGroup">
+    	<xs:sequence>
+    		<xs:element name="vegetationObject" type="xs:string" maxOccurs="unbounded" minOccurs="1"></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="id" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="road">
+        <xs:all>
+        	<xs:element name="openDriveId" type="xs:string"
+        		maxOccurs="1" minOccurs="1">
+        	</xs:element>
+        	<xs:element name="sideOfRoad" maxOccurs="1" minOccurs="0">
+        		<xs:simpleType>
+        			<xs:restriction base="xs:string">
+        				<xs:enumeration value="Left"></xs:enumeration>
+        				<xs:enumeration value="Right"></xs:enumeration>
+        				<xs:enumeration value="Both"></xs:enumeration>
+        			</xs:restriction>
+        		</xs:simpleType>
+        	</xs:element>
+        	<xs:element name="range" type="range" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="spacing" type="spacing" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="distanceFromRoad" type="distanceFromRoad"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="vegetationGroup" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
+        </xs:all>
+        
+    </xs:complexType>
+
+    <xs:complexType name="range">
+    	<xs:attribute name="minS">
+    		<xs:simpleType>
+    			<xs:restriction base="xs:float">
+    				<xs:minInclusive value="0"></xs:minInclusive>
+    			</xs:restriction>
+    		</xs:simpleType>
+    	</xs:attribute>
+    	<xs:attribute name="maxS">
+    		<xs:simpleType>
+    			<xs:restriction base="xs:float">
+    				<xs:minExclusive value="0"></xs:minExclusive>
+    			</xs:restriction>
+    		</xs:simpleType>
+    	</xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="spacing">
+    	<xs:attribute name="min">
+    		<xs:simpleType>
+    			<xs:restriction base="xs:float">
+    				<xs:minInclusive value="0"></xs:minInclusive>
+    			</xs:restriction>
+    		</xs:simpleType>
+    	</xs:attribute>
+    	<xs:attribute name="max">
+    		<xs:simpleType>
+    			<xs:restriction base="xs:float">
+    				<xs:minExclusive value="0"></xs:minExclusive>
+    			</xs:restriction>
+    		</xs:simpleType>
+    	</xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="distanceFromRoad">
+    	<xs:attribute name="min">
+    		<xs:simpleType>
+    			<xs:restriction base="xs:float">
+    				<xs:minInclusive value="0"></xs:minInclusive>
+    			</xs:restriction>
+    		</xs:simpleType>
+    	</xs:attribute>
+    	<xs:attribute name="max">
+    		<xs:simpleType>
+    			<xs:restriction base="xs:float">
+    				<xs:minExclusive value="0"></xs:minExclusive>
+    			</xs:restriction>
+    		</xs:simpleType>
+    	</xs:attribute>
     </xs:complexType>
 </xs:schema>

@@ -25,11 +25,15 @@ import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.material.MatParamTexture;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.Spatial.CullHint;
+import com.jme3.texture.Texture;
 
 import eu.opends.main.Simulator;
+import eu.opends.tools.Util;
 
 /**
  * This class is used to further process the elements on the map.
@@ -266,32 +270,6 @@ public class InternalMapProcessing
 			}
 			geo2.getMesh().getBuffer(VertexBuffer.Type.Position).setupData(Usage.Static, 3, Format.Float, posData);
 		}
-		/*
-		
-		
-		/*
-		skipPhysicModel = false;
-		for(Geometry geometry : Util.getAllGeometries(spatial))
-		{
-			MatParamTexture diffuseMap = geometry.getMaterial().getTextureParam("DiffuseMap");
-			if (diffuseMap != null)
-			{
-				Texture texture = diffuseMap.getTextureValue();
-				String texturePath = texture.getKey().getName();
-				if(texturePath.equals("Scenes/testFinal/Wood1_Diff.png")
-						|| texturePath.equals("Scenes/testFinal/Metal1_Diff.png"))
-				{
-					//if(spatial instanceof Node)
-						//((Node)spatial).detachChild(geometry);
-					
-					skipPhysicModel = true;
-				}
-				else
-					add(mapObject, geometry);
-			}
-			else
-				add(mapObject, geometry);
-		}
 		*/
 
 		
@@ -299,29 +277,59 @@ public class InternalMapProcessing
 		// no longer needed, as FaceCullMode.Off is default setting
 		//Util.setFaceCullMode(spatial, FaceCullMode.Off);
 		
-		Node node = new Node(mapObject.getName());
-    	node.attachChild(spatial);
-    	node.setLocalScale(mapObject.getScale());
-        node.updateModelBound();
+		Node physicsNode = new Node(mapObject.getName() + "_physicsNode");
+    	physicsNode.attachChild(spatial);
+    	
+    	Node visualNode = new Node(mapObject.getName());
+    	visualNode.attachChild(physicsNode);
+    	
+    	// exclude selected geometries from physics simulation
+		for(Geometry geometry : Util.getAllGeometries(spatial))
+		{
+			MatParamTexture diffuseMap = geometry.getMaterial().getTextureParam("DiffuseMap");
+			if (diffuseMap != null)
+			{
+				Texture texture = diffuseMap.getTextureValue();
+				String texturePath = texture.getKey().getName();
+				if(texturePath.endsWith("/Wood1_Diff.png")
+						|| texturePath.endsWith("/Metal1_Diff.png"))
+				{
+					if(spatial instanceof Node)
+					{
+						// exclude from visual and physical rendering
+						((Node)spatial).detachChild(geometry);
+						
+						// add to visual rendering only
+						visualNode.attachChild(geometry);
+					}
+				}
+			}
+		}
+
+    	visualNode.setLocalScale(mapObject.getScale());
+        visualNode.updateModelBound();
+        
         
 		// if marked as invisible then cull always else cull dynamic
 		if(!mapObject.isVisible())
-			node.setCullHint(CullHint.Always);
+			visualNode.setCullHint(CullHint.Always);
 		
 		String collisionShapeString = mapObject.getCollisionShape();
 		if(collisionShapeString == null)
 			collisionShapeString = "meshShape";
 		
-		node.setLocalTranslation(mapObject.getLocation());
-        node.setLocalRotation(mapObject.getRotation());
+		visualNode.setLocalTranslation(mapObject.getLocation());
+        visualNode.setLocalRotation(mapObject.getRotation());
         
+        
+        // add to physics space
 		if(!skipPhysicModel && (collisionShapeString.equalsIgnoreCase("boxShape") || collisionShapeString.equalsIgnoreCase("meshShape")))
 		{
 			// FIXME
-	        //node.setLocalRotation(new Quaternion().fromAngles(FastMath.HALF_PI, 0, 0));
+	        //physicsNode.setLocalRotation(new Quaternion().fromAngles(FastMath.HALF_PI, 0, 0));
 	        
-	        //node.setLocalTranslation(mapObject.getLocation());
-	        //node.setLocalRotation(mapObject.getRotation());
+	        //physicsNode.setLocalTranslation(mapObject.getLocation());
+	        //physicsNode.setLocalRotation(mapObject.getRotation());
 			
 	        CollisionShape collisionShape;
 	        float mass = mapObject.getMass();
@@ -329,21 +337,21 @@ public class InternalMapProcessing
 	        {
 	        	// mesh shape for static objects
 		        if(collisionShapeString.equalsIgnoreCase("meshShape"))
-		        	collisionShape = CollisionShapeFactory.createMeshShape(node);
+		        	collisionShape = CollisionShapeFactory.createMeshShape(physicsNode);
 		        else
-		        	collisionShape = CollisionShapeFactory.createBoxShape(node);
+		        	collisionShape = CollisionShapeFactory.createBoxShape(physicsNode);
 	        }
 	        else
 	        {
 		        // set whether triangle accuracy should be applied
 		        if(collisionShapeString.equalsIgnoreCase("meshShape"))
-		        	collisionShape = CollisionShapeFactory.createDynamicMeshShape(node);
+		        	collisionShape = CollisionShapeFactory.createDynamicMeshShape(physicsNode);
 		        else
-		        	collisionShape = CollisionShapeFactory.createBoxShape(node);
+		        	collisionShape = CollisionShapeFactory.createBoxShape(physicsNode);
 	        }		        
 	        
 	        RigidBodyControl physicsControl = new RigidBodyControl(collisionShape, mass);
-	        node.addControl(physicsControl);
+	        physicsNode.addControl(physicsControl);
 	        physicsControl.setPhysicsLocation(mapObject.getLocation());
 	        physicsControl.setPhysicsRotation(mapObject.getRotation());
 	        
@@ -353,28 +361,14 @@ public class InternalMapProcessing
 	        physicsSpace.add(physicsControl);
 		}
 	
+		
         // attach additional map object to scene node
 		if(mapObject.isAddToMapNode())
-			mapNode.attachChild(node);
+			mapNode.attachChild(visualNode);
 		else
-			sceneNode.attachChild(node);
+			sceneNode.attachChild(visualNode);
 	}
 
-
-	/* FIXME
-	private void add(MapObject mapObject, Geometry geometry)
-	{
-		CollisionShape collisionShape = CollisionShapeFactory.createMeshShape(geometry);
-        RigidBodyControl physicsControl = new RigidBodyControl(collisionShape, 0);
-        geometry.addControl(physicsControl);
-        physicsControl.setPhysicsLocation(mapObject.getLocation());
-        physicsControl.setPhysicsRotation(mapObject.getRotation());
-
-        // add additional map object to physics space
-        physicsSpace.add(physicsControl);
-	}
-	*/
-	
 
 	/**
 	 * Generates blind triggers which replace the original boxes.

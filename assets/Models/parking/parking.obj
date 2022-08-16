@@ -1,0 +1,19 @@
+mtllib parking.mtl
+
+v -22.0 0.02  9.0
+v  22.0 0.02  9.0
+v  22.0 0.02 -9.0
+v -22.0 0.02 -9.0
+# 4 vertices
+
+vt 0.0000 0.0000
+vt 1.0000 0.0000
+vt 1.0000 1.0000
+vt 0.0000 1.0000
+# 4 texture coordinates
+
+g face_of_parking_space
+s off
+usemtl ParkingMaterial
+f 1/1 2/2 3/3 4/4
+# 1 face

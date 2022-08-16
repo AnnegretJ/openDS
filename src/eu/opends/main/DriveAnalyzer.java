@@ -64,6 +64,7 @@ import eu.opends.basics.MapObjectOD;
 import eu.opends.basics.SimulationBasics;
 import eu.opends.camera.AnalyzerCam;
 import eu.opends.drivingTask.DrivingTask;
+import eu.opends.environment.vegetation.VegetationGenerator;
 import eu.opends.gesture.RecordedReferenceObject;
 import eu.opends.gesture.SceneRay;
 import eu.opends.input.KeyBindingCenter;
@@ -275,6 +276,9 @@ public class DriveAnalyzer extends SimulationBasics
 		// set ego cam node which is always placed 2 meters up and 1 cm behind the current position
 		egoCamNode.setLocalTranslation(0, 2, 0.01f);
 		target.attachChild(egoCamNode);
+		
+		vegetationGenerator = new VegetationGenerator(this);
+		vegetationGenerator.init();
 		
         initializationFinished = true;
 	}
@@ -666,9 +670,9 @@ public class DriveAnalyzer extends SimulationBasics
 		{
 			// make object visible if contained in list and invisible if not
 			if(visibleObjects.contains(mapObject.getName()))
-				mapObject.getSpatial().getParent().setCullHint(CullHint.Inherit);
+				mapObject.getSpatial().getParent().getParent().setCullHint(CullHint.Inherit);
 			else
-				mapObject.getSpatial().getParent().setCullHint(CullHint.Always);
+				mapObject.getSpatial().getParent().getParent().setCullHint(CullHint.Always);
 		}
 
 		// set active reference object

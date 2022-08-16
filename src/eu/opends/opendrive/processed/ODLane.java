@@ -286,7 +286,11 @@ public class ODLane
 				if(startS <= point.getS() && point.getS() <= endS)
 					pointlist2.add(point);
 			
-			drawLaneSegment(pointlist2, visualize, roadmarkType);
+			SettingsLoader settingsLoader = SimulationBasics.getDrivingTask().getSettingsLoader();
+			boolean ignoreNonDrivingLanes = settingsLoader.getSetting(Setting.OpenDrive_ignoreNonDrivingLanes, false);
+			if(!ignoreNonDrivingLanes || type == ELaneType.DRIVING)
+				drawLaneSegment(pointlist2, visualize, roadmarkType);
+			
 			//System.err.println("startS: " + startS + ", EndS: " + endS);
 			//System.err.println("Size: " + pointlist2.size());
 		}
