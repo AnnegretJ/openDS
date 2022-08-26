@@ -18,15 +18,16 @@
 
 package eu.opends.settingsController;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
@@ -106,45 +107,42 @@ public class ConnectionHandler extends Thread
 		requestParser = new RequestParser(sim);
 	}
 	
-	public void run(){		
+	public void run(){
 		while(!isInterrupted()){
-			try{					
-	        	 BufferedReader r = new BufferedReader(new InputStreamReader(in));
-	        	 	        	 
-	        	 String messageValue = "";
-	        	 
-	        	 try{
-	        		 while(!isInterrupted()){
-	        			 
-	        			 try
-	        			 {
-	        				 String line = r.readLine();
-		        		 
-	        				 if(line == null){
-	        					 interrupt();
-	        					 System.out.println("Connection closed by client.");
-	        					 break;
-	        				 }
-	        				 else {
-	        					 messageValue += line;
-		        			 
-	        					 if(line.contains("</Message>"))
-	        						 break;
-	        				 }
-	        		
-	        			 } catch (SocketTimeoutException e) {
-	        			 }
-		        	 }        	
-	        	 }catch(SocketException e){
-	        		 interrupt();
-	        		 System.out.println("Connection closed by client.");
-	        		 break;
-	        	 }	        	 
-	        	 	        		        	 
-	        	 if(!messageValue.equals("")){
-	        		 parseXML(messageValue);
-	        	 }
-	        }catch(Exception e){
+			try{
+				
+				byte[] messageByte = new byte[2000];
+				boolean end = false;
+				String messageValue = "";
+			    int bytesRead = 0;
+			    
+			    try {
+			    	while(!end && !isInterrupted())
+			    	{
+			    		try
+			    		{
+			    			bytesRead = in.read(messageByte);
+			    		
+			    			if(bytesRead == -1)
+			    				throw new SocketException("Bytes read from stream == -1");
+			    			else
+			    				messageValue += new String(messageByte, 0, bytesRead);
+
+			    		} catch (SocketTimeoutException e) {
+			    			// if no more to read in data input stream --> close loop and parse received XML
+			    			end = true;
+			    		}
+			    	}
+			    } catch(SocketException e){
+			    	interrupt();
+			    	System.out.println("Connection closed by client.");
+			    	break;
+			    }	
+				     		        	 
+	        	if(!messageValue.equals("")){
+	        		parseXML(messageValue);
+	        	}
+			}catch(Exception e){
 				e.printStackTrace();
 			}			
 		}	
@@ -354,14 +352,10 @@ public class ConnectionHandler extends Thread
 				else{
 					System.err.println("Unknown event received!");
 					return;
-				}			
-				
-						
+				}		
 			}
 			
 			response += "</Message>\n";
-			
-			
 			
 			sendResponse(response);		
 			
@@ -369,6 +363,26 @@ public class ConnectionHandler extends Thread
 		} catch (Exception e) {;
 			System.err.println("No valid XML data received!");
 			e.printStackTrace();
+			
+			try {
+				final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				final String utf8 = StandardCharsets.UTF_8.name();
+				try (PrintStream ps = new PrintStream(baos, true, utf8)) {
+					e.printStackTrace(ps);
+				}
+		    String errorDetail = baos.toString(utf8);
+		    
+			String response = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+					+ "<Message>\n"
+					+ "<Error>No valid XML data received</Error>\n"
+					+ "<Detail>" + errorDetail + "</Detail>\n"
+					+ "</Message>\n";
+			sendResponse(response);
+			
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+			
 		}		
 	}
 	

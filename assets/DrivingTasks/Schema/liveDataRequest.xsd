@@ -6,9 +6,12 @@
     <xs:element name="liveDataRequest" type="liveDataRequest"></xs:element>
     
     <xs:complexType name="liveDataRequest">
-    	<xs:sequence>
-    		<xs:element name="location" type="location" maxOccurs="unbounded" minOccurs="1"></xs:element>
-    	</xs:sequence>
+        <xs:sequence>
+    		<xs:element name="location" type="location" maxOccurs="unbounded" minOccurs="0">
+    		</xs:element>
+    		<xs:element name="triggerExecution" type="triggerExecution" maxOccurs="unbounded" minOccurs="0">
+    		</xs:element>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="location">
@@ -35,4 +38,10 @@
     	</xs:restriction>
     </xs:simpleType>
 
+
+    <xs:complexType name="triggerExecution">
+        <xs:all>
+    		<xs:element name="triggerId" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
+    	</xs:all>
+    </xs:complexType>
 </xs:schema>

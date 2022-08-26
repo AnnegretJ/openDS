@@ -1,2 +1,86 @@
 <lightTextures>
+	<layoutAlternative name="red">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="C4COUP~1.JPG" />
+			<leftTurn texture="C4COUP~1.JPG" />
+			<rightTurn texture="C4COUP~1.JPG" />
+			<hazardLights texture="C4COUP~1.JPG" />
+			<brakeLights texture="C4COUP~1.JPG" />
+			<leftTurnBrakeLights texture="C4COUP~1.JPG" />
+			<rightTurnBrakeLights texture="C4COUP~1.JPG" />
+			<hazardLightsBrakeLights texture="C4COUP~1.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="blue">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="C4COUP~1_blue.JPG" />
+			<leftTurn texture="C4COUP~1_blue.JPG" />
+			<rightTurn texture="C4COUP~1_blue.JPG" />
+			<hazardLights texture="C4COUP~1_blue.JPG" />
+			<brakeLights texture="C4COUP~1_blue.JPG" />
+			<leftTurnBrakeLights texture="C4COUP~1_blue.JPG" />
+			<rightTurnBrakeLights texture="C4COUP~1_blue.JPG" />
+			<hazardLightsBrakeLights texture="C4COUP~1_blue.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="cyan">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="C4COUP~1_cyan.JPG" />
+			<leftTurn texture="C4COUP~1_cyan.JPG" />
+			<rightTurn texture="C4COUP~1_cyan.JPG" />
+			<hazardLights texture="C4COUP~1_cyan.JPG" />
+			<brakeLights texture="C4COUP~1_cyan.JPG" />
+			<leftTurnBrakeLights texture="C4COUP~1_cyan.JPG" />
+			<rightTurnBrakeLights texture="C4COUP~1_cyan.JPG" />
+			<hazardLightsBrakeLights texture="C4COUP~1_cyan.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="green">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="C4COUP~1_green.JPG" />
+			<leftTurn texture="C4COUP~1_green.JPG" />
+			<rightTurn texture="C4COUP~1_green.JPG" />
+			<hazardLights texture="C4COUP~1_green.JPG" />
+			<brakeLights texture="C4COUP~1_green.JPG" />
+			<leftTurnBrakeLights texture="C4COUP~1_green.JPG" />
+			<rightTurnBrakeLights texture="C4COUP~1_green.JPG" />
+			<hazardLightsBrakeLights texture="C4COUP~1_green.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="orange">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="C4COUP~1_orange.JPG" />
+			<leftTurn texture="C4COUP~1_orange.JPG" />
+			<rightTurn texture="C4COUP~1_orange.JPG" />
+			<hazardLights texture="C4COUP~1_orange.JPG" />
+			<brakeLights texture="C4COUP~1_orange.JPG" />
+			<leftTurnBrakeLights texture="C4COUP~1_orange.JPG" />
+			<rightTurnBrakeLights texture="C4COUP~1_orange.JPG" />
+			<hazardLightsBrakeLights texture="C4COUP~1_orange.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="purple">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="C4COUP~1_purple.JPG" />
+			<leftTurn texture="C4COUP~1_purple.JPG" />
+			<rightTurn texture="C4COUP~1_purple.JPG" />
+			<hazardLights texture="C4COUP~1_purple.JPG" />
+			<brakeLights texture="C4COUP~1_purple.JPG" />
+			<leftTurnBrakeLights texture="C4COUP~1_purple.JPG" />
+			<rightTurnBrakeLights texture="C4COUP~1_purple.JPG" />
+			<hazardLightsBrakeLights texture="C4COUP~1_purple.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="yellow">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="C4COUP~1_yellow.JPG" />
+			<leftTurn texture="C4COUP~1_yellow.JPG" />
+			<rightTurn texture="C4COUP~1_yellow.JPG" />
+			<hazardLights texture="C4COUP~1_yellow.JPG" />
+			<brakeLights texture="C4COUP~1_yellow.JPG" />
+			<leftTurnBrakeLights texture="C4COUP~1_yellow.JPG" />
+			<rightTurnBrakeLights texture="C4COUP~1_yellow.JPG" />
+			<hazardLightsBrakeLights texture="C4COUP~1_yellow.JPG" />
+		</position>
+	</layoutAlternative>
 </lightTextures>

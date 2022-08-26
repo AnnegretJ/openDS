@@ -1,2 +1,86 @@
 <lightTextures>
+	<layoutAlternative name="silver">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="AUDIS6DM.JPG" />
+			<leftTurn texture="AUDIS6DM.JPG" />
+			<rightTurn texture="AUDIS6DM.JPG" />
+			<hazardLights texture="AUDIS6DM.JPG" />
+			<brakeLights texture="AUDIS6DM.JPG" />
+			<leftTurnBrakeLights texture="AUDIS6DM.JPG" />
+			<rightTurnBrakeLights texture="AUDIS6DM.JPG" />
+			<hazardLightsBrakeLights texture="AUDIS6DM.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="blue">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="AUDIS6DM_blue.JPG" />
+			<leftTurn texture="AUDIS6DM_blue.JPG" />
+			<rightTurn texture="AUDIS6DM_blue.JPG" />
+			<hazardLights texture="AUDIS6DM_blue.JPG" />
+			<brakeLights texture="AUDIS6DM_blue.JPG" />
+			<leftTurnBrakeLights texture="AUDIS6DM_blue.JPG" />
+			<rightTurnBrakeLights texture="AUDIS6DM_blue.JPG" />
+			<hazardLightsBrakeLights texture="AUDIS6DM_blue.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="cyan">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="AUDIS6DM_cyan.JPG" />
+			<leftTurn texture="AUDIS6DM_cyan.JPG" />
+			<rightTurn texture="AUDIS6DM_cyan.JPG" />
+			<hazardLights texture="AUDIS6DM_cyan.JPG" />
+			<brakeLights texture="AUDIS6DM_cyan.JPG" />
+			<leftTurnBrakeLights texture="AUDIS6DM_cyan.JPG" />
+			<rightTurnBrakeLights texture="AUDIS6DM_cyan.JPG" />
+			<hazardLightsBrakeLights texture="AUDIS6DM_cyan.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="green">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="AUDIS6DM_green.JPG" />
+			<leftTurn texture="AUDIS6DM_green.JPG" />
+			<rightTurn texture="AUDIS6DM_green.JPG" />
+			<hazardLights texture="AUDIS6DM_green.JPG" />
+			<brakeLights texture="AUDIS6DM_green.JPG" />
+			<leftTurnBrakeLights texture="AUDIS6DM_green.JPG" />
+			<rightTurnBrakeLights texture="AUDIS6DM_green.JPG" />
+			<hazardLightsBrakeLights texture="AUDIS6DM_green.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="purple">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="AUDIS6DM_purple.JPG" />
+			<leftTurn texture="AUDIS6DM_purple.JPG" />
+			<rightTurn texture="AUDIS6DM_purple.JPG" />
+			<hazardLights texture="AUDIS6DM_purple.JPG" />
+			<brakeLights texture="AUDIS6DM_purple.JPG" />
+			<leftTurnBrakeLights texture="AUDIS6DM_purple.JPG" />
+			<rightTurnBrakeLights texture="AUDIS6DM_purple.JPG" />
+			<hazardLightsBrakeLights texture="AUDIS6DM_purple.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="red">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="AUDIS6DM_red.JPG" />
+			<leftTurn texture="AUDIS6DM_red.JPG" />
+			<rightTurn texture="AUDIS6DM_red.JPG" />
+			<hazardLights texture="AUDIS6DM_red.JPG" />
+			<brakeLights texture="AUDIS6DM_red.JPG" />
+			<leftTurnBrakeLights texture="AUDIS6DM_red.JPG" />
+			<rightTurnBrakeLights texture="AUDIS6DM_red.JPG" />
+			<hazardLightsBrakeLights texture="AUDIS6DM_red.JPG" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="yellow">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="AUDIS6DM_yellow.JPG" />
+			<leftTurn texture="AUDIS6DM_yellow.JPG" />
+			<rightTurn texture="AUDIS6DM_yellow.JPG" />
+			<hazardLights texture="AUDIS6DM_yellow.JPG" />
+			<brakeLights texture="AUDIS6DM_yellow.JPG" />
+			<leftTurnBrakeLights texture="AUDIS6DM_yellow.JPG" />
+			<rightTurnBrakeLights texture="AUDIS6DM_yellow.JPG" />
+			<hazardLightsBrakeLights texture="AUDIS6DM_yellow.JPG" />
+		</position>
+	</layoutAlternative>
 </lightTextures>

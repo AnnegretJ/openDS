@@ -417,7 +417,7 @@ public class TriggerCenter
 	 * @param triggerID
 	 * 			name of the trigger (needed to look up action) 
 	 */
-	public static void performRemoteTriggerAction(String triggerID)
+	public static boolean performRemoteTriggerAction(String triggerID)
 	{
 		if(SimulationBasics.getRemoteTriggerActionListMap().containsKey(triggerID))
 		{
@@ -426,6 +426,13 @@ public class TriggerCenter
 			List<TriggerAction> triggerActionList = SimulationBasics.getRemoteTriggerActionListMap().get(triggerID);
 			for(TriggerAction triggerAction : triggerActionList)
 				triggerAction.performAction();
+			
+			return true;
+		}
+		else
+		{
+			System.err.println("A remote application tried to execute trigger '" + triggerID + "' which does not exist.");
+			return false;
 		}
 	}
 

@@ -44,7 +44,9 @@ public class LightTexturesContainer
 	private Simulator sim;
 	private Node carNode;
 	private LightState lightState;
-	private HashMap<LightState,HashMap<Spatial,Material>> lightTexturesContainer;
+	private String currentLayoutAlternativeName = "";
+	private HashMap<String,HashMap<LightState,HashMap<Spatial,Material>>> lightTexturesContainer 
+					= new HashMap<String ,HashMap<LightState,HashMap<Spatial,Material>>>();
 	private TurnSignalThread turnSignalThread;
 	private boolean applyTexture = false;
 	
@@ -67,39 +69,39 @@ public class LightTexturesContainer
 		this.sim = sim;
 		this.carNode = car.getCarNode();
 		
-		// init light textures container
-		lightTexturesContainer = new HashMap<LightState,HashMap<Spatial,Material>>();
-		for(LightState lightState : LightState.values())
-			lightTexturesContainer.put(lightState, new HashMap<Spatial,Material>());
-		
-		// load lights texture file
+		// load lights from configuration file
 		processLightTexturesFile(lightTexturesPath);
 		
 		// init turn signal thread
 		turnSignalThread = new TurnSignalThread(this, sim, car);
 		
 		// init light state
-		//lightState = LightState.AllOff;
 		setLightState(LightState.AllOff);
 	}
 	
-	
+
 	public void printAllContent()
 	{
-		for(LightState lightState : LightState.values())
+		for(Entry<String,HashMap<LightState,HashMap<Spatial,Material>>> entry : lightTexturesContainer.entrySet())
 		{
-			HashMap<Spatial,Material> map = lightTexturesContainer.get(lightState);
+			String lightTextureAlternativeName = entry.getKey();
+			HashMap<LightState,HashMap<Spatial,Material>> lightTextureAlternativeMap = entry.getValue();
 			
-			Iterator<Entry<Spatial,Material>> it = map.entrySet().iterator();
-		    while(it.hasNext()) 
-		    {
-		        Entry<Spatial,Material> pairs = (Entry<Spatial,Material>)it.next();
-		        System.out.println(carNode + ": " + lightState.toString() + ": " + pairs.getKey() + 
-		        		" = " + pairs.getValue());
-		    }
+			for(LightState lightState : LightState.values())
+			{
+				HashMap<Spatial,Material> map = lightTextureAlternativeMap.get(lightState);
+			
+				Iterator<Entry<Spatial,Material>> it = map.entrySet().iterator();
+				while(it.hasNext()) 
+				{
+					Entry<Spatial,Material> pairs = (Entry<Spatial,Material>)it.next();
+					System.out.println(carNode + ": " + lightTextureAlternativeName + ": " + lightState.toString() 
+						+ ": " + pairs.getKey() + " = " + pairs.getValue());
+				}
+			}
 		}
 	}
-	
+
 	
 	public void setBrakeLight(boolean setToOn)
 	{
@@ -161,6 +163,20 @@ public class LightTexturesContainer
 	}
 	
 	
+	public void setLayoutAlternative(String layoutAlternativeName)
+	{
+		if(lightTexturesContainer.containsKey(layoutAlternativeName))
+		{
+				this.currentLayoutAlternativeName = layoutAlternativeName;
+				applyTexture = true;
+		}
+		else
+			System.err.println("LightTextureContainer::setLayoutAlternative(): '" + layoutAlternativeName 
+					+ "' is not a valid layout alternative name!");
+		
+	}
+	
+	
 	public void update()
 	{
 		if(applyTexture)
@@ -174,6 +190,12 @@ public class LightTexturesContainer
 	public LightState getLightState() 
 	{
 		return lightState;
+	}
+	
+	
+	public String getLayoutAlternative() 
+	{
+		return currentLayoutAlternativeName;
 	}
 	
 	
@@ -202,17 +224,23 @@ public class LightTexturesContainer
 	
 	private void applyTexture(LightState lightState)
 	{
-		HashMap<Spatial,Material> map = lightTexturesContainer.get(lightState);
+		HashMap<LightState,HashMap<Spatial,Material>> layoutAlternative 
+						= lightTexturesContainer.get(currentLayoutAlternativeName);
 		
-		Iterator<Entry<Spatial,Material>> it = map.entrySet().iterator();
-	    while(it.hasNext()) 
-	    {
-	        Entry<Spatial,Material> pairs = (Entry<Spatial,Material>)it.next();
-	        Spatial spatial = pairs.getKey();
-	        Material material = pairs.getValue();
+		if(layoutAlternative != null)
+		{
+			HashMap<Spatial,Material> lightTextureMap = layoutAlternative.get(lightState);
+		
+			Iterator<Entry<Spatial,Material>> it = lightTextureMap.entrySet().iterator();
+			while(it.hasNext()) 
+			{
+				Entry<Spatial,Material> pairs = (Entry<Spatial,Material>)it.next();
+				Spatial spatial = pairs.getKey();
+				Material material = pairs.getValue();
 	        
-	        spatial.setMaterial(material);
-	    }
+				spatial.setMaterial(material);
+			}
+		}
 	}
 	
 	
@@ -228,35 +256,60 @@ public class LightTexturesContainer
 			for(int i = 0; i<rootNodeList.getLength(); i++)
 			{
 				org.w3c.dom.Node rootNode = rootNodeList.item(i);
-				NodeList lightTextureList = rootNode.getChildNodes();
-				
-				for(int j = 0; j<lightTextureList.getLength(); j++)
+				NodeList layoutAlternativeList = rootNode.getChildNodes();
+
+				for(int j = 0; j<layoutAlternativeList.getLength(); j++)
 				{
-					org.w3c.dom.Node lightTextureNode = lightTextureList.item(j);
+					org.w3c.dom.Node layoutAlternativeNode = layoutAlternativeList.item(j);
 					
-					if(lightTextureNode.getNodeName().equalsIgnoreCase("position"))
+					if(layoutAlternativeNode.getNodeName().equalsIgnoreCase("layoutAlternative"))
 					{
-						String path = lightTextureNode.getAttributes().getNamedItem("path").getNodeValue();
-						NodeList stateList = lightTextureNode.getChildNodes();
+						// get name of layout alternative node
+						String layoutAlternativeName 
+								= layoutAlternativeNode.getAttributes().getNamedItem("name").getNodeValue();
 						
-						for(int k = 0; k<stateList.getLength(); k++)
+						if(currentLayoutAlternativeName.isEmpty())
+							currentLayoutAlternativeName = layoutAlternativeName;
+						
+						// init layout alternative
+						HashMap<LightState,HashMap<Spatial,Material>> layoutAlternative 
+								= new HashMap<LightState,HashMap<Spatial,Material>>();
+						for(LightState lightState : LightState.values())
+							layoutAlternative.put(lightState, new HashMap<Spatial,Material>());
+
+						NodeList lightTextureList = layoutAlternativeNode.getChildNodes();
+						
+						for(int k = 0; k<lightTextureList.getLength(); k++)
 						{
-							org.w3c.dom.Node stateNode = stateList.item(k);
-							
-							for(LightState state : LightState.values())
+							org.w3c.dom.Node lightTextureNode = lightTextureList.item(k);						
+					
+							if(lightTextureNode.getNodeName().equalsIgnoreCase("position"))
 							{
-								if(stateNode.getNodeName().equalsIgnoreCase(state.toString()))
+								String path = lightTextureNode.getAttributes().getNamedItem("path").getNodeValue();
+								NodeList stateList = lightTextureNode.getChildNodes();
+						
+								for(int l = 0; l<stateList.getLength(); l++)
 								{
-									org.w3c.dom.Node texture = stateNode.getAttributes().getNamedItem("texture");
-									if(texture != null)
+									org.w3c.dom.Node stateNode = stateList.item(l);
+							
+									for(LightState state : LightState.values())
 									{
-										String textureString = texture.getNodeValue();
-										if(!textureString.isEmpty())
-											addTexture(path, state, parentDirectory + "/" + textureString);
+										if(stateNode.getNodeName().equalsIgnoreCase(state.toString()))
+										{
+											org.w3c.dom.Node texture = stateNode.getAttributes().getNamedItem("texture");
+											if(texture != null)
+											{
+												String textureString = texture.getNodeValue();
+												if(!textureString.isEmpty())
+													addTexture(layoutAlternative, path, state, parentDirectory 
+															+ "/" + textureString);
+											}
+										}
 									}
 								}
-							}
+							}				
 						}
+						lightTexturesContainer.put(layoutAlternativeName, layoutAlternative);
 					}
 				}
 			}
@@ -266,7 +319,8 @@ public class LightTexturesContainer
 	}
 
 
-	private void addTexture(String spatialPath, LightState lightState, String texturePath)
+	private void addTexture(HashMap<LightState,HashMap<Spatial,Material>> layoutAlternative, 
+			String spatialPath, LightState lightState, String texturePath)
 	{
 		Spatial partOfCar = lookupInCarNode(spatialPath);
 		Material material = loadMaterial(texturePath);
@@ -276,7 +330,7 @@ public class LightTexturesContainer
 			//System.err.println("SET: " + spatialPath + " - " + lightState.toString() + " - " + texturePath);
 			
 			// add assignment to hash map
-			HashMap<Spatial,Material> map = lightTexturesContainer.get(lightState);
+			HashMap<Spatial,Material> map = layoutAlternative.get(lightState);
 			if(map.put(partOfCar, material) != null)
 				System.err.println("Caution: old assignment of " + spatialPath + 
 						" in node " + carNode + " has been overwritten.");

@@ -46,7 +46,9 @@ import eu.opends.opendrive.processed.PreferredConnections;
 import eu.opends.settingsController.liveDataRequest.data.LiveDataRequest;
 import eu.opends.settingsController.liveDataRequest.data.Location;
 import eu.opends.settingsController.liveDataRequest.data.ObjectFactory;
+import eu.opends.settingsController.liveDataRequest.data.TriggerExecution;
 import eu.opends.settingsController.liveDataRequest.data.TypeEnum;
+import eu.opends.trigger.TriggerCenter;
 
 public class RequestParser
 {
@@ -111,15 +113,36 @@ public class RequestParser
 				{
 					LiveDataRequest liveDataRequest = (LiveDataRequest) object2;
 					
-					// look up these values once for all following locations to guarantee 
-					// the same reference point for all location calculations
-					ODLane lane = sim.getCar().getCurrentLane();
-					boolean isWrongWay = sim.getCar().isWrongWay();
-					double s = sim.getCar().getCurrentS();
-					PreferredConnections pc = sim.getCar().getPreferredConnectionsList();
+					if(!liveDataRequest.getLocation().isEmpty())
+					{
+						// look up these values once for all following locations to guarantee 
+						// the same reference point for all location calculations
+						ODLane lane = sim.getCar().getCurrentLane();
+						boolean isWrongWay = sim.getCar().isWrongWay();
+						double s = sim.getCar().getCurrentS();
+						PreferredConnections pc = sim.getCar().getPreferredConnectionsList();
 
-					for(Location location : liveDataRequest.getLocation())
-						returnString += lookupAbsoluteLocation(location, lane, isWrongWay, s, pc);
+						for(Location location : liveDataRequest.getLocation())
+							returnString += lookupAbsoluteLocation(location, lane, isWrongWay, s, pc);
+					}
+					
+					if(!liveDataRequest.getTriggerExecution().isEmpty())
+					{
+						for(TriggerExecution triggerExecution : liveDataRequest.getTriggerExecution())
+						{
+							String triggerId = triggerExecution.getTriggerId();
+							boolean success = TriggerCenter.performRemoteTriggerAction(triggerId);
+							
+							returnString += "<triggerExecution><triggerId>" + triggerId + "</triggerId><status>";
+						  
+							if(success)
+								returnString += "success";
+							else
+								returnString += "trigger ID does not exist";
+							
+							returnString += "</status></triggerExecution>";
+						}
+					}
 				}
 			}
 
@@ -173,6 +196,8 @@ public class RequestParser
 				Float elevationOffset = location.getElev();
 				if(elevationOffset != null && elevationOffset != 0)
 					targetPosition.setY(targetPosition.getY() + elevationOffset);
+				
+				sim.scheduleDrawSphere(location.getId()  + "_sphere", targetPosition);
 				
 				// return translation (if requested)
 				if(location.getType().equals(TypeEnum.TRANSLATION) || location.getType().equals(TypeEnum.BOTH))

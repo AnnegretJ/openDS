@@ -770,6 +770,12 @@ public abstract class Car
 	}
 	
 	
+	public void setLayout(String layoutAlternativeName)
+	{
+		lightTexturesContainer.setLayoutAlternative(layoutAlternativeName);
+	}
+	
+	
 	public void setBrakeLight(boolean setToOn)
 	{
 		lightTexturesContainer.setBrakeLight(setToOn);

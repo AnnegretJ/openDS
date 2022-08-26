@@ -807,6 +807,63 @@ public class InteractionMethods
 	
 	
 	/**
+	 * Creates a ChangeVehicleLayout trigger action to assign a layout (=set of textures) to the given 
+	 * traffic vehicle (or steering car if not set).
+	 * 
+	 * @param sim
+	 * 			Simulator.
+	 * 
+	 * @param delay
+	 * 			Amount of seconds (float) to wait before the TriggerAction will be executed.
+	 * 
+	 * @param repeat
+	 * 			Number of maximum repetitions (0 = infinite).
+	 * 
+	 * @param parameterList
+	 * 			List of additional parameters.
+	 * 
+	 * @return
+	 * 			ChangeVehicleLayout trigger action with name of the traffic object and layout name.
+	 */
+	@Action(
+			name = "changeVehicleLayout",
+			layer = Layer.SCENARIO,
+			description = "Assigns a layout to the given traffic object",
+			defaultDelay = 0,
+			defaultRepeat = 0,
+			param = {@Parameter(name="trafficObjectID", type="String", defaultValue="null", 
+								description="ID of the traffic vehicle to assign layout. "
+										+ "If not set, steering car will be used instead"),
+					 @Parameter(name="layoutName", type="String", defaultValue="null", 
+								description="Name of the layout")
+					}
+		)
+	public TriggerAction changeVehicleLayout(SimulationBasics sim, float delay, int repeat, Properties parameterList)
+	{
+		String parameter = "";
+		
+		try {
+			
+			// read ID of traffic object (if null --> apply trigger action to steering car instead)
+			parameter = "trafficObjectID";
+			String trafficObjectID = parameterList.getProperty(parameter);
+			
+			// extract layout name
+			parameter = "layoutName";
+			String layoutName = parameterList.getProperty(parameter);
+			
+			// create ChangeVehicleLayoutTriggerAction
+			return new ChangeVehicleLayoutTriggerAction(sim, delay, repeat, trafficObjectID, layoutName);
+			
+		} catch (Exception e) {
+			
+			reportError("changeVehicleLayout", parameter);
+			return null;
+		}
+	}
+	
+	
+	/**
 	 * Creates a PresentationTask trigger action by parsing the node list for SIM-TD
 	 * presentation models. As soon as the trigger is hit, the presentation task
 	 * will be displayed in the HMI GUI.

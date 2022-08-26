@@ -744,8 +744,10 @@ public class OpenDRIVECar extends Car implements TrafficObject
 				int lane_trigger = triggerPos.getLane();
 				double s_trigger = triggerPos.getS();
 
-				if(roadID_trigger.equals(roadID_car) && lane_trigger == lane_car && (Math.abs(s_trigger-s_car) < 0.5d))
-					TriggerCenter.performTrigger(item.getValue());
+				if(roadID_trigger.equals(roadID_car) && (Math.abs(s_trigger-s_car) < 0.5d))
+					// either trigger when car is in given lane or when lane_trigger == 0 and car is in any lane 
+					if(lane_trigger == lane_car || lane_trigger == 0)
+						TriggerCenter.performTrigger(item.getValue());
 			}
 		}
 	}

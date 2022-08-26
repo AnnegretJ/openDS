@@ -1,0 +1,50 @@
+<lightTextures>
+	<layoutAlternative name="gray">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="gray_allOff.jpg" />
+			<leftTurn texture="gray_leftTurn.jpg" />
+			<rightTurn texture="gray_rightTurn.jpg" />
+			<hazardLights texture="gray_hazardLights.jpg" />
+			<brakeLights texture="gray_brakeLights.jpg" />
+			<leftTurnBrakeLights texture="gray_leftTurnBrakeLights.jpg" />
+			<rightTurnBrakeLights texture="gray_rightTurnBrakeLights.jpg" />
+			<hazardLightsBrakeLights texture="gray_hazardLightsBrakeLights.jpg" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="blue">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="blue_allOff.jpg" />
+			<leftTurn texture="blue_leftTurn.jpg" />
+			<rightTurn texture="blue_rightTurn.jpg" />
+			<hazardLights texture="blue_hazardLights.jpg" />
+			<brakeLights texture="blue_brakeLights.jpg" />
+			<leftTurnBrakeLights texture="blue_leftTurnBrakeLights.jpg" />
+			<rightTurnBrakeLights texture="blue_rightTurnBrakeLights.jpg" />
+			<hazardLightsBrakeLights texture="blue_hazardLightsBrakeLights.jpg" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="purple">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="purple_allOff.jpg" />
+			<leftTurn texture="purple_leftTurn.jpg" />
+			<rightTurn texture="purple_rightTurn.jpg" />
+			<hazardLights texture="purple_hazardLights.jpg" />
+			<brakeLights texture="purple_brakeLights.jpg" />
+			<leftTurnBrakeLights texture="purple_leftTurnBrakeLights.jpg" />
+			<rightTurnBrakeLights texture="purple_rightTurnBrakeLights.jpg" />
+			<hazardLightsBrakeLights texture="purple_hazardLightsBrakeLights.jpg" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="red">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="red_allOff.jpg" />
+			<leftTurn texture="red_leftTurn.jpg" />
+			<rightTurn texture="red_rightTurn.jpg" />
+			<hazardLights texture="red_hazardLights.jpg" />
+			<brakeLights texture="red_brakeLights.jpg" />
+			<leftTurnBrakeLights texture="red_leftTurnBrakeLights.jpg" />
+			<rightTurnBrakeLights texture="red_rightTurnBrakeLights.jpg" />
+			<hazardLightsBrakeLights texture="red_hazardLightsBrakeLights.jpg" />
+		</position>
+	</layoutAlternative>
+</lightTextures>

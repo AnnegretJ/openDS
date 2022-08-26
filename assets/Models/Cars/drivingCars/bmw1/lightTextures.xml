@@ -1,12 +1,62 @@
 <lightTextures>
-	<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
-		<allOff texture="bmw1.png" />
-		<leftTurn texture="bmw1_left.png" />
-		<rightTurn texture="bmw1_right.png" />
-		<hazardLights texture="bmw1_hazard.png" />
-		<brakeLights texture="bmw1_brake.png" />
-		<leftTurnBrakeLights texture="bmw1_left_brake.png" />
-		<rightTurnBrakeLights texture="bmw1_right_brake.png" />
-		<hazardLightsBrakeLights texture="bmw1_hazard_brake.png" />
-	</position>
+	<layoutAlternative name="black">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="bmw1.png" />
+			<leftTurn texture="bmw1_left.png" />
+			<rightTurn texture="bmw1_right.png" />
+			<hazardLights texture="bmw1_hazard.png" />
+			<brakeLights texture="bmw1_brake.png" />
+			<leftTurnBrakeLights texture="bmw1_left_brake.png" />
+			<rightTurnBrakeLights texture="bmw1_right_brake.png" />
+			<hazardLightsBrakeLights texture="bmw1_hazard_brake.png" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="silver">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="bmw2.png" />
+			<leftTurn texture="bmw2_left.png" />
+			<rightTurn texture="bmw2_right.png" />
+			<hazardLights texture="bmw2_hazard.png" />
+			<brakeLights texture="bmw2_brake.png" />
+			<leftTurnBrakeLights texture="bmw2_left_brake.png" />
+			<rightTurnBrakeLights texture="bmw2_right_brake.png" />
+			<hazardLightsBrakeLights texture="bmw2_hazard_brake.png" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="bronze">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="bmw3.png" />
+			<leftTurn texture="bmw3_left.png" />
+			<rightTurn texture="bmw3_right.png" />
+			<hazardLights texture="bmw3_hazard.png" />
+			<brakeLights texture="bmw3_brake.png" />
+			<leftTurnBrakeLights texture="bmw3_left_brake.png" />
+			<rightTurnBrakeLights texture="bmw3_right_brake.png" />
+			<hazardLightsBrakeLights texture="bmw3_hazard_brake.png" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="gold">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="bmw4.png" />
+			<leftTurn texture="bmw4_left.png" />
+			<rightTurn texture="bmw4_right.png" />
+			<hazardLights texture="bmw4_hazard.png" />
+			<brakeLights texture="bmw4_brake.png" />
+			<leftTurnBrakeLights texture="bmw4_left_brake.png" />
+			<rightTurnBrakeLights texture="bmw4_right_brake.png" />
+			<hazardLightsBrakeLights texture="bmw4_hazard_brake.png" />
+		</position>
+	</layoutAlternative>
+	<layoutAlternative name="red">
+		<position path="chassis/chassis-entity/Chassis-ogremesh/Chassis-geom-1" >
+			<allOff texture="bmw5.png" />
+			<leftTurn texture="bmw5_left.png" />
+			<rightTurn texture="bmw5_right.png" />
+			<hazardLights texture="bmw5_hazard.png" />
+			<brakeLights texture="bmw5_brake.png" />
+			<leftTurnBrakeLights texture="bmw5_left_brake.png" />
+			<rightTurnBrakeLights texture="bmw5_right_brake.png" />
+			<hazardLightsBrakeLights texture="bmw5_hazard_brake.png" />
+		</position>
+	</layoutAlternative>
 </lightTextures>
