@@ -197,8 +197,6 @@ public class RequestParser
 				if(elevationOffset != null && elevationOffset != 0)
 					targetPosition.setY(targetPosition.getY() + elevationOffset);
 				
-				sim.scheduleDrawSphere(location.getId()  + "_sphere", targetPosition);
-				
 				// return translation (if requested)
 				if(location.getType().equals(TypeEnum.TRANSLATION) || location.getType().equals(TypeEnum.BOTH))
 					locationString += "\t<translation>\r\n" +
