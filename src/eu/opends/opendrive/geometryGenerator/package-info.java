@@ -5,5 +5,5 @@
 // Generiert: 2018.04.13 um 02:21:13 PM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://opends.eu/geometryDescription", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://opends.eu/geometryDescription", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.opends.opendrive.geometryGenerator;

@@ -1,6 +1,6 @@
 /*
 *  This file is part of OpenDS (Open Source Driving Simulator).
-*  Copyright (C) 2021 Rafael Math
+*  Copyright (C) 2023 Rafael Math
 *
 *  OpenDS is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@ package eu.opends.settingsController.liveDataRequest;
 import java.io.File;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -71,7 +71,7 @@ public class RequestParser
 			Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(schemaFile));
 			jaxbUnmarshaller.setSchema(schema);
 		
-		} catch (javax.xml.bind.UnmarshalException e){
+		} catch (jakarta.xml.bind.UnmarshalException e){
 			
 			System.err.println(e.getLinkedException().toString());
 			

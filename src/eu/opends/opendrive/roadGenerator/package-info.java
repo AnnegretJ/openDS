@@ -5,5 +5,5 @@
 // Generated on: 2018.11.22 at 03:20:44 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://opends.eu/roadDescription", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://opends.eu/roadDescription", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.opends.opendrive.roadGenerator;

@@ -1,6 +1,6 @@
 /*
 *  This file is part of OpenDS (Open Source Driving Simulator).
-*  Copyright (C) 2021 Rafael Math
+*  Copyright (C) 2023 Rafael Math
 *
 *  OpenDS is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -279,6 +279,7 @@ public class InternalMapProcessing
 		
 		Node physicsNode = new Node(mapObject.getName() + "_physicsNode");
     	physicsNode.attachChild(spatial);
+    	spatial.setLocalScale(mapObject.getScale());
     	
     	Node visualNode = new Node(mapObject.getName());
     	visualNode.attachChild(physicsNode);
@@ -306,7 +307,6 @@ public class InternalMapProcessing
 			}
 		}
 
-    	visualNode.setLocalScale(mapObject.getScale());
         visualNode.updateModelBound();
         
         
