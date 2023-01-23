@@ -1,0 +1,18 @@
+Driver: TestDriver
+Driving Task: track.xml
+Start Time: 2023-01-22 14:47:17.493
+
+2023-01-22 14:47:31.006 --> Auto Pilot on
+2023-01-22 14:47:34.911 --> Auto Pilot off
+2023-01-22 14:47:45.544 --> Auto Pilot on
+2023-01-22 14:47:46.809 --> Auto Pilot off
+2023-01-22 14:47:47.407 --> Auto Pilot on
+2023-01-22 14:47:47.582 --> Auto Pilot off
+2023-01-22 14:47:47.731 --> Auto Pilot on
+2023-01-22 14:47:47.986 --> Auto Pilot off
+2023-01-22 14:47:48.678 --> Auto Pilot on
+2023-01-22 14:47:49.267 --> Auto Pilot off
+2023-01-22 14:47:50.043 --> Auto Pilot on
+2023-01-22 14:47:50.419 --> Auto Pilot off
+2023-01-22 14:47:51.198 --> Auto Pilot on
+2023-01-22 14:47:51.545 --> Auto Pilot off
