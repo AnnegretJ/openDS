@@ -69,7 +69,7 @@
 		<sendToCodriver>false</sendToCodriver>
 		<updateRate>0.045</updateRate>
 		<useReferenceLane>true</useReferenceLane>
-		<showMessageBox>true</showMessageBox>
+		<showMessageBox>false</showMessageBox>
 		<printStatusMsg>false</printStatusMsg>
 		<printCSVMsg>false</printCSVMsg>
 		<rangeOfTrajectoryForecast>200</rangeOfTrajectoryForecast>

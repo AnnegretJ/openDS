@@ -1,5 +1,0 @@
-Driver: TestDriver
-Driving Task: init_drive.xml
-Start Time: 2023-01-22 14:50:28.613
-
-2023-01-22 14:50:46.096 --> Auto Pilot on

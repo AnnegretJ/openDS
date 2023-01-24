@@ -2,7 +2,7 @@
 <OpenDRIVE>
     <header revMajor="1" revMinor="1" name="openDrive" version="1.00" date="2019-11-18_15-12-13" north="1.9000000000000000e+03" south="-1.1500000000000000e+03" east="3.3000000000000000e+03" west="-4.8000000000000000e+02">
     </header>
-    <road name="s000" length="1000.0" id="s000" junction="-1">
+    <road name="s000" length="800.0" id="s000" junction="-1">
         <link>
 			<successor elementType="road" elementId="s001" contactPoint="start" />	
         </link>

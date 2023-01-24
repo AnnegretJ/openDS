@@ -19,8 +19,8 @@
         	</tires>
         	<engine>
         		<engineOn>true</engineOn>
-        		<minSpeed>0</minSpeed>
-				<maxSpeed>180</maxSpeed>
+        		<minSpeed>70</minSpeed>
+				<maxSpeed>70</maxSpeed>
 				<acceleration>3.3</acceleration>
 				<minRPM>750</minRPM>
 				<maxRPM>7500</maxRPM>
@@ -69,22 +69,99 @@
 			<animationStand>Stand</animationStand>
 			<animationWalk>WalkBaked</animationWalk>
 			<scale>0.9</scale>
-			<minDistanceFromPath>1.0</minDistanceFromPath>
-			<maxDistanceFromPath>1.1</maxDistanceFromPath>
+			<minDistanceFromPath>0.0</minDistanceFromPath>
+			<maxDistanceFromPath>1.0</maxDistanceFromPath>
 			<startWayPoint>pedestrian01_startWP</startWayPoint>
-			<enabled>false</enabled>
+			<enabled>true</enabled>
+			<resetWhenStuck>false</resetWhenStuck>
+		</pedestrian>
+		<pedestrian id="pedestrian02">
+			<modelPath>Models/Humans/female/female.scene</modelPath>
+			<mass>5</mass>
+			<animationStand>Stand</animationStand>
+			<animationWalk>WalkBaked</animationWalk>
+			<scale>0.9</scale>
+			<minDistanceFromPath>0.0</minDistanceFromPath>
+			<maxDistanceFromPath>1.0</maxDistanceFromPath>
+			<startWayPoint>pedestrian02_startWP</startWayPoint>
+			<enabled>true</enabled>
+			<resetWhenStuck>false</resetWhenStuck>
+		</pedestrian>
+		<pedestrian id="pedestrian03">
+			<modelPath>Models/Humans/female/female.scene</modelPath>
+			<mass>5</mass>
+			<animationStand>Stand</animationStand>
+			<animationWalk>WalkBaked</animationWalk>
+			<scale>0.9</scale>
+			<minDistanceFromPath>0.0</minDistanceFromPath>
+			<maxDistanceFromPath>1.0</maxDistanceFromPath>
+			<startWayPoint>pedestrian03_startWP</startWayPoint>
+			<enabled>true</enabled>
+			<resetWhenStuck>false</resetWhenStuck>
+		</pedestrian>
+		<pedestrian id="pedestrian04">
+			<modelPath>Models/Humans/female/female.scene</modelPath>
+			<mass>5</mass>
+			<animationStand>Stand</animationStand>
+			<animationWalk>WalkBaked</animationWalk>
+			<scale>0.9</scale>
+			<minDistanceFromPath>0.0</minDistanceFromPath>
+			<maxDistanceFromPath>1.0</maxDistanceFromPath>
+			<startWayPoint>pedestrian04_startWP</startWayPoint>
+			<enabled>true</enabled>
+			<resetWhenStuck>false</resetWhenStuck>
+		</pedestrian>
+		<pedestrian id="pedestrian05">
+			<modelPath>Models/Humans/female/female.scene</modelPath>
+			<mass>5</mass>
+			<animationStand>Stand</animationStand>
+			<animationWalk>WalkBaked</animationWalk>
+			<scale>0.9</scale>
+			<minDistanceFromPath>0.0</minDistanceFromPath>
+			<maxDistanceFromPath>1.0</maxDistanceFromPath>
+			<startWayPoint>pedestrian05_startWP</startWayPoint>
+			<enabled>true</enabled>
+			<resetWhenStuck>false</resetWhenStuck>
+		</pedestrian>
+		<pedestrian id="pedestrian06">
+			<modelPath>Models/Humans/female/female.scene</modelPath>
+			<mass>5</mass>
+			<animationStand>Stand</animationStand>
+			<animationWalk>WalkBaked</animationWalk>
+			<scale>0.9</scale>
+			<minDistanceFromPath>0.0</minDistanceFromPath>
+			<maxDistanceFromPath>1.0</maxDistanceFromPath>
+			<startWayPoint>pedestrian06_startWP</startWayPoint>
+			<enabled>true</enabled>
 			<resetWhenStuck>false</resetWhenStuck>
 		</pedestrian>
     </traffic>
         
-    <road>
+   <road>
 		<wayPoints debug="false" alignToTerrain="true">
-			<wayPoint id="pedestrian01_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>10.0</entry><entry>0.0</entry><entry>8.46488</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian01_target_1_1"><translation><vector jtype="java_lang_Float" size="3"><entry>9.0</entry><entry>0.0</entry><entry>8.46488</entry></vector></translation></wayPoint>
+		<!-- lower negative for first entry = further down the road; higher positive for third entry = further left, lower positive for third entry = further right -->
+			<wayPoint id="pedestrian01_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-800</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-800</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian02_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-900</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian02_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-900</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian03_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1000</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian03_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1000</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian04_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1100</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian04_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1100</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian05_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1200</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian05_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1200</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian06_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1300</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian06_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1300</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
 		</wayPoints>
 		<segments debug="false">
-			<segment id="Segment_pedestrian01_1"><from>pedestrian01_startWP</from><to>pedestrian01_target_1_1</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian01_1"><from>pedestrian01_startWP</from><to>pedestrian01_right1</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian02_1"><from>pedestrian02_startWP</from><to>pedestrian02_right1</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian03_1"><from>pedestrian03_startWP</from><to>pedestrian03_right1</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian04_1"><from>pedestrian04_startWP</from><to>pedestrian04_right1</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian05_1"><from>pedestrian05_startWP</from><to>pedestrian05_right1</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
+			<segment id="Segment_pedestrian06_1"><from>pedestrian06_startWP</from><to>pedestrian06_right1</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
 		</segments>
+
     </road>
 
 

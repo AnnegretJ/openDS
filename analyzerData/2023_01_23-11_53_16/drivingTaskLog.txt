@@ -1,4 +1,0 @@
-Driver: TestDriver
-Driving Task: init_drive.xml
-Start Time: 2023-01-23 11:53:19.338
-

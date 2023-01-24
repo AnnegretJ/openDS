@@ -7,23 +7,6 @@
 	</activities>
 	
 	<triggers>
-		<trigger id="start_pedestrian01" priority="1">
-			<activities>
-				<activity id="start_pedestrian01">
-					<action id="moveTraffic" delay="0" repeat="0">
-						<parameter name="trafficObjectID" value="pedestrian01" />
-						<parameter name="enabled" value="true" />
-					</action>
-				</activity>
-			</activities>
-			<condition>
-				<openDrivePos>
-					<roadID>s000</roadID>
-					<lane>-1</lane>
-					<s>32.0</s>
-				</openDrivePos>
-			</condition>
-		</trigger>
 		<trigger id="stop_car01_trigger" priority="1">
 			<activities>
 				<activity id="stop_car01">
@@ -37,7 +20,7 @@
 				<openDrivePos>
 					<roadID>s001</roadID>
 					<lane>-1</lane>
-					<s>50.0</s>
+					<s>70.0</s>
 				</openDrivePos>
 			</condition>
 		</trigger>
