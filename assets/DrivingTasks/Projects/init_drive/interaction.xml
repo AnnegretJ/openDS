@@ -4,23 +4,130 @@
         xsi:schemaLocation="http://opends.eu/drivingtask/interaction ../../Schema/interaction.xsd">
 
 	<activities>
+		<activity id="change_lane_left">
+			<action id="setAutoPilot" delay="0" repeat="1">
+				<parameter name="isEnabled" value="true"/>
+			</action>
+			<action id="playSound" delay="0" repeat="1">
+				<parameter name="soundID" value="beep"/>
+			</action>
+			<action id="changeLaneODCar" delay="0" repeat="1">
+				<parameter name="delay" value="0.0"/>
+				<parameter name="maxRepeat" value="1"/>
+				<parameter name="trafficObjectName" value="null"/>
+				<parameter name="lanePos" value="Left"/>
+			</action>
+			<action id="setAutoPilot" delay="5" repeat="1">
+				<parameter name="isEnabled" value="false"/>
+			</action>
+		</activity>
+		<activity id="change_lane_right">
+			<action id="setAutoPilot" delay="0" repeat="1">
+				<parameter name="isEnabled" value="true"/>
+			</action>
+			<action id="playSound" delay="0" repeat="1">
+				<parameter name="soundID" value="beep"/>
+			</action>
+			<action id="changeLaneODCar" delay="0" repeat="1">
+				<parameter name="delay" value="0.0"/>
+				<parameter name="maxRepeat" value="1"/>
+				<parameter name="trafficObjectName" value="null"/>
+				<parameter name="lanePos" value="Right"/>
+			</action>
+			<action id="setAutoPilot" delay="5" repeat="1">
+				<parameter name="isEnabled" value="false"/>
+			</action>
+		</activity>
+		<activity id="stop">
+			<action id="shutDownSimulation" delay="0" repeat="1">
+			</action>
+		</activity>
+		<activity id="steer_right">
+			<action id="setAutoPilot" delay="0" repeat="100">
+				<parameter name="isEnabled" value="true"/>
+			</action>
+			<action id="changeLaneODCar" delay="0" repeat="100">
+				<parameter name="delay" value="0.0"/>
+				<parameter name="maxRepeat" value="100"/>
+				<parameter name="trafficObjectName" value="null"/>
+				<parameter name="lanePos" value="Right"/>
+			</action>
+			<action id="setAutoPilot" delay="5" repeat="100">
+				<parameter name="isEnabled" value="false"/>
+			</action>
+		</activity>
+		<activity id="steer_left">
+			<action id="setAutoPilot" delay="0" repeat="100">
+				<parameter name="isEnabled" value="true"/>
+			</action>
+			<action id="changeLaneODCar" delay="0" repeat="100">
+				<parameter name="delay" value="0.0"/>
+				<parameter name="maxRepeat" value="100"/>
+				<parameter name="trafficObjectName" value="null"/>
+				<parameter name="lanePos" value="Left"/>
+			</action>
+			<action id="setAutoPilot" delay="5" repeat="100">
+				<parameter name="isEnabled" value="false"/>
+			</action>
+		</activity>
 	</activities>
-	
+
 	<triggers>
-		<trigger id="stop_car01_trigger" priority="1">
+		<trigger id="go_left" priority="1">
 			<activities>
-				<activity id="stop_car01">
-					<action id="moveTraffic" delay="0" repeat="0">
-						<parameter name="trafficObjectID" value="car01" />
-						<parameter name="engineOn" value="false" />
-					</action>
+				<activity ref="steer_left">
 				</activity>
 			</activities>
 			<condition>
+				<pressKey>
+					<key>KEY_A</key>
+				</pressKey>
+			</condition>
+		</trigger>
+		<trigger id="go_right" priority="1">
+			<activities>
+				<activity ref="steer_right">
+				</activity>
+			</activities>
+			<condition>
+				<pressKey>
+					<key>KEY_D</key>
+				</pressKey>
+			</condition>
+		</trigger>
+		<trigger id="end_simulation" priority="1">
+			<activities>
+				<activity ref="stop"/>
+			</activities>
+			<condition>
 				<openDrivePos>
-					<roadID>s001</roadID>
+					<roadID>s000</roadID>
+					<lane>1</lane>
+					<s>1422.0</s>
+				</openDrivePos>
+			</condition>
+		</trigger>
+		<trigger id="end_simulation" priority="1">
+			<activities>
+				<activity ref="stop"/>
+			</activities>
+			<condition>
+				<openDrivePos>
+					<roadID>s000</roadID>
 					<lane>-1</lane>
-					<s>70.0</s>
+					<s>1422.0</s>
+				</openDrivePos>
+			</condition>
+		</trigger>
+		<trigger id="end_simulation" priority="1">
+			<activities>
+				<activity ref="stop"/>
+			</activities>
+			<condition>
+				<openDrivePos>
+					<roadID>s000</roadID>
+					<lane>-2</lane>
+					<s>1422.0</s>
 				</openDrivePos>
 			</condition>
 		</trigger>

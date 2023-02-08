@@ -1,4 +1,0 @@
-WayPoint_;null;0,0,0;0,0,0;0.4,0.4,0.4;
-SpeedLimit30_;Models/RoadSigns/speedLimits/speedLimit30/speedLimit30.scene;4,-0.5,0;0,0,0;1,1,1;
-SpeedLimit50_;Models/RoadSigns/speedLimits/speedLimit50/speedLimit50.scene;4,-0.5,0;0,0,0;1,1,1;
-SpeedLimit80_;Models/RoadSigns/speedLimits/speedLimit80/speedLimit80.scene;4,-0.5,0;0,0,0;1,1,1;

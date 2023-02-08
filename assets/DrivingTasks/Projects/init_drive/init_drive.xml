@@ -3,7 +3,7 @@
 <properties>
 <comment></comment>
 <entry key="interaction">interaction.xml</entry>
-<entry key="verbose">false</entry>
+<entry key="verbose">falsse</entry>
 <entry key="scenario">scenario.xml</entry>
 <entry key="settings">settings.xml</entry>
 <entry key="scene">scene.xml</entry>

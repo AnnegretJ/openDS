@@ -7,7 +7,7 @@
        	<weather>
             <snowingPercentage>-1</snowingPercentage>
        		<rainingPercentage>-1</rainingPercentage>
-       		<fogPercentage>30</fogPercentage>
+       		<fogPercentage>60</fogPercentage>
        	</weather>
     </environment>
 		
@@ -19,8 +19,8 @@
         	</tires>
         	<engine>
         		<engineOn>true</engineOn>
-        		<minSpeed>70</minSpeed>
-				<maxSpeed>70</maxSpeed>
+        		<minSpeed>50</minSpeed>
+				<maxSpeed>50</maxSpeed>
 				<acceleration>3.3</acceleration>
 				<minRPM>750</minRPM>
 				<maxRPM>7500</maxRPM>
@@ -51,8 +51,8 @@
         		<frictionSlip>50</frictionSlip>
         	</wheel>
         	<brake>
-        		<decelerationFreeWheel>2.0</decelerationFreeWheel>
-        		<decelerationBrake>8.7</decelerationBrake>
+        		<decelerationFreeWheel>0.0</decelerationFreeWheel>
+        		<decelerationBrake>0.0</decelerationBrake>
         	</brake>
         </car>
 		<openDrive>
@@ -140,18 +140,18 @@
    <road>
 		<wayPoints debug="false" alignToTerrain="true">
 		<!-- lower negative for first entry = further down the road; higher positive for third entry = further left, lower positive for third entry = further right -->
-			<wayPoint id="pedestrian01_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-800</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian01_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-800</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian02_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-900</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian02_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-900</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian03_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1000</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian03_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1000</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian04_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1100</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian04_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1100</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian05_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1200</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian05_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1200</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian06_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1300</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
-			<wayPoint id="pedestrian06_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1300</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-700</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian01_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-700</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian02_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-950</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian02_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-950</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian03_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1200</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian03_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1200</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian04_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1450</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian04_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1450</entry><entry>-50</entry><entry>98.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian05_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1700</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian05_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1700</entry><entry>-50</entry><entry>101.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian06_startWP"><translation><vector jtype="java_lang_Float" size="3"><entry>-1950</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
+			<wayPoint id="pedestrian06_right1"><translation><vector jtype="java_lang_Float" size="3"><entry>-1950</entry><entry>-50</entry><entry>96.5</entry></vector></translation></wayPoint>
 		</wayPoints>
 		<segments debug="false">
 			<segment id="Segment_pedestrian01_1"><from>pedestrian01_startWP</from><to>pedestrian01_right1</to><speed>0.0</speed><jump>false</jump><probability>1</probability></segment>
@@ -164,6 +164,4 @@
 
     </road>
 
-
-     
 </scenario>

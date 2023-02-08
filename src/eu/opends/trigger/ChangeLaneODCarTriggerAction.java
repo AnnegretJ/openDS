@@ -45,7 +45,7 @@ public class ChangeLaneODCarTriggerAction extends TriggerAction
 	 * 
 	 * @param delay
 	 * 			Amount of seconds (float) to wait before the TriggerAction will be executed.
-	 * 
+	 *
 	 * @param maxRepeat
 	 * 			Number of maximum recurrences
 	 * 
